@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BioSCADA AI — Build Studio</title>
+<title>SENTRA — Streaming Event‑driven Network of Threshold Response Agents</title>
 <style>
 :root{
   --ink:#07171c;--panel:#0c242b;--panel2:#0e2a32;--deep:#0F3D3E;--teal:#126E82;
@@ -223,8 +223,8 @@ a.dl{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)
 </head>
 <body>
 <div class="topbar">
-  <div class="logo">B</div>
-  <div class="brand"><b>BioSCADA AI</b><span>BUILD STUDIO</span></div>
+  <div class="logo">S</div>
+  <div class="brand"><b>SENTRA</b><span>THRESHOLD RESPONSE AGENTS</span></div>
   <div class="top-status">
     <span id="apiPill" class="pill off"><span class="dot"></span> <span id="apiTxt">connecting…</span></span>
     <span id="kbPill" class="pill"><span class="dot"></span> <span id="kbTxt">KB —</span></span>
@@ -375,33 +375,100 @@ const VIEWS = {}, AFTER = {};
 
 /* ---------- STEP 0: OVERVIEW ---------- */
 VIEWS.overview = () => `
-  <div class="eyebrow"><span class="n">STEP 0</span> Pipeline</div>
-  <h1>From sensor telemetry to a signed corrective action</h1>
-  <p class="lead">This studio walks the full BioSCADA AI pipeline end to end — upload the parameter datasets, train a predictive model per parameter, stream a model-driven breach into Kafka, let the responsible agent decompose the question and retrieve grounded remedies, then gate the action behind a human e-signature. Every step below runs against the real services when the API is live.</p>
-  <div class="card">
-    <h3><span class="ic">🗺️</span> The flow<span class="tag">13 steps · 6 phases</span></h3>
-    <div class="pipe">
-      ${[
-        ["Ingest","Upload 1–5 datasets; each parameter carries hardcoded control / alarm / trip bands."],
-        ["Model","Train one model per parameter (GBM · RF · SVM · ANN). The prediction becomes the trigger + context."],
-        ["Stream","All parameters stream into Kafka; a predicted breach is flagged RED with its drivers as the “why”."],
-        ["Agents","Five parameter agents + one human-escalation agent, coordinated by an orchestrator."],
-        ["Flink","Flink SQL decomposes the stream — window, aggregate, score, filter — emitting “breach + why”."],
-        ["RAG","The breach becomes a query; the LLM splits it into SOP / CAPA / OEM sub-queries and retrieves."],
-        ["Govern","The human agent applies a 21 CFR Part 11 e-signature; the action commits to a WORM audit."],
-      ].map(([p,d],i)=>`<div class="pipe-op ${i===0?'active':''}">
-        <div class="pipe-dot">${i+1}</div>
-        <div class="pipe-body"><div class="pipe-nm">${p}</div><div class="pipe-dt">${d}</div></div></div>`).join('')}
+  <div class="eyebrow"><span class="n">SENTRA</span> PLATFORM OVERVIEW</div>
+  <h1 style="font-size:28px;letter-spacing:-.5px;margin-bottom:10px">SENTRA — Streaming Event‑driven Network of Threshold Response Agents</h1>
+  <p class="lead" style="max-width:880px"><b>SENTRA</b> is an enterprise-grade multi-agent SCADA & industrial telemetry intelligence platform. It elevates traditional Predictive Maintenance (PdM) from passive failure forecasting into an autonomous, real-time agentic network across biomanufacturing, water treatment, chemical processing, cleanroom HVAC, and smart power grids.</p>
+  
+  <!-- HERO ARCHITECTURE IMAGE & CTA -->
+  <div class="card" style="padding:20px;background:linear-gradient(135deg,rgba(18,110,130,.28),rgba(7,23,28,.9));border:1px solid var(--cyan)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3><span class="ic">⚡</span> System Architecture & Agentic Flow<span class="tag">SENTRA v1.0</span></h3>
+      <button class="btn primary" style="padding:10px 22px;font-size:13.5px;box-shadow:0 0 20px rgba(43,179,192,.5)" onclick="go(1)">Start Journey →</button>
+    </div>
+    <div style="position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line2);box-shadow:0 12px 36px rgba(0,0,0,.6)">
+      <img src="./sentra_architecture.jpg" alt="SENTRA Architecture Diagram" style="width:100%;height:auto;max-height:440px;display:block;object-fit:cover">
+      <div style="position:absolute;bottom:12px;left:12px;right:12px;background:rgba(7,23,28,.88);backdrop-filter:blur(10px);padding:10px 16px;border-radius:8px;border:1px solid var(--line2);display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span class="chip sop">⚡ Real-time Telemetry</span>
+        <span class="chip capa">🧠 PdM ML Zoo</span>
+        <span class="chip oem">🌊 Flink SQL Stream</span>
+        <span class="chip sop">🤖 Multi-Agent RAG</span>
+        <span class="chip capa">🛡️ 21 CFR Part 11 Governance</span>
+      </div>
     </div>
   </div>
+
+  <!-- TECH & TOOLS STACK -->
+  <div class="card" style="margin-top:20px">
+    <h3><span class="ic">🛠️</span> Powered by Tech & Tools Stack<span class="tag">Production Grade</span></h3>
+    <div class="grid g5">
+      <div class="tile">
+        <div class="nm">Ingestion / Stream</div>
+        <div class="vl" style="font-size:15px;color:var(--cyan)">Apache Kafka</div>
+        <div class="bd">OPC-UA · MQTT · Schema Reg</div>
+      </div>
+      <div class="tile">
+        <div class="nm">Stream Processing</div>
+        <div class="vl" style="font-size:15px;color:var(--mint)">Apache Flink SQL</div>
+        <div class="bd">PyFlink · Tumbling Windows</div>
+      </div>
+      <div class="tile">
+        <div class="nm">Predictive Modelling</div>
+        <div class="vl" style="font-size:15px;color:var(--amber)">ML Model Zoo</div>
+        <div class="bd">GBM · RF · SVM · PyTorch ANN</div>
+      </div>
+      <div class="tile">
+        <div class="nm">Agentic RAG Engine</div>
+        <div class="vl" style="font-size:15px;color:var(--cyan)">Multi-Agent LLM</div>
+        <div class="bd">LangGraph · Qdrant · BGE-small</div>
+      </div>
+      <div class="tile">
+        <div class="nm">GxP Governance</div>
+        <div class="vl" style="font-size:15px;color:#ff8d76">OPA & E-Signature</div>
+        <div class="bd">OPA Rego · Part 11 · WORM Audit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERALL ARCHITECTURE CARDS -->
+  <div style="margin:24px 0 14px">
+    <h2 style="font-size:19px;color:#fff;font-weight:700">Overall Architecture in 6 Core Pillars</h2>
+    <p style="font-size:12.5px;color:var(--slate)">SENTRA's event-driven pipeline continuously transforms raw sensor feeds into governed corrective actions:</p>
+  </div>
+
   <div class="grid g3">
-    <div class="card" style="margin:0"><h3><span class="ic">🎯</span> Dependent</h3>
-      <div class="note">The five SCADA parameters are the <b>dependent variables</b> — what each agent protects.</div></div>
-    <div class="card" style="margin:0"><h3><span class="ic">📊</span> Independent</h3>
-      <div class="note">Their PdM features are the <b>independent variables</b> — what the model measures to forecast a breach.</div></div>
-    <div class="card" style="margin:0"><h3><span class="ic">🔍</span> The “why”</h3>
-      <div class="note">On a breach, those same features become the <b>“why”</b> carried into the RAG prompt.</div></div>
-  </div>`;
+    <div class="card" style="margin:0">
+      <h3><span class="ic">📥</span> 1. Multi-Domain Ingestion</h3>
+      <div class="note">Ingests live sensor telemetry across Biomanufacturing, Water Treatment, Chemical Processing, Cleanroom HVAC, and Smart Power Grids.</div>
+    </div>
+    <div class="card" style="margin:0">
+      <h3><span class="ic">🎚️</span> 2. Nested Band Ranges</h3>
+      <div class="note">Enforces validated Control (normal), Alarm (autonomous agent micro-adjustment), and Trip (mandatory QA escalation) boundaries.</div>
+    </div>
+    <div class="card" style="margin:0">
+      <h3><span class="ic">🧠</span> 3. PdM ML Forecasting</h3>
+      <div class="note">Scores independent variables using specialized ML models (GBM, RF, SVM, ANN) to forecast breach probability $P(\text{breach})$ and drivers.</div>
+    </div>
+    <div class="card" style="margin:0">
+      <h3><span class="ic">🌊</span> 4. Flink Relational Stream</h3>
+      <div class="note">Continuous Flink SQL operators (Window $\rightarrow$ Aggregate $\rightarrow$ Inline UDF Score $\rightarrow$ Filter) emit enriched breach events into Kafka.</div>
+    </div>
+    <div class="card" style="margin:0">
+      <h3><span class="ic">🤖</span> 5. Multi-Agent RAG Engine</h3>
+      <div class="note">Autonomous parameter agents decompose breach queries into SOP, CAPA, and OEM sub-queries, retrieving cited remedies from hybrid vector indexes.</div>
+    </div>
+    <div class="card" style="margin:0">
+      <h3><span class="ic">🛡️</span> 6. Zero-Trust Governance</h3>
+      <div class="note">Open Policy Agent (OPA) Rego rules enforce role-based e-signatures (21 CFR Part 11 / ISO 27001), committing immutable hash-chained audit trails.</div>
+    </div>
+  </div>
+
+  <!-- START JOURNEY CTA BANNER -->
+  <div class="card" style="margin-top:22px;text-align:center;padding:26px 20px;background:linear-gradient(180deg,#0a252c,#07171c);border-color:var(--teal)">
+    <h2 style="font-size:20px;color:#fff;margin-bottom:6px">Ready to Build & Step Through Your SENTRA Pipeline?</h2>
+    <p style="font-size:13px;color:var(--slate);margin-bottom:18px">Step through the 13-stage interactive studio from dataset upload to signed corrective actions.</p>
+    <button class="btn primary lg" style="padding:12px 28px;font-size:14px;font-weight:700" onclick="go(1)">Start Journey →</button>
+  </div>
+`;
 
 /* ---------- STEP 1: UPLOAD ---------- */
 VIEWS.upload = () => `
