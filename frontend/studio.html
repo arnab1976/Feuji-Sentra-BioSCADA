@@ -379,7 +379,6 @@ async function boot(){
   }
   go(0);
 }
-
 /* ================= RENDER DISPATCH ================= */
 function renderStep(id){
   const fn = VIEWS[id];
@@ -390,28 +389,28 @@ const VIEWS = {}, AFTER = {};
 
 /* ---------- STEP 0: OVERVIEW ---------- */
 VIEWS.overview = () => `
-  <div style="display:flex;flex-direction:column;gap:10px;padding:2px 0;max-height:calc(100vh - 80px);justify-content:space-between">
+  <div style="display:flex;flex-direction:column;gap:12px;height:calc(100vh - 75px);box-sizing:border-box">
     
     <!-- HEADER BAR -->
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(135deg,rgba(18,110,130,.25),rgba(7,23,28,.8));border:1px solid var(--line2);border-radius:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:linear-gradient(135deg,rgba(18,110,130,.3),rgba(7,23,28,.85));border:1px solid var(--cyan);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4)">
       <div>
-        <div class="eyebrow" style="margin-bottom:2px"><span class="n">SENTRA</span> PLATFORM OVERVIEW</div>
-        <h1 style="font-size:19px;letter-spacing:-.3px;margin:0;color:#fff">SENTRA — Streaming Event‑driven Network of Threshold Response Agents</h1>
-        <p style="font-size:11px;color:var(--slate);margin:2px 0 0">Cross-industry autonomous SCADA telemetry intelligence across Biomanufacturing, Water, Energy, Chemical & HVAC.</p>
+        <div class="eyebrow" style="margin-bottom:3px"><span class="n">SENTRA</span> PLATFORM OVERVIEW</div>
+        <h1 style="font-size:22px;letter-spacing:-.4px;margin:0;color:#fff;font-weight:800">SENTRA — Streaming Event‑driven Network of Threshold Response Agents</h1>
+        <p style="font-size:12px;color:var(--slate);margin:3px 0 0">Cross-industry autonomous SCADA telemetry intelligence across Biomanufacturing, Water, Energy, Chemical & HVAC.</p>
       </div>
-      <button class="btn primary lg" style="padding:9px 22px;font-size:13px;box-shadow:0 0 18px rgba(43,179,192,.45);white-space:nowrap;cursor:pointer" onclick="go(1)">Start Journey →</button>
+      <button class="btn primary lg" style="padding:12px 28px;font-size:14px;box-shadow:0 0 24px rgba(43,179,192,.55);white-space:nowrap;cursor:pointer;font-weight:700" onclick="go(1)">Start Journey →</button>
     </div>
 
-    <!-- MAIN 2-COLUMN DISPLAY (FIT IN VIEWPORT) -->
-    <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:10px;align-items:stretch">
+    <!-- MIDDLE 2-COLUMN SECTION (STRETCHED TO FILL VERTICAL SPACE) -->
+    <div style="flex:1;display:grid;grid-template-columns:1.15fr 0.85fr;gap:12px;min-height:0">
       
-      <!-- LEFT: ARCHITECTURE HERO VISUAL DIAGRAM -->
-      <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg,#0a242c,#07171c)">
-        <h3 style="font-size:11.5px;margin-bottom:8px;padding-bottom:6px"><span class="ic">⚡</span> Real-time System Architecture & Agentic Flow<span class="tag">SENTRA v1.0</span></h3>
+      <!-- LEFT: ARCHITECTURE VISUAL CARD -->
+      <div class="card" style="margin:0;padding:16px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg,#0a242c,#07171c);height:100%;box-sizing:border-box">
+        <h3 style="font-size:13px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)"><span class="ic">⚡</span> Real-time System Architecture & Agentic Flow<span class="tag">SENTRA v1.0</span></h3>
         
-        <!-- SVG DIAGRAM -->
-        <div style="background:#051317;border:1px solid var(--line2);border-radius:8px;padding:8px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:200px">
-          <svg viewBox="0 0 760 260" style="width:100%;height:100%;max-height:240px" xmlns="http://www.w3.org/2000/svg">
+        <!-- SVG SYSTEM DIAGRAM -->
+        <div style="background:#051317;border:1px solid var(--line2);border-radius:10px;padding:12px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:0">
+          <svg viewBox="0 0 760 260" style="width:100%;height:100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2BB3C0"/><stop offset="100%" stop-color="#126E82"/></linearGradient>
               <linearGradient id="gradMint" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8FD6BD"/><stop offset="100%" stop-color="#2FB387"/></linearGradient>
@@ -420,61 +419,61 @@ VIEWS.overview = () => `
             </defs>
 
             <!-- CONNECTOR LINES -->
-            <path d="M 120 130 L 160 130 M 270 130 L 310 130 M 420 130 L 460 130 M 580 130 L 620 130" stroke="#1d4d58" stroke-width="2.5" stroke-dasharray="5,4"/>
+            <path d="M 120 130 L 150 130 M 270 130 L 300 130 M 420 130 L 450 130 M 580 130 L 610 130" stroke="#2BB3C0" stroke-width="2.5" stroke-dasharray="6,4"/>
 
             <!-- NODE 1: TELEMETRY INGESTION -->
-            <g transform="translate(10, 75)">
-              <rect width="110" height="110" rx="8" fill="#081a1f" stroke="#2BB3C0" stroke-width="1.5"/>
-              <text x="55" y="24" fill="#2BB3C0" font-size="10.5" font-weight="bold" text-anchor="middle">1. INGESTION</text>
-              <rect x="10" y="34" width="90" height="20" rx="4" fill="#0d2e38"/>
-              <text x="55" y="48" fill="#8FD6BD" font-size="9" text-anchor="middle">Apache Kafka</text>
-              <text x="55" y="70" fill="#7C9A9A" font-size="8" text-anchor="middle">OPC-UA · MQTT</text>
-              <text x="55" y="86" fill="#E0A33E" font-size="8" text-anchor="middle">5 SCADA Parameters</text>
+            <g transform="translate(10, 70)">
+              <rect width="110" height="120" rx="8" fill="#081a1f" stroke="#2BB3C0" stroke-width="1.5"/>
+              <text x="55" y="24" fill="#2BB3C0" font-size="11" font-weight="bold" text-anchor="middle">1. INGESTION</text>
+              <rect x="10" y="34" width="90" height="22" rx="4" fill="#0d2e38"/>
+              <text x="55" y="49" fill="#8FD6BD" font-size="9.5" font-weight="bold" text-anchor="middle">Apache Kafka</text>
+              <text x="55" y="74" fill="#7C9A9A" font-size="8.5" text-anchor="middle">OPC-UA · MQTT</text>
+              <text x="55" y="94" fill="#E0A33E" font-size="8.5" font-weight="bold" text-anchor="middle">5 SCADA Feeds</text>
             </g>
 
             <!-- NODE 2: FLINK SQL STREAM -->
-            <g transform="translate(150, 75)">
-              <rect width="120" height="110" rx="8" fill="#081a1f" stroke="#8FD6BD" stroke-width="1.5"/>
-              <text x="60" y="24" fill="#8FD6BD" font-size="10.5" font-weight="bold" text-anchor="middle">2. FLINK SQL</text>
-              <rect x="10" y="34" width="100" height="20" rx="4" fill="#0e352b"/>
-              <text x="60" y="48" fill="#8FD6BD" font-size="9" text-anchor="middle">PyFlink UDF Score</text>
-              <text x="60" y="70" fill="#7C9A9A" font-size="8" text-anchor="middle">10s Tumbling Window</text>
-              <text x="60" y="86" fill="#2BB3C0" font-size="8" text-anchor="middle">Score p_breach > 0.3</text>
+            <g transform="translate(150, 70)">
+              <rect width="120" height="120" rx="8" fill="#081a1f" stroke="#8FD6BD" stroke-width="1.5"/>
+              <text x="60" y="24" fill="#8FD6BD" font-size="11" font-weight="bold" text-anchor="middle">2. FLINK SQL</text>
+              <rect x="10" y="34" width="100" height="22" rx="4" fill="#0e352b"/>
+              <text x="60" y="49" fill="#8FD6BD" font-size="9.5" font-weight="bold" text-anchor="middle">PyFlink UDF Score</text>
+              <text x="60" y="74" fill="#7C9A9A" font-size="8.5" text-anchor="middle">10s Tumbling Window</text>
+              <text x="60" y="94" fill="#2BB3C0" font-size="8.5" font-weight="bold" text-anchor="middle">Score p_breach > 0.3</text>
             </g>
 
             <!-- NODE 3: MODEL ZOO -->
-            <g transform="translate(300, 75)">
-              <rect width="120" height="110" rx="8" fill="#081a1f" stroke="#E0A33E" stroke-width="1.5"/>
-              <text x="60" y="24" fill="#E0A33E" font-size="10.5" font-weight="bold" text-anchor="middle">3. MODEL ZOO</text>
-              <rect x="10" y="34" width="100" height="20" rx="4" fill="#2c220f"/>
-              <text x="60" y="48" fill="#E0A33E" font-size="9" text-anchor="middle">GBM · RF · SVM · ANN</text>
-              <text x="60" y="70" fill="#7C9A9A" font-size="8" text-anchor="middle">DV / IV Correlation</text>
-              <text x="60" y="86" fill="#ff8d76" font-size="8" text-anchor="middle">Top Driver "Why"</text>
+            <g transform="translate(300, 70)">
+              <rect width="120" height="120" rx="8" fill="#081a1f" stroke="#E0A33E" stroke-width="1.5"/>
+              <text x="60" y="24" fill="#E0A33E" font-size="11" font-weight="bold" text-anchor="middle">3. MODEL ZOO</text>
+              <rect x="10" y="34" width="100" height="22" rx="4" fill="#2c220f"/>
+              <text x="60" y="49" fill="#E0A33E" font-size="9.5" font-weight="bold" text-anchor="middle">GBM · RF · SVM · ANN</text>
+              <text x="60" y="74" fill="#7C9A9A" font-size="8.5" text-anchor="middle">DV / IV Correlation</text>
+              <text x="60" y="94" fill="#ff8d76" font-size="8.5" font-weight="bold" text-anchor="middle">Top Driver "Why"</text>
             </g>
 
             <!-- NODE 4: MULTI-AGENT RAG -->
-            <g transform="translate(450, 75)">
-              <rect width="130" height="110" rx="8" fill="#081a1f" stroke="#2BB3C0" stroke-width="1.5" filter="url(#glow)"/>
-              <text x="65" y="24" fill="#2BB3C0" font-size="10.5" font-weight="bold" text-anchor="middle">4. AGENT RAG</text>
-              <rect x="10" y="34" width="110" height="20" rx="4" fill="#0d2e38"/>
-              <text x="65" y="48" fill="#2BB3C0" font-size="9" text-anchor="middle">5 Parameter Agents</text>
-              <text x="65" y="70" fill="#7C9A9A" font-size="8" text-anchor="middle">SOP / CAPA / OEM</text>
-              <text x="65" y="86" fill="#8FD6BD" font-size="8" text-anchor="middle">Cited Remedy RAG</text>
+            <g transform="translate(450, 70)">
+              <rect width="130" height="120" rx="8" fill="#081a1f" stroke="#2BB3C0" stroke-width="1.5" filter="url(#glow)"/>
+              <text x="65" y="24" fill="#2BB3C0" font-size="11" font-weight="bold" text-anchor="middle">4. AGENT RAG</text>
+              <rect x="10" y="34" width="110" height="22" rx="4" fill="#0d2e38"/>
+              <text x="65" y="49" fill="#2BB3C0" font-size="9.5" font-weight="bold" text-anchor="middle">5 Parameter Agents</text>
+              <text x="65" y="74" fill="#7C9A9A" font-size="8.5" text-anchor="middle">SOP / CAPA / OEM</text>
+              <text x="65" y="94" fill="#8FD6BD" font-size="8.5" font-weight="bold" text-anchor="middle">Cited Remedy RAG</text>
             </g>
 
             <!-- NODE 5: GOVERNANCE & AUDIT -->
-            <g transform="translate(610, 75)">
-              <rect width="140" height="110" rx="8" fill="#081a1f" stroke="#D9614C" stroke-width="1.5"/>
-              <text x="70" y="24" fill="#D9614C" font-size="10.5" font-weight="bold" text-anchor="middle">5. GOVERNANCE</text>
-              <rect x="10" y="34" width="120" height="20" rx="4" fill="#351613"/>
-              <text x="70" y="48" fill="#ff8d76" font-size="9" text-anchor="middle">21 CFR Part 11</text>
-              <text x="70" y="70" fill="#7C9A9A" font-size="8" text-anchor="middle">OPA Rego Policy Engine</text>
-              <text x="70" y="86" fill="#E0A33E" font-size="8" text-anchor="middle">WORM Audit Log</text>
+            <g transform="translate(610, 70)">
+              <rect width="140" height="120" rx="8" fill="#081a1f" stroke="#D9614C" stroke-width="1.5"/>
+              <text x="70" y="24" fill="#D9614C" font-size="11" font-weight="bold" text-anchor="middle">5. GOVERNANCE</text>
+              <rect x="10" y="34" width="120" height="22" rx="4" fill="#351613"/>
+              <text x="70" y="49" fill="#ff8d76" font-size="9.5" font-weight="bold" text-anchor="middle">21 CFR Part 11</text>
+              <text x="70" y="74" fill="#7C9A9A" font-size="8.5" text-anchor="middle">OPA Rego Engine</text>
+              <text x="70" y="94" fill="#E0A33E" font-size="8.5" font-weight="bold" text-anchor="middle">WORM Audit Log</text>
             </g>
           </svg>
         </div>
 
-        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
           <span class="chip sop">⚡ Real-Time Stream</span>
           <span class="chip capa">🧠 PdM ML Zoo</span>
           <span class="chip oem">🌊 Flink SQL</span>
@@ -483,54 +482,54 @@ VIEWS.overview = () => `
         </div>
       </div>
 
-      <!-- RIGHT: 6 ARCHITECTURE PILLARS GRID -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:space-between">
-        <div class="card" style="margin:0;padding:10px">
-          <h3 style="font-size:11px;margin-bottom:4px;padding-bottom:4px"><span class="ic">📥</span> 1. Multi-Domain Ingestion</h3>
-          <div class="note" style="font-size:10px;margin:0;line-height:1.35">Ingests live sensor telemetry across Biomanufacturing, Water, Chemical, Cleanroom & Energy Grids.</div>
+      <!-- RIGHT: 6 ARCHITECTURE PILLARS GRID (STRETCHED TO FULL HEIGHT) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:10px;height:100%;box-sizing:border-box">
+        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:12px;margin-bottom:6px;padding-bottom:5px"><span class="ic">📥</span> 1. Multi-Domain Ingestion</h3>
+          <div class="note" style="font-size:11px;margin:0;line-height:1.4;color:var(--slate)">Ingests live sensor telemetry across Biomanufacturing, Water, Chemical, Cleanroom & Energy Grids.</div>
         </div>
-        <div class="card" style="margin:0;padding:10px">
-          <h3 style="font-size:11px;margin-bottom:4px;padding-bottom:4px"><span class="ic">🎚️</span> 2. Nested Band Ranges</h3>
-          <div class="note" style="font-size:10px;margin:0;line-height:1.35">Enforces Control (normal), Alarm (autonomous), and Trip (QA e-sign) validation boundaries.</div>
+        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:12px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🎚️</span> 2. Nested Band Ranges</h3>
+          <div class="note" style="font-size:11px;margin:0;line-height:1.4;color:var(--slate)">Enforces Control (normal), Alarm (autonomous), and Trip (QA e-sign) validation boundaries.</div>
         </div>
-        <div class="card" style="margin:0;padding:10px">
-          <h3 style="font-size:11px;margin-bottom:4px;padding-bottom:4px"><span class="ic">🧠</span> 3. PdM ML Forecasting</h3>
-          <div class="note" style="font-size:10px;margin:0;line-height:1.35">Scores independent variables using specialized ML models (GBM, RF, SVM, ANN) to forecast $P(\text{breach})$.</div>
+        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:12px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🧠</span> 3. PdM ML Forecasting</h3>
+          <div class="note" style="font-size:11px;margin:0;line-height:1.4;color:var(--slate)">Scores independent variables using ML models (GBM, RF, SVM, ANN) to forecast breach probability P(breach).</div>
         </div>
-        <div class="card" style="margin:0;padding:10px">
-          <h3 style="font-size:11px;margin-bottom:4px;padding-bottom:4px"><span class="ic">🌊</span> 4. Flink Stream Relational</h3>
-          <div class="note" style="font-size:10px;margin:0;line-height:1.35">Continuous Flink SQL operators (Window $\rightarrow$ Score $\rightarrow$ Filter) emit enriched breach events into Kafka.</div>
+        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:12px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🌊</span> 4. Flink Stream Relational</h3>
+          <div class="note" style="font-size:11px;margin:0;line-height:1.4;color:var(--slate)">Continuous Flink SQL operators (Window → Score → Filter) emit enriched breach events into Kafka.</div>
         </div>
-        <div class="card" style="margin:0;padding:10px">
-          <h3 style="font-size:11px;margin-bottom:4px;padding-bottom:4px"><span class="ic">🤖</span> 5. Multi-Agent RAG Engine</h3>
-          <div class="note" style="font-size:10px;margin:0;line-height:1.35">Parameter agents decompose breach queries into SOP, CAPA, and OEM sub-queries, retrieving cited remedies.</div>
+        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:12px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🤖</span> 5. Multi-Agent RAG Engine</h3>
+          <div class="note" style="font-size:11px;margin:0;line-height:1.4;color:var(--slate)">Parameter agents decompose breach queries into SOP, CAPA, and OEM sub-queries, retrieving cited remedies.</div>
         </div>
-        <div class="card" style="margin:0;padding:10px">
-          <h3 style="font-size:11px;margin-bottom:4px;padding-bottom:4px"><span class="ic">🛡️</span> 6. Zero-Trust Governance</h3>
-          <div class="note" style="font-size:10px;margin:0;line-height:1.35">OPA Rego rules enforce role-based e-signatures (21 CFR Part 11 / ISO 27001), committing WORM audit trails.</div>
+        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:12px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🛡️</span> 6. Zero-Trust Governance</h3>
+          <div class="note" style="font-size:11px;margin:0;line-height:1.4;color:var(--slate)">OPA Rego rules enforce role-based e-signatures (21 CFR Part 11 / ISO 27001), committing WORM audit trails.</div>
         </div>
       </div>
 
     </div>
 
     <!-- BOTTOM TECH STACK BAR -->
-    <div class="card" style="margin:0;padding:8px 12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <span style="font-size:10.5px;font-weight:700;color:#fff;white-space:nowrap"><span class="ic" style="display:inline-grid">🛠️</span> Tech Stack:</span>
-        <div class="grid g5" style="flex:1;gap:6px">
-          <div style="background:#081a1f;border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:9.5px">
+    <div class="card" style="margin:0;padding:10px 16px;background:linear-gradient(180deg,#0a242c,#07171c)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <span style="font-size:11px;font-weight:800;color:#fff;white-space:nowrap;letter-spacing:.5px"><span class="ic" style="display:inline-grid">🛠️</span> Tech Stack:</span>
+        <div class="grid g5" style="flex:1;gap:8px">
+          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:10.5px">
             <span style="color:var(--cyan);font-weight:700">Kafka</span> · OPC-UA / MQTT
           </div>
-          <div style="background:#081a1f;border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:9.5px">
+          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:10.5px">
             <span style="color:var(--mint);font-weight:700">Flink SQL</span> · PyFlink Window
           </div>
-          <div style="background:#081a1f;border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:9.5px">
-            <span style="color:var(--amber);font-weight:700">ML Zoo</span> · GBM/RF/SVM/ANN
+          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:10.5px">
+            <span style="color:var(--amber);font-weight:700">ML Zoo</span> · GBM / RF / SVM / ANN
           </div>
-          <div style="background:#081a1f;border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:9.5px">
+          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:10.5px">
             <span style="color:var(--cyan);font-weight:700">RAG</span> · LangGraph / Qdrant
           </div>
-          <div style="background:#081a1f;border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:9.5px">
+          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:10.5px">
             <span style="color:#ff8d76;font-weight:700">OPA</span> · Part 11 / WORM
           </div>
         </div>
