@@ -1,0 +1,9 @@
+[
+  {"batch_id":"BR-12-2401","molecule":"Omez","phase":"Fermentation","parameter":"temp","setpoint":"37.0 degC","observed_range":"36.7-37.3 degC","deviations":"none","disposition":"Released"},
+  {"batch_id":"BR-12-2406","molecule":"Omez","phase":"Fermentation","parameter":"temp","setpoint":"37.0 degC","observed_range":"36.6-38.2 degC","deviations":"DEV-4471 temperature excursion 22 minutes","disposition":"Released after QA review"},
+  {"batch_id":"BR-12-2406","molecule":"Omez","phase":"Fermentation","parameter":"ph","setpoint":"7.0","observed_range":"6.82-7.18","deviations":"none","disposition":"Released after QA review"},
+  {"batch_id":"BR-12-2412","molecule":"Nise","phase":"Fermentation","parameter":"ph","setpoint":"7.0","observed_range":"6.55-7.10","deviations":"DEV-4488 pH low excursion requiring hold","disposition":"Released after investigation"},
+  {"batch_id":"FIL-07-2403","molecule":"Nise","phase":"Filtration","parameter":"press","setpoint":"105 kPa","observed_range":"101-116 kPa","deviations":"DEV-4502 differential pressure excursion","disposition":"Released after filter change"},
+  {"batch_id":"WFI-02-2406","molecule":"Mintop","phase":"Utility","parameter":"cond","setpoint":"800 uS/cm","observed_range":"742-965 uS/cm","deviations":"DEV-4530 conductivity excursion","disposition":"Water quarantined and reprocessed"},
+  {"batch_id":"CR-A1-2401","molecule":"Mintop","phase":"Cleanroom","parameter":"hum","setpoint":"47 pct","observed_range":"34-52 pct","deviations":"DEV-4410 low humidity winter excursion","disposition":"Released after environmental review"}
+]

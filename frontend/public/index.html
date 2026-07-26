@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioSCADA AI — Intelligence Platform</title>
+<style>
+:root{
+  --ink:#0B2027;--deep:#0F3D3E;--teal:#126E82;--cyan:#2BB3C0;--mint:#8FD6BD;
+  --line:#1d4651;--slate:#7C9A9A;--slate-d:#5B7373;--amber:#E0A33E;--coral:#D9614C;--green:#2FB387;
+  --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:#081519;color:#dbe9e9;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:#27505b;border-radius:6px}
+
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:16px;padding:11px 22px;
+  background:linear-gradient(180deg,#0c252c,#0a1f25);border-bottom:1px solid var(--line)}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--teal));
+  display:flex;align-items:center;justify-content:center;color:#04181c;font-weight:800;font-size:17px}
+.brand b{color:#fff;font-size:16px;display:block}
+.brand span{color:var(--cyan);font-size:10.5px;font-weight:600;letter-spacing:1.6px}
+.status{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:11.5px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;
+  background:rgba(47,179,135,.12);border:1px solid rgba(47,179,135,.35);color:var(--green);font-weight:600}
+.chip.off{background:rgba(217,97,76,.12);border-color:rgba(217,97,76,.35);color:#ff8d76}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+.shell{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 56px)}
+.nav{background:#0a1f25;border-right:1px solid var(--line);padding:16px 11px;position:sticky;top:56px;
+  height:calc(100vh - 56px);overflow-y:auto}
+.navgroup{font-size:9.5px;letter-spacing:1.5px;color:var(--slate-d);font-weight:700;margin:14px 9px 7px;text-transform:uppercase}
+.navitem{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;cursor:pointer;
+  color:#a8c2c2;font-size:13px;font-weight:500;margin-bottom:2px;position:relative;transition:.15s}
+.navitem:hover{background:#10303a;color:#fff}
+.navitem.active{background:linear-gradient(135deg,rgba(43,179,192,.18),rgba(18,110,130,.1));color:#fff;font-weight:600}
+.navitem.active::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:3px;background:var(--cyan)}
+.navitem .num{margin-left:auto;font-size:9.5px;font-family:var(--mono);color:var(--slate-d)}
+
+.main{padding:22px 26px 60px;max-width:1240px}
+.view{display:none;animation:fade .25s}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:10.5px;letter-spacing:2.4px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:7px}
+h1{font-size:23px;color:#fff;font-weight:700;margin-bottom:6px}
+.lead{font-size:13.5px;color:var(--slate);max-width:760px;line-height:1.55;margin-bottom:18px}
+
+.card{background:linear-gradient(180deg,#0e2a32,#0c242b);border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:14px}
+.card h3{font-size:13px;color:#fff;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:11px;
+  padding-bottom:9px;border-bottom:1px solid var(--line)}
+.card h3 .tag{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--slate-d);font-weight:400}
+.grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.g5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:1000px){.g5,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+
+.tile{background:#081a1f;border:1px solid var(--line);border-radius:10px;padding:12px;position:relative}
+.tile.alarm{border-color:rgba(224,163,62,.5)}.tile.trip{border-color:rgba(217,97,76,.55)}
+.tile .nm{font-size:11px;color:var(--slate);font-weight:600}
+.tile .vl{font-family:var(--mono);font-size:24px;font-weight:700;color:#fff;margin:5px 0 2px}
+.tile .vl small{font-size:11px;color:var(--slate);font-weight:400}
+.tile .bd{font-size:9.5px;color:var(--slate-d);font-family:var(--mono)}
+.badge{position:absolute;top:10px;right:10px;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:12px;letter-spacing:.4px}
+.b-ok{background:rgba(47,179,135,.15);color:var(--green)}
+.b-alarm{background:rgba(224,163,62,.18);color:var(--amber)}
+.b-trip{background:rgba(217,97,76,.2);color:#ff8d76}
+canvas.spark{width:100%;height:34px;display:block;margin-top:8px}
+
+label{display:block;font-size:11px;font-weight:600;color:#bcd6d6;margin-bottom:6px}
+input,select,textarea{width:100%;font-family:var(--sans);font-size:12.5px;padding:9px 11px;border-radius:8px;
+  background:#081a1f;border:1px solid var(--line);color:#e6f3f3;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(43,179,192,.12)}
+textarea{min-height:76px;font-family:var(--mono);font-size:11.5px;resize:vertical}
+.field{margin-bottom:12px}
+.btn{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:8px;
+  border:1px solid var(--line);background:#10303a;color:#cfe6e6;cursor:pointer;transition:.15s}
+.btn:hover{background:#15404c;border-color:var(--teal);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:linear-gradient(135deg,var(--cyan),var(--teal));border-color:transparent;color:#04181c}
+.btn.amber{background:rgba(224,163,62,.16);border-color:rgba(224,163,62,.4);color:var(--amber)}
+.btn.green{background:rgba(47,179,135,.16);border-color:rgba(47,179,135,.4);color:var(--green)}
+.btn.coral{background:rgba(217,97,76,.16);border-color:rgba(217,97,76,.45);color:#ff8d76}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:5px 0;border-bottom:1px dotted #17363f}
+.kv:last-child{border:none}.kv .k{color:var(--slate)}.kv .v{font-family:var(--mono);color:#cfe6e6}
+.kv .v.c{color:var(--cyan)}.kv .v.g{color:var(--green)}.kv .v.a{color:var(--amber)}.kv .v.r{color:#ff8d76}
+
+pre.code{font-family:var(--mono);font-size:11px;line-height:1.65;background:#06161a;border:1px solid var(--line);
+  border-radius:9px;padding:12px;color:#9fc4c4;overflow-x:auto;white-space:pre-wrap}
+.log{font-family:var(--mono);font-size:10.5px;background:#06161a;border:1px solid var(--line);border-radius:9px;
+  padding:11px;height:190px;overflow-y:auto;line-height:1.75}
+.log .ts{color:var(--slate-d)}.log .ok{color:var(--green)}.log .warn{color:var(--amber)}
+.log .act{color:var(--cyan)}.log .info{color:#8fb9c4}
+
+.step{display:flex;gap:10px;padding:9px 0;border-bottom:1px dotted #17363f}
+.step:last-child{border:none}
+.step .n{width:20px;height:20px;border-radius:5px;flex-shrink:0;background:rgba(43,179,192,.18);color:var(--cyan);
+  display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;font-family:var(--mono)}
+.step .tx{font-size:12px;color:#cfe6e6;line-height:1.5}
+.cite{display:inline-block;font-family:var(--mono);font-size:9.5px;color:var(--mint);
+  background:rgba(143,214,189,.09);border:1px solid rgba(143,214,189,.22);padding:1px 6px;border-radius:4px;margin-top:4px}
+.hit{background:#081a1f;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}
+.hit .hh{display:flex;gap:8px;align-items:center;font-size:11px;margin-bottom:5px}
+.hit .src{font-family:var(--mono);font-size:9.5px;padding:1px 6px;border-radius:4px;background:#10303a;color:var(--mint)}
+.hit .sc{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--cyan)}
+.hit .tx{font-size:11.5px;color:#bcd6d6;line-height:1.5}
+.pill{font-size:10px;padding:3px 9px;border-radius:20px;background:#0c2630;border:1px solid var(--line);color:#cfe6e6}
+.decision{border-radius:10px;padding:14px;text-align:center;margin-top:10px}
+.decision.allow{background:rgba(47,179,135,.12);border:1px solid rgba(47,179,135,.4)}
+.decision.esign{background:rgba(224,163,62,.12);border:1px solid rgba(224,163,62,.4)}
+.decision b{font-size:18px;letter-spacing:.5px}
+.decision.allow b{color:var(--green)}.decision.esign b{color:var(--amber)}
+.decision small{display:block;color:var(--slate);font-size:11px;margin-top:5px}
+.note{font-size:11.5px;color:var(--slate);margin-top:8px}
+.err{color:#ff8d76;font-size:11.5px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">B</div>
+  <div class="brand"><b>BioSCADA AI</b><span>INTELLIGENCE PLATFORM</span></div>
+  <div class="status">
+    <span id="kbInfo" class="pill">KB —</span>
+    <span id="llmInfo" class="pill">LLM —</span>
+    <span id="kafkaChip" class="chip off"><span class="dot"></span> <span id="kafkaTxt">connecting</span></span>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="nav">
+    <div class="navgroup">Pipeline</div>
+    <div class="navitem active" data-v="live"><span>Control Room</span><span class="num">P0</span></div>
+    <div class="navitem" data-v="flink"><span>Flink SQL</span><span class="num">P1</span></div>
+    <div class="navitem" data-v="predict"><span>Prediction</span><span class="num">P2</span></div>
+    <div class="navitem" data-v="agent"><span>Agent &amp; RAG</span><span class="num">P3</span></div>
+    <div class="navitem" data-v="govern"><span>Govern &amp; Sign</span><span class="num">P4</span></div>
+    <div class="navgroup">Knowledge</div>
+    <div class="navitem" data-v="kb"><span>Knowledge Base</span></div>
+    <div class="navitem" data-v="audit"><span>Audit Trail</span></div>
+  </aside>
+
+  <main class="main">
+    <!-- ============ CONTROL ROOM ============ -->
+    <section class="view on" id="v-live">
+      <div class="eyebrow">Phase 0 · Ingestion</div>
+      <h1>Control room</h1>
+      <p class="lead">Live SCADA telemetry streaming through Kafka. Inject a breach to drive the pipeline end to end.</p>
+      <div class="card">
+        <h3>Operator controls<span class="tag">simulator</span></h3>
+        <div class="row" id="injectRow"></div>
+        <div class="note" id="injectNote"></div>
+      </div>
+      <div class="grid g5" id="tiles"></div>
+      <div class="card" style="margin-top:14px">
+        <h3>Breach events from Flink<span class="tag">breach.events</span></h3>
+        <div class="log" id="breachLog"></div>
+      </div>
+    </section>
+
+    <!-- ============ FLINK ============ -->
+    <section class="view" id="v-flink">
+      <div class="eyebrow">Phase 1 · Stream processing</div>
+      <h1>Flink SQL continuous query</h1>
+      <p class="lead">One declarative statement, decomposed by Flink into a distributed operator graph. This is compute decomposition — semantic decomposition happens later, in the agent.</p>
+      <div class="card"><h3>The query</h3><pre class="code" id="flinkSql">loading…</pre></div>
+      <div class="card"><h3>Operator plan</h3><div id="flinkOps"></div></div>
+      <div class="card"><h3>Decomposition boundary</h3>
+        <div class="grid g2">
+          <div><div class="kv"><span class="k">Flink SQL</span><span class="v c">relational-plan</span></div>
+            <div class="note" id="bFlink"></div></div>
+          <div><div class="kv"><span class="k">LLM</span><span class="v c">semantic</span></div>
+            <div class="note" id="bLlm"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PREDICT ============ -->
+    <section class="view" id="v-predict">
+      <div class="eyebrow">Phase 2 · Predictive maintenance</div>
+      <h1>Run the breach forecast</h1>
+      <p class="lead">Score a windowed reading against the trained per-parameter model. Each parameter is a dependent variable; the aggregates are its independent variables.</p>
+      <div class="card">
+        <h3>Model input</h3>
+        <div class="grid g3">
+          <div class="field"><label>Parameter</label><select id="pParam"></select></div>
+          <div class="field"><label>v_avg (window mean)</label><input type="number" step="0.01" id="pAvg"></div>
+          <div class="field"><label>v_std</label><input type="number" step="0.01" id="pStd" value="0.08"></div>
+        </div>
+        <div class="row"><button class="btn primary" id="pRun">Run prediction</button>
+          <span class="note" id="pNote"></span></div>
+        <div id="pOut"></div>
+      </div>
+    </section>
+
+    <!-- ============ AGENT ============ -->
+    <section class="view" id="v-agent">
+      <div class="eyebrow">Phase 3 · Agentic RAG</div>
+      <h1>Activate the agent</h1>
+      <p class="lead">The parameter agent decomposes the question into sub-questions, retrieves from both structured and unstructured sources, and returns a cited remedy.</p>
+      <div class="card">
+        <h3>Event</h3>
+        <div class="grid g3">
+          <div class="field"><label>Parameter</label><select id="aParam"></select></div>
+          <div class="field"><label>Reading (v_avg)</label><input type="number" step="0.01" id="aAvg"></div>
+          <div class="field"><label>Zone</label><select id="aZone"><option>alarm</option><option>trip</option></select></div>
+        </div>
+        <div class="row"><button class="btn primary" id="aRun">Run agent</button>
+          <span class="note" id="aNote"></span></div>
+      </div>
+      <div id="aOut"></div>
+    </section>
+
+    <!-- ============ GOVERN ============ -->
+    <section class="view" id="v-govern">
+      <div class="eyebrow">Phase 4 · Governance</div>
+      <h1>Authorize &amp; e-sign</h1>
+      <p class="lead">Mint a short-lived token, evaluate policy, then commit with a 21 CFR Part 11 electronic signature. Nothing executes unsigned.</p>
+      <div class="card">
+        <h3>1 · Token</h3>
+        <div class="row"><button class="btn" id="gToken">Mint JWT</button>
+          <span class="note" id="gTokenNote">run an agent first</span></div>
+        <pre class="code" id="gTokenBox" style="display:none;margin-top:10px"></pre>
+      </div>
+      <div class="card">
+        <h3>2 · Policy decision</h3>
+        <div class="row"><button class="btn" id="gDecide">Evaluate policy</button></div>
+        <div id="gDecision"></div>
+      </div>
+      <div class="card">
+        <h3>3 · Electronic signature</h3>
+        <div class="grid g2">
+          <div class="field"><label>Signer name</label><input id="gSigner" placeholder="e.g. A. Operator"></div>
+          <div class="field"><label>Role</label><select id="gRole">
+            <option>Performed by — Operator</option><option>Reviewed by — QA</option>
+            <option>Approved by — Production Lead</option></select></div>
+        </div>
+        <div class="field"><label>Reason</label><input id="gReason" placeholder="e.g. Approve corrective setpoint within policy"></div>
+        <div class="row"><button class="btn green" id="gSign">Apply e-signature</button>
+          <button class="btn coral" id="gReject">Reject</button></div>
+        <div id="gSignOut"></div>
+      </div>
+    </section>
+
+    <!-- ============ KB ============ -->
+    <section class="view" id="v-kb">
+      <div class="eyebrow">Knowledge base</div>
+      <h1>Consolidated corpus</h1>
+      <p class="lead">Structured records (CAPA, maintenance, batch) and unstructured documents (SOP, OEM) in one hybrid-retrieval index.</p>
+      <div class="card"><h3>Composition</h3><div id="kbStats"></div></div>
+      <div class="card">
+        <h3>Search</h3>
+        <div class="field"><input id="kbQ" placeholder="e.g. coolant flow dropped and temperature is rising"></div>
+        <div class="row"><button class="btn primary" id="kbGo">Search</button></div>
+        <div id="kbOut" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- ============ AUDIT ============ -->
+    <section class="view" id="v-audit">
+      <div class="eyebrow">Compliance</div>
+      <h1>Audit trail</h1>
+      <p class="lead">Append-only record of every action. In the deployed stack this is hash-chained in Postgres and mirrored to object-lock storage.</p>
+      <div class="card"><h3>WORM audit<span class="tag">21 CFR Part 11</span></h3><div class="log" id="auditLog"></div></div>
+    </section>
+  </main>
+</div>
+
+<script>
+// API base:
+//   served by nginx (docker)  -> same-origin '/api' (nginx proxies to the api service)
+//   opened directly as a file -> absolute URL to the local API
+//   any other host/port       -> absolute URL, overridable via ?api=
+const API = (() => {
+  const override = new URLSearchParams(location.search).get('api');
+  if (override) return override.replace(/\/$/, '');
+  if (location.protocol === 'file:') return 'http://localhost:8000/api';
+  if (location.port === '' || location.port === '3000' || location.port === '80') return '/api';
+  return 'http://localhost:8000/api';
+})();
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let PARAMS = [], lastEvent = null, hist = {};
+
+async function api(path, opts={}){
+  const r = await fetch(API + path, {headers:{'Content-Type':'application/json'}, ...opts});
+  if(!r.ok){ const t = await r.text(); throw new Error(`${r.status}: ${t}`); }
+  return r.json();
+}
+
+/* ---------------- nav ---------------- */
+$$('.navitem').forEach(n => n.onclick = () => {
+  $$('.navitem').forEach(x => x.classList.remove('active'));
+  n.classList.add('active');
+  $$('.view').forEach(v => v.classList.remove('on'));
+  $('#v-' + n.dataset.v).classList.add('on');
+  if(n.dataset.v === 'audit') loadAudit();
+  if(n.dataset.v === 'kb') loadKbStats();
+  if(n.dataset.v === 'flink') loadFlink();
+});
+
+/* ---------------- boot ---------------- */
+async function boot(){
+  try{
+    const h = await api('/health');
+    $('#kafkaChip').className = 'chip' + (h.kafka_connected ? '' : ' off');
+    $('#kafkaTxt').textContent = h.kafka_connected ? 'kafka live' : 'kafka offline';
+    $('#kbInfo').textContent = `KB ${h.kb_chunks} chunks`;
+    $('#llmInfo').textContent = 'LLM ' + (h.llm_available ? 'local' : 'template');
+  }catch(e){ $('#kafkaTxt').textContent = 'api unreachable'; }
+
+  PARAMS = await api('/parameters');
+  const opts = PARAMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  $('#pParam').innerHTML = opts; $('#aParam').innerHTML = opts;
+  syncDefaults('#pParam', '#pAvg'); syncDefaults('#aParam', '#aAvg');
+  $('#pParam').onchange = () => syncDefaults('#pParam', '#pAvg');
+  $('#aParam').onchange = () => syncDefaults('#aParam', '#aAvg');
+
+  $('#injectRow').innerHTML = PARAMS.map(p =>
+    `<button class="btn amber" data-inj="${p.id}">Inject ${p.short}</button>`).join('') +
+    `<button class="btn coral" data-inj-trip="1">Inject trip (temp)</button>`;
+  $$('[data-inj]').forEach(b => b.onclick = () => inject(b.dataset.inj, 'alarm'));
+  $('[data-inj-trip]').onclick = () => inject('temp', 'trip');
+
+  PARAMS.forEach(p => hist[p.id] = []);
+  renderTiles();
+  setInterval(pollTelemetry, 2000);
+  pollTelemetry();
+  loadFlink();
+}
+
+function syncDefaults(sel, inp){
+  const p = PARAMS.find(x => x.id === $(sel).value);
+  if(p) $(inp).value = (p.alarm[1] + 0.2).toFixed(2);
+}
+
+async function inject(param, severity){
+  try{
+    await api(`/inject?param=${param}&severity=${severity}`, {method:'POST'});
+    $('#injectNote').textContent = `Injected ${severity} on ${param} — watch the tiles and the breach log.`;
+  }catch(e){ $('#injectNote').innerHTML = `<span class="err">Simulator unreachable — is it running?</span>`; }
+}
+
+/* ---------------- telemetry ---------------- */
+function renderTiles(){
+  $('#tiles').innerHTML = PARAMS.map(p => `
+    <div class="tile" id="t-${p.id}">
+      <span class="badge b-ok" id="bd-${p.id}">—</span>
+      <div class="nm">${p.short}</div>
+      <div class="vl"><span id="vl-${p.id}">--</span><small> ${p.unit}</small></div>
+      <div class="bd">ctl ${p.control[0]}–${p.control[1]}</div>
+      <canvas class="spark" id="sp-${p.id}"></canvas>
+    </div>`).join('');
+}
+
+async function pollTelemetry(){
+  let data;
+  try{ data = await api('/telemetry?limit=40'); }catch(e){ return; }
+  PARAMS.forEach(p => {
+    const rows = data[p.id] || [];
+    if(!rows.length) return;
+    const last = rows[rows.length - 1];
+    hist[p.id] = rows.map(r => r.value);
+    $('#vl-' + p.id).textContent = Number(last.value).toFixed(2);
+    const z = last.zone || 'control';
+    const tile = $('#t-' + p.id), bd = $('#bd-' + p.id);
+    tile.className = 'tile' + (z === 'control' ? '' : ' ' + z);
+    bd.className = 'badge ' + (z === 'trip' ? 'b-trip' : z === 'alarm' ? 'b-alarm' : 'b-ok');
+    bd.textContent = z.toUpperCase();
+    spark('sp-' + p.id, hist[p.id], z === 'trip' ? '#D9614C' : z === 'alarm' ? '#E0A33E' : '#2BB3C0');
+  });
+  try{
+    const ev = await api('/flink/events?limit=12');
+    $('#breachLog').innerHTML = ev.length ? ev.map(e =>
+      `<div><span class="ts">${(e.window_start||'').slice(11,19)}</span> <span class="warn">${e.param}</span> p_breach=<span class="act">${e.p_breach}</span> zone=${e.zone} driver=${e.top_driver||'-'}</div>`
+    ).join('') : '<div class="ts">no breach events yet — inject one, or wait for natural drift</div>';
+  }catch(e){}
+}
+
+function spark(id, data, color){
+  const c = document.getElementById(id); if(!c || !data.length) return;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = c.clientWidth * dpr, h = c.clientHeight * dpr;
+  c.width = w; c.height = h;
+  const g = c.getContext('2d'); g.clearRect(0,0,w,h);
+  const mn = Math.min(...data), mx = Math.max(...data), rg = (mx - mn) || 1;
+  g.lineWidth = 2 * dpr; g.strokeStyle = color; g.beginPath();
+  data.forEach((v,i) => {
+    const x = i/(data.length-1)*w, y = h - ((v-mn)/rg)*(h*0.8) - h*0.1;
+    i ? g.lineTo(x,y) : g.moveTo(x,y);
+  });
+  g.stroke();
+}
+
+/* ---------------- flink ---------------- */
+async function loadFlink(){
+  try{
+    const f = await api('/flink/plan');
+    $('#flinkSql').textContent = f.sql;
+    $('#flinkOps').innerHTML = f.operators.map(o =>
+      `<div class="step"><span class="n">${o.n}</span><div class="tx"><b>${o.name}</b><br><span style="color:var(--slate)">${o.detail}</span></div></div>`).join('');
+    $('#bFlink').textContent = f.boundary.flink;
+    $('#bLlm').textContent = f.boundary.llm;
+  }catch(e){}
+}
+
+/* ---------------- predict ---------------- */
+$('#pRun').onclick = async () => {
+  $('#pNote').textContent = 'scoring…';
+  try{
+    const r = await api('/predict', {method:'POST', body: JSON.stringify({
+      param: $('#pParam').value, v_avg: parseFloat($('#pAvg').value),
+      v_std: parseFloat($('#pStd').value) || 0, v_delta: 0.3})});
+    const cls = r.p_breach > .66 ? 'r' : r.p_breach > .33 ? 'a' : 'g';
+    $('#pOut').innerHTML = `<div class="card" style="margin-top:12px">
+      <div class="kv"><span class="k">P(breach in ${r.horizon_minutes} min)</span><span class="v ${cls}" style="font-size:15px">${(r.p_breach*100).toFixed(1)}%</span></div>
+      <div class="kv"><span class="k">Zone</span><span class="v">${r.zone.toUpperCase()}</span></div>
+      <div class="kv"><span class="k">Top driver</span><span class="v c">${r.top_driver}</span></div>
+      <div class="kv"><span class="k">Model</span><span class="v">${r.model}</span></div></div>`;
+    $('#pNote').textContent = '';
+  }catch(e){ $('#pNote').innerHTML = `<span class="err">${e.message}</span>`; }
+};
+
+/* ---------------- agent ---------------- */
+$('#aRun').onclick = async () => {
+  $('#aNote').textContent = 'agent running — decomposing query, retrieving…';
+  $('#aOut').innerHTML = '';
+  try{
+    const card = await api('/agent/run', {method:'POST', body: JSON.stringify({
+      param: $('#aParam').value, v_avg: parseFloat($('#aAvg').value),
+      zone: $('#aZone').value, p_breach: 0.7})});
+    lastEvent = card.event_id;
+    $('#aNote').textContent = '';
+    $('#aOut').innerHTML = `
+      <div class="card"><h3>Sub-questions (semantic decomposition)<span class="tag">${card.retrieved_chunks} chunks fused</span></h3>
+        ${card.sub_questions.map((q,i)=>`<div class="step"><span class="n">${i+1}</span><div class="tx">${q}</div></div>`).join('')}</div>
+      <div class="card"><h3>Remedy card<span class="tag">${card.generated_by}</span></h3>
+        <div class="kv"><span class="k">Event</span><span class="v c">${card.event_id}</span></div>
+        <div class="kv"><span class="k">Root cause</span><span class="v">${card.root_cause}</span></div>
+        <div class="kv"><span class="k">Confidence</span><span class="v">${card.confidence}</span></div>
+        <div style="margin-top:12px">${card.steps.map(s=>
+          `<div class="step"><span class="n">${s.order}</span><div class="tx">${s.action}${s.citation?`<br><span class="cite">${s.citation}</span>`:''}</div></div>`).join('')}</div>
+        <div class="row" style="margin-top:10px">${card.citations.map(c=>`<span class="cite">${c}</span>`).join('')}</div>
+        <div class="decision ${card.requires_esign?'esign':'allow'}">
+          <b>${card.requires_esign?'REQUIRES QA E-SIGN':'AUTONOMOUS — SIGN FOR TRACEABILITY'}</b>
+          <small>${card.esign_reason}</small></div>
+        <div class="note">Continue to <b>Govern &amp; Sign</b> to authorize.</div>
+      </div>`;
+  }catch(e){ $('#aNote').innerHTML = `<span class="err">${e.message}</span>`; }
+};
+
+/* ---------------- govern ---------------- */
+$('#gToken').onclick = async () => {
+  if(!lastEvent){ $('#gTokenNote').innerHTML = '<span class="err">run an agent first</span>'; return; }
+  const param = $('#aParam').value;
+  const t = await api('/govern/token', {method:'POST', body: JSON.stringify({param, ttl_minutes:10})});
+  $('#gTokenBox').style.display = 'block';
+  $('#gTokenBox').textContent = JSON.stringify(t.claims, null, 2);
+  $('#gTokenNote').textContent = `minted for ${lastEvent}`;
+};
+$('#gDecide').onclick = async () => {
+  if(!lastEvent){ $('#gDecision').innerHTML = '<div class="err">run an agent first</div>'; return; }
+  const d = await api(`/govern/decide?event_id=${lastEvent}`, {method:'POST'});
+  const esign = d.decision === 'REQUIRE_ESIGN';
+  $('#gDecision').innerHTML = `<div class="decision ${esign?'esign':'allow'}">
+    <b>${d.decision.replace('_',' ')}</b><small>${d.reason}<br>obligations: [${d.obligations.join(', ')}]</small></div>`;
+};
+$('#gSign').onclick = async () => {
+  if(!lastEvent){ $('#gSignOut').innerHTML = '<div class="err">run an agent first</div>'; return; }
+  try{
+    const r = await api('/govern/sign', {method:'POST', body: JSON.stringify({
+      event_id: lastEvent, signer: $('#gSigner').value,
+      role: $('#gRole').value, reason: $('#gReason').value})});
+    $('#gSignOut').innerHTML = `<div class="decision allow"><b>SIGNED &amp; COMMITTED</b>
+      <small>${r.signature.signer} · ${r.signature.role} · ${r.signature.signed_at}</small></div>`;
+  }catch(e){ $('#gSignOut').innerHTML = `<div class="err">${e.message}</div>`; }
+};
+$('#gReject').onclick = async () => {
+  if(!lastEvent) return;
+  await api('/govern/reject', {method:'POST', body: JSON.stringify({
+    event_id: lastEvent, signer: $('#gSigner').value || 'operator',
+    reason: $('#gReason').value || 'rejected'})});
+  $('#gSignOut').innerHTML = `<div class="decision esign"><b>REJECTED</b><small>no control change applied</small></div>`;
+};
+
+/* ---------------- kb ---------------- */
+async function loadKbStats(){
+  try{
+    const s = await api('/rag/stats');
+    $('#kbStats').innerHTML = `
+      <div class="kv"><span class="k">Total chunks</span><span class="v c">${s.total_chunks}</span></div>
+      <div class="kv"><span class="k">Structured</span><span class="v">${s.structured}</span></div>
+      <div class="kv"><span class="k">Unstructured</span><span class="v">${s.unstructured}</span></div>
+      <div class="kv"><span class="k">Embedding model</span><span class="v">${s.embed_model}</span></div>
+      <div class="row" style="margin-top:10px">${Object.entries(s.by_source_type).map(([k,v])=>
+        `<span class="pill">${k}: ${v}</span>`).join('')}</div>`;
+  }catch(e){}
+}
+$('#kbGo').onclick = async () => {
+  const q = $('#kbQ').value.trim(); if(!q) return;
+  $('#kbOut').innerHTML = '<div class="note">searching…</div>';
+  try{
+    const hits = await api(`/rag/search?q=${encodeURIComponent(q)}&top_k=6`);
+    $('#kbOut').innerHTML = hits.map(h => `<div class="hit">
+      <div class="hh"><span class="src">${h.source_type}</span>
+        <b>${h.source_id}</b>
+        <span class="pill">${h.structured?'structured':'unstructured'}</span>
+        <span class="sc">${h.score}</span></div>
+      <div class="tx">${h.text.slice(0,300)}…</div></div>`).join('');
+  }catch(e){ $('#kbOut').innerHTML = `<div class="err">${e.message}</div>`; }
+};
+
+/* ---------------- audit ---------------- */
+async function loadAudit(){
+  try{
+    const a = await api('/audit?limit=80');
+    $('#auditLog').innerHTML = a.map(e =>
+      `<div><span class="ts">${e.ts.slice(11,19)}</span> <span class="${e.level}">${e.action}</span> ${JSON.stringify(e.detail).slice(0,110)}</div>`
+    ).join('') || '<div class="ts">no audit entries yet</div>';
+  }catch(e){}
+}
+
+boot();
+</script>
+</body>
+</html>

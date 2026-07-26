@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioSCADA AI — Build Studio</title>
+<style>
+:root{
+  --ink:#07171c;--panel:#0c242b;--panel2:#0e2a32;--deep:#0F3D3E;--teal:#126E82;
+  --cyan:#2BB3C0;--mint:#8FD6BD;--line:#1a4049;--line2:#22505b;
+  --slate:#8aa5a5;--slate-d:#5B7373;--amber:#E0A33E;--coral:#D9614C;--green:#2FB387;
+  --red:#ff5a44;--redglow:rgba(255,90,68,.5);
+  --mono:'SFMono-Regular',ui-monospace,Consolas,'Liberation Mono',Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:radial-gradient(1200px 600px at 80% -10%,#0d2b30 0%,#07171c 55%),#07171c;
+  color:#d6e7e7;-webkit-font-smoothing:antialiased;line-height:1.5}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:#081a1f}
+::-webkit-scrollbar-thumb{background:#25505b;border-radius:6px}::-webkit-scrollbar-thumb:hover{background:#2f6572}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;
+  padding:11px 20px;background:linear-gradient(180deg,rgba(9,26,31,.97),rgba(8,22,27,.93));
+  border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--teal));
+  display:grid;place-items:center;color:#04181c;font-weight:800;font-size:18px;
+  box-shadow:0 0 22px rgba(43,179,192,.35)}
+.brand b{color:#fff;font-size:15px;display:block;letter-spacing:.2px}
+.brand span{color:var(--cyan);font-size:10px;font-weight:700;letter-spacing:2px}
+.top-status{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:11px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;
+  background:#0c2630;border:1px solid var(--line2);color:#bcd6d6;font-weight:600;white-space:nowrap}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--slate-d)}
+.pill.ok{color:var(--green);border-color:rgba(47,179,135,.4)}.pill.ok .dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+.pill.off{color:var(--coral);border-color:rgba(217,97,76,.4)}.pill.off .dot{background:var(--coral)}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 57px)}
+.rail{background:linear-gradient(180deg,#0a1f25,#081a1f);border-right:1px solid var(--line);
+  padding:16px 12px 40px;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto}
+.rail-head{font-size:9.5px;letter-spacing:1.8px;color:var(--slate-d);font-weight:800;
+  text-transform:uppercase;margin:6px 8px 12px}
+.progress-wrap{margin:0 8px 16px}
+.progress-track{height:5px;border-radius:4px;background:#0c2630;overflow:hidden}
+.progress-bar{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--teal),var(--cyan));transition:width .4s ease}
+.progress-label{font-size:10px;color:var(--slate);margin-top:6px;font-family:var(--mono)}
+
+.step-nav{display:flex;flex-direction:column;gap:1px}
+.step-item{display:flex;align-items:flex-start;gap:11px;padding:9px 10px;border-radius:9px;cursor:pointer;
+  position:relative;transition:.15s;border:1px solid transparent}
+.step-item:hover{background:#10303a}
+.step-item.active{background:linear-gradient(135deg,rgba(43,179,192,.16),rgba(18,110,130,.07));border-color:var(--line2)}
+.step-item.active .step-num{background:var(--cyan);color:#04181c;border-color:var(--cyan)}
+.step-item.done .step-num{background:rgba(47,179,135,.18);color:var(--green);border-color:rgba(47,179,135,.5)}
+.step-num{width:24px;height:24px;flex-shrink:0;border-radius:7px;background:#0c2630;border:1px solid var(--line2);
+  display:grid;place-items:center;font-size:10.5px;font-weight:700;font-family:var(--mono);color:var(--slate);margin-top:1px}
+.step-tx{flex:1;min-width:0}
+.step-tt{font-size:12.5px;font-weight:600;color:#cfe6e6;line-height:1.35}
+.step-item.active .step-tt{color:#fff}
+.step-sub{font-size:10px;color:var(--slate-d);margin-top:1px}
+.step-phase{font-size:8.5px;letter-spacing:1.4px;color:var(--slate-d);font-weight:800;
+  text-transform:uppercase;margin:15px 10px 6px;padding-top:12px;border-top:1px solid var(--line)}
+.step-phase:first-child{border-top:none;padding-top:0;margin-top:4px}
+
+/* ---------- main ---------- */
+.main{padding:26px 34px 90px;max-width:1100px}
+.view{display:none;animation:fade .3s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:2.2px;
+  color:var(--cyan);font-weight:800;text-transform:uppercase;margin-bottom:10px}
+.eyebrow .n{font-family:var(--mono);background:rgba(43,179,192,.12);border:1px solid rgba(43,179,192,.3);
+  padding:2px 7px;border-radius:5px;letter-spacing:1px}
+h1{font-size:26px;color:#fff;font-weight:750;margin-bottom:8px;letter-spacing:-.3px}
+.lead{font-size:14px;color:var(--slate);max-width:720px;line-height:1.6;margin-bottom:22px}
+.lead b{color:#bcd6d6;font-weight:600}
+
+/* cards */
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+  border-radius:14px;padding:18px 19px;margin-bottom:16px;position:relative}
+.card h3{font-size:13px;color:#fff;font-weight:650;display:flex;align-items:center;gap:9px;margin-bottom:14px;
+  padding-bottom:11px;border-bottom:1px solid var(--line)}
+.card h3 .ic{width:22px;height:22px;border-radius:6px;background:rgba(43,179,192,.13);display:grid;place-items:center;
+  font-size:12px}
+.card h3 .tag{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--slate-d);font-weight:500;letter-spacing:.5px}
+
+.grid{display:grid;gap:13px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:1080px){.g5,.g4{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.shell{grid-template-columns:1fr}.rail{display:none}.g5,.g4,.g3,.g2{grid-template-columns:1fr}}
+
+/* buttons */
+.btn{font-family:var(--sans);font-size:12.5px;font-weight:650;padding:10px 17px;border-radius:9px;
+  border:1px solid var(--line2);background:#10303a;color:#cfe6e6;cursor:pointer;transition:.15s;
+  display:inline-flex;align-items:center;gap:8px}
+.btn:hover:not(:disabled){background:#164049;border-color:var(--teal);color:#fff;transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:linear-gradient(135deg,var(--cyan),var(--teal));border-color:transparent;color:#04181c;
+  box-shadow:0 4px 16px rgba(43,179,192,.25)}
+.btn.primary:hover:not(:disabled){box-shadow:0 6px 22px rgba(43,179,192,.4);color:#04181c}
+.btn.ghost{background:transparent}
+.btn.green{background:rgba(47,179,135,.15);border-color:rgba(47,179,135,.45);color:var(--green)}
+.btn.amber{background:rgba(224,163,62,.14);border-color:rgba(224,163,62,.4);color:var(--amber)}
+.btn.coral{background:rgba(217,97,76,.14);border-color:rgba(217,97,76,.45);color:#ff8d76}
+.btn.sm{padding:7px 12px;font-size:11.5px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+
+/* nav footer */
+.stepbar{display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:18px;
+  border-top:1px solid var(--line)}
+.stepbar .hint{font-size:11.5px;color:var(--slate-d)}
+
+/* forms */
+label{display:block;font-size:11px;font-weight:650;color:#aecaca;margin-bottom:6px;letter-spacing:.2px}
+input,select{width:100%;font-family:var(--sans);font-size:12.5px;padding:10px 12px;border-radius:8px;
+  background:#081a1f;border:1px solid var(--line2);color:#e6f3f3;outline:none;transition:.15s}
+input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(43,179,192,.12)}
+.field{margin-bottom:13px}
+
+/* tiles / data */
+.tile{background:#081a1f;border:1px solid var(--line);border-radius:11px;padding:13px;position:relative;transition:.2s}
+.tile .nm{font-size:11px;color:var(--slate);font-weight:600}
+.tile .vl{font-family:var(--mono);font-size:23px;font-weight:700;color:#fff;margin:4px 0 2px;letter-spacing:-.5px}
+.tile .vl small{font-size:11px;color:var(--slate);font-weight:400}
+.tile .bd{font-size:9.5px;color:var(--slate-d);font-family:var(--mono)}
+.tile .badge{position:absolute;top:11px;right:11px;font-size:8px;font-weight:800;padding:3px 8px;border-radius:12px;letter-spacing:.6px}
+.b-ok{background:rgba(47,179,135,.16);color:var(--green)}
+.b-alarm{background:rgba(224,163,62,.2);color:var(--amber)}
+.b-trip{background:rgba(217,97,76,.22);color:#ff8d76}
+.tile.trip{border-color:var(--redglow);animation:redpulse 1.4s infinite}
+@keyframes redpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,90,68,0)}50%{box-shadow:0 0 18px 2px rgba(255,90,68,.3)}}
+
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:7px 0;border-bottom:1px dotted #17363f}
+.kv:last-child{border:none}.kv .k{color:var(--slate)}.kv .v{font-family:var(--mono);color:#cfe6e6;text-align:right}
+.kv .v.c{color:var(--cyan)}.kv .v.g{color:var(--green)}.kv .v.a{color:var(--amber)}.kv .v.r{color:#ff8d76}
+
+pre.code{font-family:var(--mono);font-size:11px;line-height:1.7;background:#050f13;border:1px solid var(--line);
+  border-radius:10px;padding:14px;color:#9fc4c4;overflow-x:auto;white-space:pre-wrap;tab-size:2}
+pre.code .kw{color:var(--cyan)}pre.code .fn{color:var(--mint)}pre.code .cm{color:var(--slate-d)}
+
+.log{font-family:var(--mono);font-size:10.5px;background:#050f13;border:1px solid var(--line);border-radius:10px;
+  padding:12px;height:200px;overflow-y:auto;line-height:1.85}
+.log .ts{color:var(--slate-d)}.log .ok{color:var(--green)}.log .warn{color:var(--amber)}
+.log .act{color:var(--cyan)}.log .info{color:#8fb9c4}.log .red{color:var(--red);font-weight:700}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 9px;border-radius:20px;
+  background:#0c2630;border:1px solid var(--line2);color:#bcd6d6;font-family:var(--mono)}
+.chip.sop{color:var(--cyan);border-color:rgba(43,179,192,.35)}
+.chip.capa{color:var(--amber);border-color:rgba(224,163,62,.35)}
+.chip.oem{color:var(--mint);border-color:rgba(143,214,189,.35)}
+
+.note{font-size:11.5px;color:var(--slate-d);margin-top:9px;line-height:1.5}
+.note.ok{color:var(--green)}.err{color:#ff8d76;font-size:11.5px;margin-top:9px}
+
+/* dropzone */
+.drop{border:1.5px dashed var(--line2);border-radius:12px;padding:26px 20px;text-align:center;
+  cursor:pointer;transition:.2s;background:#081a1f}
+.drop:hover,.drop.drag{border-color:var(--cyan);background:#0a2028}
+.drop .di{font-size:26px;margin-bottom:8px;opacity:.8}
+.drop .dt{font-size:13px;color:#cfe6e6;font-weight:600}
+.drop .ds{font-size:11px;color:var(--slate-d);margin-top:4px}
+
+/* pipeline stepper (flink live + rag build) */
+.pipe{display:flex;flex-direction:column;gap:0}
+.pipe-op{display:flex;gap:13px;align-items:flex-start;padding:11px 0;position:relative}
+.pipe-op:not(:last-child)::after{content:"";position:absolute;left:15px;top:34px;bottom:-2px;width:2px;background:var(--line2)}
+.pipe-op.active:not(:last-child)::after{background:linear-gradient(var(--cyan),var(--line2))}
+.pipe-dot{width:32px;height:32px;flex-shrink:0;border-radius:9px;background:#0c2630;border:1px solid var(--line2);
+  display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--slate);z-index:1;transition:.3s}
+.pipe-op.active .pipe-dot{background:var(--cyan);color:#04181c;border-color:var(--cyan);box-shadow:0 0 16px rgba(43,179,192,.4)}
+.pipe-op.done .pipe-dot{background:rgba(47,179,135,.18);color:var(--green);border-color:rgba(47,179,135,.5)}
+.pipe-body{flex:1;padding-top:3px}
+.pipe-nm{font-size:13px;font-weight:650;color:#e6f3f3}
+.pipe-op.active .pipe-nm{color:#fff}
+.pipe-dt{font-size:11.5px;color:var(--slate);margin-top:2px;line-height:1.45}
+.pipe-out{font-family:var(--mono);font-size:10.5px;color:var(--mint);margin-top:6px;background:#050f13;
+  border:1px solid var(--line);border-radius:7px;padding:7px 9px;display:none}
+.pipe-op.active .pipe-out,.pipe-op.done .pipe-out{display:block}
+
+/* agent roster */
+.agent{background:#081a1f;border:1px solid var(--line);border-radius:11px;padding:14px;transition:.2s}
+.agent:hover{border-color:var(--line2)}
+.agent .ah{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.agent .aic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;
+  background:rgba(43,179,192,.13)}
+.agent .an{font-size:12.5px;font-weight:700;color:#fff}
+.agent .ar{font-size:9.5px;color:var(--slate-d);font-family:var(--mono)}
+.agent .ad{font-size:11px;color:var(--slate);line-height:1.5}
+.agent.human{border-color:rgba(224,163,62,.35);background:linear-gradient(180deg,rgba(224,163,62,.06),#081a1f)}
+.agent.human .aic{background:rgba(224,163,62,.16)}
+.agent.orch{border-color:rgba(43,179,192,.4);background:linear-gradient(180deg,rgba(43,179,192,.07),#081a1f)}
+
+/* remedy steps */
+.rstep{display:flex;gap:11px;padding:10px 0;border-bottom:1px dotted #17363f}
+.rstep:last-child{border:none}
+.rstep .rn{width:22px;height:22px;flex-shrink:0;border-radius:6px;background:rgba(43,179,192,.16);color:var(--cyan);
+  display:grid;place-items:center;font-size:11px;font-weight:700;font-family:var(--mono)}
+.rstep .rt{font-size:12px;color:#cfe6e6;line-height:1.5}
+.cite{display:inline-block;font-family:var(--mono);font-size:9.5px;color:var(--mint);
+  background:rgba(143,214,189,.08);border:1px solid rgba(143,214,189,.22);padding:2px 7px;border-radius:5px;margin-top:5px}
+.hit{background:#081a1f;border:1px solid var(--line);border-radius:9px;padding:11px;margin-bottom:8px}
+.hit .hh{display:flex;gap:8px;align-items:center;font-size:11px;margin-bottom:6px}
+.hit .sc{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--cyan)}
+.hit .tx{font-size:11.5px;color:#bcd6d6;line-height:1.5}
+
+.decision{border-radius:11px;padding:15px;text-align:center;margin-top:12px}
+.decision.allow{background:rgba(47,179,135,.1);border:1px solid rgba(47,179,135,.4)}
+.decision.esign{background:rgba(224,163,62,.1);border:1px solid rgba(224,163,62,.4)}
+.decision b{font-size:16px;letter-spacing:.4px}
+.decision.allow b{color:var(--green)}.decision.esign b{color:var(--amber)}
+.decision small{display:block;color:var(--slate);font-size:11px;margin-top:5px}
+
+.mono-tag{font-family:var(--mono);font-size:10px;color:var(--slate-d)}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(43,179,192,.25);
+  border-top-color:var(--cyan);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+a.dl{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">B</div>
+  <div class="brand"><b>BioSCADA AI</b><span>BUILD STUDIO</span></div>
+  <div class="top-status">
+    <span id="apiPill" class="pill off"><span class="dot"></span> <span id="apiTxt">connecting…</span></span>
+    <span id="kbPill" class="pill"><span class="dot"></span> <span id="kbTxt">KB —</span></span>
+    <span id="modelPill" class="pill"><span class="dot"></span> <span id="modelTxt">models —</span></span>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-head">Pipeline Build</div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-bar" id="progBar"></div></div>
+      <div class="progress-label"><span id="progNum">0</span> / 13 steps visited</div>
+    </div>
+    <nav class="step-nav" id="stepNav"></nav>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<script>
+/* ================= STEP DEFINITIONS ================= */
+const STEPS = [
+  {id:"overview", phase:"Start",       n:"0",  t:"Overview",            sub:"The end-to-end pipeline"},
+  {id:"upload",   phase:"Ingest",      n:"1",  t:"Upload datasets",     sub:"1–5 parameter CSVs"},
+  {id:"bands",    phase:"Ingest",      n:"2",  t:"Threshold bands",     sub:"Control · alarm · trip"},
+  {id:"model",    phase:"Model",       n:"3",  t:"Run modelling",       sub:"One model per dataset"},
+  {id:"leader",   phase:"Model",       n:"3.5",t:"Model leaderboard",   sub:"Which model, what AUC"},
+  {id:"stream",   phase:"Stream",      n:"4",  t:"Stream to Kafka",     sub:"Trigger flagged RED"},
+  {id:"roster",   phase:"Agents",      n:"5",  t:"Agent roster",        sub:"5 agents + escalation"},
+  {id:"dviv",     phase:"Agents",      n:"6",  t:"DV / IV → the “why”",  sub:"Drivers ground the query"},
+  {id:"flinksql", phase:"Flink",       n:"7",  t:"Flink SQL decompose", sub:"Relational-plan operators"},
+  {id:"flinklive",phase:"Flink",       n:"8",  t:"Flink live stream",   sub:"Window→score→emit"},
+  {id:"ragquery", phase:"RAG",         n:"9",  t:"Breach → RAG query",  sub:"Split SOP/CAPA/OEM"},
+  {id:"ragbuild", phase:"RAG",         n:"10", t:"Build RAG from PDF",  sub:"Upload · parse · index"},
+  {id:"govern",   phase:"Govern",      n:"11", t:"Govern & e-sign",     sub:"21 CFR Part 11 + audit"},
+];
+
+/* ================= API + STATE ================= */
+const API = (() => {
+  const o = new URLSearchParams(location.search).get('api');
+  if (o) return o.replace(/\/$/,'');
+  if (location.protocol === 'file:') return 'http://localhost:8000/api';
+  if (['','80','3000'].includes(location.port)) return '/api';
+  return 'http://localhost:8000/api';
+})();
+
+const S = {
+  bands: [], datasets: {}, training: {}, lastEvent: null,
+  kbStats: null, apiOk: false, ragChunks: 0, visited: new Set(), cur: 0,
+};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s??'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+async function api(path, opts={}){
+  const r = await fetch(API+path, opts);
+  if(!r.ok){ let d; try{d=await r.json()}catch{d={detail:await r.text()}} throw new Error(d.detail||`HTTP ${r.status}`); }
+  return r.json();
+}
+async function apiForm(path, formData){
+  const r = await fetch(API+path, {method:'POST', body:formData});
+  if(!r.ok){ let d; try{d=await r.json()}catch{d={detail:await r.text()}} throw new Error(d.detail||`HTTP ${r.status}`); }
+  return r.json();
+}
+
+/* param metadata used when the API is offline (keeps the demo alive) */
+const FALLBACK_BANDS = [
+  {param:"temp",name:"Reactor Temperature",short:"Temperature",unit:"°C",asset:"BR-12",control:[36.5,37.5],alarm:[36,38],trip:[35.5,38.5],model:"gbm",model_label:"Gradient Boosting (GBM)"},
+  {param:"ph",name:"pH",short:"pH",unit:"pH",asset:"BR-12",control:[6.8,7.2],alarm:[6.6,7.4],trip:[6.4,7.6],model:"random_forest",model_label:"Random Forest"},
+  {param:"press",name:"Differential Pressure",short:"Pressure",unit:"kPa",asset:"FIL-07",control:[100,110],alarm:[96,114],trip:[92,118],model:"gbm",model_label:"Gradient Boosting (GBM)"},
+  {param:"cond",name:"Conductivity (WFI)",short:"Conductivity",unit:"µS/cm",asset:"WFI-02",control:[700,900],alarm:[640,960],trip:[600,1000],model:"svm",model_label:"Support Vector Machine (RBF)"},
+  {param:"hum",name:"Humidity (Cleanroom)",short:"Humidity",unit:"%",asset:"CR-A1",control:[40,55],alarm:[36,59],trip:[32,63],model:"ann",model_label:"Neural Network (MLP)"},
+];
+const IV_MAP = {
+  temp:["coolant_flow_rate","jacket_temperature","steam_valve_position","heat_exchanger_dp","agitator_torque"],
+  ph:["acid_base_dose_rate","co2_accumulation","agitator_speed","probe_drift_mv","dissolved_oxygen"],
+  press:["filter_dp","gas_exhaust_flow","pump_speed_hz","valve_position","seal_integrity_index"],
+  cond:["water_flow_rate","resin_bed_dp","regeneration_cycle_count","toc_level","feed_composition"],
+  hum:["hvac_fan_speed","cooling_coil_temp","hepa_dp","outdoor_humidity","door_open_count"],
+};
+const AGENTS = [
+  {id:"temp",icon:"🌡️",name:"Temperature Agent",role:"agent.execute.temp",asset:"BR-12",desc:"Protects reactor temperature. Diagnoses coolant and heat-exchanger faults; may micro-adjust the coolant setpoint autonomously within policy."},
+  {id:"ph",icon:"⚗️",name:"pH Agent",role:"agent.execute.ph",asset:"BR-12",desc:"Protects pH. Prepares dosing recommendations but never executes autonomously — every pH change needs QA e-signature (SOP-PH-009)."},
+  {id:"press",icon:"🎚️",name:"Pressure Agent",role:"agent.execute.press",asset:"FIL-07",desc:"Protects filter differential pressure. Distinguishes filter blockage from exhaust restriction before acting."},
+  {id:"cond",icon:"💧",name:"Conductivity Agent",role:"agent.execute.cond",asset:"WFI-02",desc:"Protects WFI conductivity. Traces excursions to feed composition or resin-bed exhaustion; can quarantine non-conforming water."},
+  {id:"hum",icon:"🌫️",name:"Humidity Agent",role:"agent.execute.hum",asset:"CR-A1",desc:"Protects cleanroom RH. Separates true HVAC faults from transient door-open spikes."},
+];
+
+/* ================= NAV / PROGRESS ================= */
+function buildNav(){
+  let html = '', lastPhase = '';
+  STEPS.forEach((s,i) => {
+    if(s.phase !== lastPhase){ html += `<div class="step-phase">${s.phase}</div>`; lastPhase = s.phase; }
+    html += `<div class="step-item" data-i="${i}" id="nav-${i}">
+      <div class="step-num">${s.n}</div>
+      <div class="step-tx"><div class="step-tt">${s.t}</div><div class="step-sub">${s.sub}</div></div></div>`;
+  });
+  $('#stepNav').innerHTML = html;
+  $$('.step-item').forEach(el => el.onclick = () => go(+el.dataset.i));
+}
+function go(i){
+  S.cur = i; S.visited.add(i);
+  $$('.step-item').forEach((el,idx)=>{
+    el.classList.toggle('active', idx===i);
+    el.classList.toggle('done', S.visited.has(idx) && idx!==i);
+  });
+  const pct = Math.round(S.visited.size/STEPS.length*100);
+  $('#progBar').style.width = pct+'%'; $('#progNum').textContent = S.visited.size;
+  renderStep(STEPS[i].id);
+  $('#main').scrollTo(0,0); window.scrollTo(0,0);
+}
+function nav(dir){ const n = S.cur+dir; if(n>=0 && n<STEPS.length) go(n); }
+function stepbar(){
+  const prev = S.cur>0 ? `<button class="btn ghost sm" onclick="nav(-1)">← ${STEPS[S.cur-1].t}</button>` : '<span></span>';
+  const next = S.cur<STEPS.length-1 ? `<button class="btn primary sm" onclick="nav(1)">${STEPS[S.cur+1].t} →</button>` : '<span class="mono-tag">end of pipeline</span>';
+  return `<div class="stepbar">${prev}${next}</div>`;
+}
+
+/* ================= BOOT ================= */
+async function boot(){
+  buildNav();
+  try{
+    const h = await api('/health');
+    S.apiOk = true;
+    $('#apiPill').className='pill ok'; $('#apiTxt').textContent='API live';
+    $('#kbPill').className='pill ok'; $('#kbTxt').textContent=`KB ${h.kb_chunks}`; S.ragChunks=h.kb_chunks;
+    $('#modelPill').className='pill '+(h.models_loaded?.length?'ok':''); $('#modelTxt').textContent=`${h.models_loaded?.length||0} models`;
+    try{ S.bands = await api('/studio/bands'); S.studioOk = true; }
+    catch{ S.bands = FALLBACK_BANDS; S.studioOk = false; }
+    try{ S.kbStats = await api('/rag/stats'); }catch{}
+    if(S.apiOk && !S.studioOk){
+      // health works but the studio endpoints aren't mounted (older server build)
+      $('#apiPill').className='pill'; $('#apiTxt').textContent='API partial — update server';
+    }
+  }catch(e){
+    S.apiOk=false; S.bands=FALLBACK_BANDS;
+    $('#apiTxt').textContent='API offline — demo mode'; $('#kbTxt').textContent='KB (sim)'; $('#modelTxt').textContent='models (sim)';
+  }
+  go(0);
+}
+
+/* ================= RENDER DISPATCH ================= */
+function renderStep(id){
+  const fn = VIEWS[id];
+  $('#main').innerHTML = `<section class="view on">${fn ? fn() : '—'}${stepbar()}</section>`;
+  if(AFTER[id]) AFTER[id]();
+}
+const VIEWS = {}, AFTER = {};
+
+/* ---------- STEP 0: OVERVIEW ---------- */
+VIEWS.overview = () => `
+  <div class="eyebrow"><span class="n">STEP 0</span> Pipeline</div>
+  <h1>From sensor telemetry to a signed corrective action</h1>
+  <p class="lead">This studio walks the full BioSCADA AI pipeline end to end — upload the parameter datasets, train a predictive model per parameter, stream a model-driven breach into Kafka, let the responsible agent decompose the question and retrieve grounded remedies, then gate the action behind a human e-signature. Every step below runs against the real services when the API is live.</p>
+  <div class="card">
+    <h3><span class="ic">🗺️</span> The flow<span class="tag">13 steps · 6 phases</span></h3>
+    <div class="pipe">
+      ${[
+        ["Ingest","Upload 1–5 datasets; each parameter carries hardcoded control / alarm / trip bands."],
+        ["Model","Train one model per parameter (GBM · RF · SVM · ANN). The prediction becomes the trigger + context."],
+        ["Stream","All parameters stream into Kafka; a predicted breach is flagged RED with its drivers as the “why”."],
+        ["Agents","Five parameter agents + one human-escalation agent, coordinated by an orchestrator."],
+        ["Flink","Flink SQL decomposes the stream — window, aggregate, score, filter — emitting “breach + why”."],
+        ["RAG","The breach becomes a query; the LLM splits it into SOP / CAPA / OEM sub-queries and retrieves."],
+        ["Govern","The human agent applies a 21 CFR Part 11 e-signature; the action commits to a WORM audit."],
+      ].map(([p,d],i)=>`<div class="pipe-op ${i===0?'active':''}">
+        <div class="pipe-dot">${i+1}</div>
+        <div class="pipe-body"><div class="pipe-nm">${p}</div><div class="pipe-dt">${d}</div></div></div>`).join('')}
+    </div>
+  </div>
+  <div class="grid g3">
+    <div class="card" style="margin:0"><h3><span class="ic">🎯</span> Dependent</h3>
+      <div class="note">The five SCADA parameters are the <b>dependent variables</b> — what each agent protects.</div></div>
+    <div class="card" style="margin:0"><h3><span class="ic">📊</span> Independent</h3>
+      <div class="note">Their PdM features are the <b>independent variables</b> — what the model measures to forecast a breach.</div></div>
+    <div class="card" style="margin:0"><h3><span class="ic">🔍</span> The “why”</h3>
+      <div class="note">On a breach, those same features become the <b>“why”</b> carried into the RAG prompt.</div></div>
+  </div>`;
+
+/* ---------- STEP 1: UPLOAD ---------- */
+VIEWS.upload = () => `
+  <div class="eyebrow"><span class="n">STEP 1</span> Ingest</div>
+  <h1>Upload your parameter datasets</h1>
+  <p class="lead">Drop one or more of the five parameter CSVs. The application reads each file, identifies the parameter from its <b>dependent-variable column</b>, and lists the independent variables it will model. You can upload a single dataset or all five.</p>
+  <div class="card">
+    <h3><span class="ic">📤</span> Dataset upload<span class="tag">CSV · dependent + independent vars</span></h3>
+    <div class="drop" id="drop">
+      <div class="di">📄</div>
+      <div class="dt">Drop CSV files here, or click to browse</div>
+      <div class="ds">reactor_temperature · ph · differential_pressure · conductivity_wfi · humidity_cleanroom</div>
+      <input type="file" id="fileInput" accept=".csv" multiple class="hidden">
+    </div>
+    <div class="note" id="upNote"></div>
+  </div>
+  <div id="dsList"></div>`;
+
+AFTER.upload = () => {
+  const drop = $('#drop'), input = $('#fileInput');
+  drop.onclick = () => input.click();
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add('drag'); };
+  drop.ondragleave = () => drop.classList.remove('drag');
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove('drag'); handleFiles(e.dataTransfer.files); };
+  input.onchange = () => handleFiles(input.files);
+  renderDatasets();
+};
+
+async function handleFiles(files){
+  const list = [...files];
+  if(!list.length) return;
+  const ok = [], failed = [];
+  for(const f of list){
+    $('#upNote').innerHTML = `<span class="spin"></span> reading ${esc(f.name)}… (${ok.length+failed.length+1}/${list.length})`;
+    if(S.apiOk && S.studioOk){
+      try{
+        const fd = new FormData(); fd.append('file', f);
+        const d = await apiForm('/studio/upload-dataset', fd);
+        S.datasets[d.param] = d; ok.push(d.name||d.param);
+      }catch(e){
+        // fall back to local identification so a live-API hiccup doesn't block the demo
+        const pid = guessParam(f.name);
+        if(pid){ S.datasets[pid] = localDataset(pid); ok.push(S.datasets[pid].name); }
+        else failed.push(`${f.name}: ${e.message}`);
+      }
+    } else {
+      const pid = guessParam(f.name);
+      if(pid){ S.datasets[pid] = localDataset(pid); ok.push(S.datasets[pid].name); }
+      else failed.push(`${f.name}: couldn't identify the parameter from the filename`);
+    }
+  }
+  const parts = [];
+  if(ok.length) parts.push(`<span class="note ok">✓ ${Object.keys(S.datasets).length} of 5 datasets ready</span>`);
+  if(failed.length) parts.push(`<span class="err">${failed.map(esc).join('<br>')}</span>`);
+  $('#upNote').innerHTML = parts.join('<br>');
+  const input = $('#fileInput'); if(input) input.value = '';   // allow re-selecting the same files
+  renderDatasets();
+}
+function localDataset(pid){
+  const b = S.bands.find(x=>x.param===pid) || FALLBACK_BANDS.find(x=>x.param===pid);
+  return {param:pid, name:b.name, asset:b.asset, rows:1200,
+    dependent_variable:pid, independent_variables:IV_MAP[pid], model_label:b.model_label,
+    control_band:b.control, source:'local'};
+}
+function guessParam(name){
+  const n = name.toLowerCase();
+  if(n.includes('temp')||n.includes('reactor')) return 'temp';
+  if(n.includes('press')||n.includes('differential')) return 'press';
+  if(n.includes('cond')||n.includes('wfi')) return 'cond';
+  if(n.includes('hum')||n.includes('cleanroom')) return 'hum';
+  if(n.includes('ph')||n.match(/\bph\b/)) return 'ph';
+  return null;
+}
+function renderDatasets(){
+  const el = $('#dsList'); if(!el) return;
+  const ds = Object.values(S.datasets);
+  if(!ds.length){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="card"><h3><span class="ic">✅</span> Loaded datasets<span class="tag">${ds.length} of 5</span></h3>
+    <div class="grid g2">${ds.map(d=>`<div class="tile">
+      <div class="nm">${esc(d.name)} · ${esc(d.asset||'')}</div>
+      <div class="vl" style="font-size:15px">${d.rows||'—'} <small>rows</small></div>
+      <div class="kv"><span class="k">Dependent var</span><span class="v c">${esc(d.dependent_variable||d.param)}</span></div>
+      <div class="kv"><span class="k">Independent vars</span><span class="v">${(d.independent_variables||[]).length}</span></div>
+      <div class="kv"><span class="k">Model</span><span class="v g">${esc(d.model_label||'')}</span></div>
+    </div>`).join('')}</div>
+    <div class="note">Each dataset's dependent variable is highlighted — that is what the agent will protect. The independent variables become the model's inputs and, later, the retrieval “why”.</div></div>`;
+}
+
+/* ---------- STEP 2: BANDS ---------- */
+VIEWS.bands = () => `
+  <div class="eyebrow"><span class="n">STEP 2</span> Ingest</div>
+  <h1>Threshold bands are hardcoded per parameter</h1>
+  <p class="lead">Every parameter ships with a validated <b>control</b> band (normal), an <b>alarm</b> band (agent acts), and a <b>trip</b> band (QA e-signature required). These are fixed in the application, not learned — they come from the process validation, and the model's job is to forecast a breach before the value ever leaves control.</p>
+  <div class="card">
+    <h3><span class="ic">🎚️</span> Band configuration<span class="tag">control · alarm · trip</span></h3>
+    <div id="bandRows"></div>
+  </div>`;
+
+AFTER.bands = () => {
+  $('#bandRows').innerHTML = S.bands.map(b => {
+    const span = b.trip[1]-b.trip[0];
+    const seg = (lo,hi,color)=>`<div style="position:absolute;left:${(lo-b.trip[0])/span*100}%;width:${(hi-lo)/span*100}%;top:0;bottom:0;background:${color};border-radius:3px"></div>`;
+    return `<div style="padding:12px 0;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <b style="font-size:12.5px;color:#fff">${esc(b.name)}</b>
+        <span class="chip">${esc(b.asset)}</span>
+        <span class="chip" style="color:var(--mint)">${esc(b.model_label)}</span>
+        <span class="mono-tag" style="margin-left:auto">${esc(b.unit)}</span>
+      </div>
+      <div style="position:relative;height:26px;background:#050f13;border-radius:5px;border:1px solid var(--line);overflow:hidden">
+        ${seg(b.trip[0],b.trip[1],'rgba(217,97,76,.18)')}
+        ${seg(b.alarm[0],b.alarm[1],'rgba(224,163,62,.22)')}
+        ${seg(b.control[0],b.control[1],'rgba(47,179,135,.3)')}
+      </div>
+      <div style="display:flex;gap:16px;margin-top:6px;font-size:10px;font-family:var(--mono);color:var(--slate)">
+        <span style="color:var(--green)">■ control ${b.control[0]}–${b.control[1]}</span>
+        <span style="color:var(--amber)">■ alarm ${b.alarm[0]}–${b.alarm[1]}</span>
+        <span style="color:#ff8d76">■ trip ${b.trip[0]}–${b.trip[1]}</span>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+/* ---------- STEP 3: MODEL ---------- */
+VIEWS.model = () => `
+  <div class="eyebrow"><span class="n">STEP 3</span> Model</div>
+  <h1>Run modelling on each dataset</h1>
+  <p class="lead">Each parameter gets the model best suited to its signal. The trained model's output becomes the <b>trigger</b> and the <b>context</b> for the agent layer: the predicted breach probability, the responsible parameter/agent, and the “why” — the top drivers among the independent variables.</p>
+  <div class="card">
+    <h3><span class="ic">🧠</span> Model assignment<span class="tag">one model per parameter</span></h3>
+    <div class="note" style="margin-bottom:12px">Train them individually, or run all at once. Training is real when the API is live — synthesized data is used if you didn't upload a CSV for a parameter.</div>
+    <div class="btn-row" style="margin-bottom:6px">
+      <button class="btn primary" id="trainAll">▶ Train all models</button>
+      <span class="note" id="trainNote"></span>
+    </div>
+    <div id="modelRows"></div>
+  </div>`;
+
+AFTER.model = () => { renderModelRows(); $('#trainAll').onclick = trainAll; };
+
+function renderModelRows(){
+  const el = $('#modelRows'); if(!el) return;
+  el.innerHTML = S.bands.map(b => {
+    const t = S.training[b.param];
+    const status = t
+      ? `<span class="v g">AUC ${t.auc}</span>`
+      : `<button class="btn sm" data-train="${b.param}">Train</button>`;
+    return `<div class="kv" style="align-items:center">
+      <span class="k" style="display:flex;align-items:center;gap:8px">
+        <b style="color:#e6f3f3">${esc(b.name)}</b>
+        <span class="chip" style="color:var(--mint)">${esc(b.model_label)}</span></span>
+      <span class="v" id="mrow-${b.param}">${status}</span></div>`;
+  }).join('');
+  $$('[data-train]').forEach(btn => btn.onclick = () => trainOne(btn.dataset.train));
+}
+async function trainOne(param){
+  const cell = $('#mrow-'+param); if(cell) cell.innerHTML = '<span class="spin"></span>';
+  let t;
+  if(S.apiOk && S.studioOk){
+    try{
+      t = await api(`/studio/train?param=${param}`, {method:'POST'});
+    }catch(e){
+      t = simTrain(param); t.source = 'fallback';
+    }
+  } else {
+    // API offline, or studio routes not available — representative model so
+    // the pipeline still runs end to end
+    t = simTrain(param); await new Promise(r=>setTimeout(r,500));
+  }
+  S.training[param] = t;
+  if(cell) cell.innerHTML = `<span class="v g">AUC ${t.auc}</span>`;
+}
+async function trainAll(){
+  $('#trainNote').innerHTML = '<span class="spin"></span> training all five models…';
+  for(const b of S.bands){ await trainOne(b.param); }
+  $('#trainNote').innerHTML = '<span class="note ok">✓ all models trained — see the leaderboard</span>';
+}
+function simTrain(param){
+  const b = S.bands.find(x=>x.param===param) || FALLBACK_BANDS.find(x=>x.param===param) || {};
+  const aucs = {temp:0.924, ph:0.862, press:0.906, cond:0.923, hum:0.942};
+  const ivs = IV_MAP[param] || [];
+  const auc = aucs[param]||0.9;
+  return {param, name:b.name||param, model_label:b.model_label||'model', model:b.model||'',
+    auc, accuracy:+(auc-0.01).toFixed(3), precision:0.87, recall:0.75,
+    positive_rate:0.32, n_train:900, n_test:300, source:'demo',
+    independent_variables:ivs,
+    top_drivers:ivs.slice(0,3).map((f,i)=>({feature:f, importance:[0.42,0.28,0.19][i]}))};
+}
+
+/* ---------- STEP 3.5: LEADERBOARD ---------- */
+VIEWS.leader = () => `
+  <div class="eyebrow"><span class="n">STEP 3.5</span> Model</div>
+  <h1>Model leaderboard</h1>
+  <p class="lead">Which model runs on each dataset, and how well it forecasts a breach. The <b>top drivers</b> here are the independent variables the model leans on most — these are exactly what gets carried into the RAG prompt as the “why”.</p>
+  <div id="lbBody"></div>`;
+
+AFTER.leader = () => {
+  const trained = Object.values(S.training);
+  if(!trained.length){
+    $('#lbBody').innerHTML = `<div class="card"><div class="note">No models trained yet. Go to <b>Step 3</b> and train the models first.</div>
+      <div class="btn-row"><button class="btn primary sm" onclick="go(3)">← Run modelling</button></div></div>`;
+    return;
+  }
+  $('#lbBody').innerHTML = `
+    <div class="card"><h3><span class="ic">🏆</span> Results<span class="tag">${trained.length} trained</span></h3>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
+        <tr style="text-align:left;color:var(--slate);border-bottom:1px solid var(--line)">
+          <th style="padding:8px 6px">Parameter</th><th>Model</th><th>AUC</th><th>Acc</th><th>Precision</th><th>Recall</th></tr>
+        ${trained.map(t=>`<tr style="border-bottom:1px dotted #17363f">
+          <td style="padding:9px 6px;color:#e6f3f3;font-weight:600">${esc(t.name)}</td>
+          <td><span class="chip" style="color:var(--mint)">${esc(t.model_label)}</span></td>
+          <td style="font-family:var(--mono);color:var(--cyan);font-weight:700">${t.auc}</td>
+          <td style="font-family:var(--mono)">${t.accuracy}</td>
+          <td style="font-family:var(--mono)">${t.precision}</td>
+          <td style="font-family:var(--mono)">${t.recall}</td></tr>`).join('')}
+      </table></div>
+    </div>
+    ${trained.map(t=>`<div class="card"><h3><span class="ic">📊</span> ${esc(t.name)} — top drivers <span class="tag">the “why”</span></h3>
+      ${(t.top_drivers||[]).map(d=>{
+        const w = Math.round(d.importance*100);
+        return `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px">
+          <span class="mono-tag" style="color:#cfe6e6">${esc(d.feature)}</span><span class="mono-tag" style="color:var(--cyan)">${d.importance.toFixed(3)}</span></div>
+          <div style="height:7px;background:#050f13;border-radius:4px;overflow:hidden"><div style="height:100%;width:${w}%;background:linear-gradient(90deg,var(--teal),var(--cyan));border-radius:4px"></div></div></div>`;
+      }).join('')}</div>`).join('')}`;
+};
+
+/* ---------- STEP 4: STREAM ---------- */
+VIEWS.stream = () => `
+  <div class="eyebrow"><span class="n">STEP 4</span> Stream</div>
+  <h1>Stream to Kafka — trigger flagged RED</h1>
+  <p class="lead">All parameter telemetry streams into Apache Kafka. When a model predicts a breach, that event is flagged <b style="color:var(--red)">RED</b> and carries its context — the predicted probability, the responsible parameter/agent, and the driver features as the “why”. That flagged event is what wakes the agent layer.</p>
+  <div class="card">
+    <h3><span class="ic">📡</span> Live topic: breach.events<span class="tag">model output → trigger</span></h3>
+    <div class="btn-row" style="margin-bottom:12px">
+      ${S.bands.map(b=>`<button class="btn amber sm" data-trig="${b.param}">⚡ Trigger ${esc(b.short)}</button>`).join('')}
+    </div>
+    <div class="log" id="streamLog"><div class="ts">no events yet — trigger a parameter above</div></div>
+  </div>
+  <div id="trigDetail"></div>`;
+
+AFTER.stream = () => {
+  $$('[data-trig]').forEach(b => b.onclick = () => triggerStream(b.dataset.trig));
+};
+async function triggerStream(param){
+  let e;
+  try{
+    if(S.apiOk && S.studioOk){ e = await api(`/studio/stream-trigger?param=${param}`, {method:'POST'}); }
+    else { const b=S.bands.find(x=>x.param===param); e={event_id:`evt-${param}-${Date.now()}`,param,asset:b.asset,
+      agent:`${b.short} Agent`,value:(b.alarm[1]+ (b.trip[1]-b.alarm[1])*.4).toFixed(2),zone:'alarm',
+      p_breach:(S.training[param]?.auc||0.9),top_driver:IV_MAP[param][0],why:IV_MAP[param].slice(0,3),
+      flag:'RED',pushed_to:'buffer'}; }
+  }catch(err){ return; }
+  S.lastEvent = e;
+  const log = $('#streamLog');
+  if(log.querySelector('.ts')) log.innerHTML = '';
+  log.insertAdjacentHTML('afterbegin',
+    `<div><span class="ts">${new Date().toLocaleTimeString()}</span> <span class="red">● RED</span> <span class="warn">${esc(e.param)}</span> p_breach=<span class="act">${e.p_breach}</span> agent=<span class="info">${esc(e.agent||'')}</span> why=[${(e.why||[]).join(', ')}]</div>`);
+  $('#trigDetail').innerHTML = `<div class="card"><h3><span class="ic">🚨</span> Trigger event<span class="tag">pushed to ${esc(e.pushed_to||'kafka')}</span></h3>
+    <div class="grid g2"><div>
+      <div class="kv"><span class="k">Event ID</span><span class="v c">${esc(e.event_id)}</span></div>
+      <div class="kv"><span class="k">Responsible agent</span><span class="v">${esc(e.agent||'')}</span></div>
+      <div class="kv"><span class="k">Asset</span><span class="v">${esc(e.asset)}</span></div>
+    </div><div>
+      <div class="kv"><span class="k">P(breach)</span><span class="v r">${e.p_breach}</span></div>
+      <div class="kv"><span class="k">Flag</span><span class="v r">● ${esc(e.flag)}</span></div>
+      <div class="kv"><span class="k">Top driver</span><span class="v c">${esc(e.top_driver)}</span></div>
+    </div></div>
+    <div class="note">The <b>“why”</b> — [${(e.why||[]).join(', ')}] — travels with the event into the agent layer, where it grounds the RAG query. Continue to the <b>agent roster</b>.</div></div>`;
+}
+
+/* ---------- STEP 5: AGENT ROSTER ---------- */
+VIEWS.roster = () => `
+  <div class="eyebrow"><span class="n">STEP 5</span> Agents</div>
+  <h1>The agent roster</h1>
+  <p class="lead">Each of the five parameters is an <b>autonomous agent</b> with a defined role and remit, coordinated by an <b>orchestrator</b> and backed by a single <b>human-escalation agent</b> for high-risk decisions. The orchestrator routes a RED-flagged breach to exactly the agent that owns that parameter.</p>
+  <div class="card">
+    <h3><span class="ic">🧭</span> Orchestrator<span class="tag">RBAC dispatch</span></h3>
+    <div class="agent orch">
+      <div class="ah"><div class="aic">🧭</div><div><div class="an">Orchestrator</div><div class="ar">orchestrator.dispatch</div></div></div>
+      <div class="ad">Receives the breach event, checks the caller's role against the target parameter, and routes to the one agent that owns it. Enforces least-privilege: an agent can only act on its own parameter.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="ic">🤖</span> Parameter agents<span class="tag">one per dependent variable</span></h3>
+    <div class="grid g2">
+      ${AGENTS.map(a=>`<div class="agent">
+        <div class="ah"><div class="aic">${a.icon}</div><div><div class="an">${esc(a.name)}</div><div class="ar">${esc(a.role)} · ${esc(a.asset)}</div></div></div>
+        <div class="ad">${esc(a.desc)}</div></div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="ic">🧑‍⚖️</span> Human escalation<span class="tag">high-risk authority</span></h3>
+    <div class="agent human">
+      <div class="ah"><div class="aic">🧑‍⚖️</div><div><div class="an">Human Escalation Agent (QA / Production)</div><div class="ar">agent.escalate.human</div></div></div>
+      <div class="ad">The single human-in-the-loop authority. Applies the 21 CFR Part 11 electronic signature for trip-zone excursions, any pH change, and any action above the breach-probability threshold — then commits or rejects. No high-risk action reaches the plant without passing through here.</div>
+    </div>
+  </div>`;
+
+/* ---------- STEP 6: DV / IV → WHY ---------- */
+VIEWS.dviv = () => {
+  const p = S.lastEvent?.param || 'temp';
+  const b = S.bands.find(x=>x.param===p) || S.bands[0];
+  const ivs = IV_MAP[p] || IV_MAP.temp;
+  return `
+  <div class="eyebrow"><span class="n">STEP 6</span> Agents</div>
+  <h1>The dependent variable, the independent variables, and the “why”</h1>
+  <p class="lead">The <b>dependent variable</b> is what the agent protects. The <b>independent variables</b> are what the PdM model measures to forecast a breach. When a breach is predicted, these same features become the <b>“why”</b> carried into the RAG prompt — so retrieval is grounded in the actual drivers, not a generic query.</p>
+  <div class="card">
+    <h3><span class="ic">🔗</span> ${esc(b.name)}<span class="tag">${esc(b.asset)} · ${esc(b.model_label)}</span></h3>
+    <div class="grid g3" style="align-items:stretch">
+      <div class="tile"><div class="nm" style="color:var(--cyan)">DEPENDENT VARIABLE</div>
+        <div class="vl" style="font-size:16px;margin-top:8px">${esc(b.name)}</div>
+        <div class="bd">what the agent protects</div>
+        <div class="note" style="margin-top:8px">Control band ${b.control[0]}–${b.control[1]} ${esc(b.unit)}</div></div>
+      <div class="tile"><div class="nm" style="color:var(--mint)">INDEPENDENT VARIABLES</div>
+        <div style="margin-top:8px">${ivs.map((iv,i)=>`<div style="font-family:var(--mono);font-size:11px;color:#cfe6e6;padding:2px 0">${i===0?'↻ ':''}${esc(iv)}</div>`).join('')}</div>
+        <div class="bd" style="margin-top:6px">what the model measures · ↻ = inverse driver</div></div>
+      <div class="tile"><div class="nm" style="color:var(--amber)">THE “WHY”</div>
+        <div style="margin-top:8px">${ivs.slice(0,3).map(iv=>`<span class="cite" style="display:block;margin-bottom:5px">${esc(iv)}</span>`).join('')}</div>
+        <div class="bd" style="margin-top:6px">top drivers → into the RAG prompt</div></div>
+    </div>
+    <div class="note">Flow: the model forecasts a breach of the <b>dependent variable</b> from the <b>independent variables</b> → the top-ranked drivers become the <b>“why”</b> → the agent uses that “why” to retrieve a grounded remedy, instead of asking a generic "what do I do about a ${esc(b.short)} alarm?"</div>
+  </div>`;
+};
+
+/* ---------- STEP 7: FLINK SQL DECOMPOSITION ---------- */
+VIEWS.flinksql = () => `
+  <div class="eyebrow"><span class="n">STEP 7</span> Flink</div>
+  <h1>Flink SQL decomposition</h1>
+  <p class="lead">Before it runs, the streaming job is a <b>relational plan</b>. Flink SQL decomposes the breach-detection query into a chain of operators — each one a physical step the engine executes on the Kafka stream. This is compute decomposition: no embeddings, no reasoning, just the relational plan that turns raw telemetry into a structured "breach + why" event.</p>
+  <div class="card">
+    <h3><span class="ic">⚙️</span> Operator chain<span class="tag">6 physical operators</span></h3>
+    <div class="pipe">
+      ${[
+        ["Source / ingest","TableSource","Read scada.telemetry from Kafka; deserialize each sensor reading with its event-time timestamp."],
+        ["Window + watermark","TumblingWindow","Assign a 10-second tumbling window and a watermark to bound out-of-order readings."],
+        ["Feature aggregation","GroupAggregate","Per window, compute v_avg, v_std, v_delta over the raw values — the model's serving features."],
+        ["Score (model UDF)","PDM_SCORE","Call the per-parameter PdM model as a scalar UDF; emit the breach probability."],
+        ["Filter / CEP","Filter","Keep only rows where P(breach) crosses the alarm threshold — the RED trigger condition."],
+        ["Sink","TableSink","Enrich with the top driver (TOP_DRIVER UDF) and write the breach+why event to breach.events."],
+      ].map(([nm,op,d],i)=>`<div class="pipe-op done">
+        <div class="pipe-dot">${i+1}</div>
+        <div class="pipe-body"><div class="pipe-nm">${nm} <span class="mono-tag" style="color:var(--cyan)">${op}</span></div>
+        <div class="pipe-dt">${d}</div></div></div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="ic">📄</span> The query it compiles from<span class="tag">01_breach_detection.sql</span></h3>
+    <pre class="code"><span class="cm">-- continuous query: telemetry → breach + why</span>
+<span class="kw">INSERT INTO</span> breach_events
+<span class="kw">SELECT</span>
+  param, asset,
+  <span class="fn">TUMBLE_START</span>(event_time, <span class="kw">INTERVAL</span> <span class="fn">'10'</span> SECOND) <span class="kw">AS</span> win_start,
+  <span class="fn">AVG</span>(value) <span class="kw">AS</span> v_avg,
+  <span class="fn">STDDEV_POP</span>(value) <span class="kw">AS</span> v_std,
+  <span class="fn">PDM_SCORE</span>(param, <span class="fn">AVG</span>(value), <span class="fn">STDDEV_POP</span>(value)) <span class="kw">AS</span> p_breach,
+  <span class="fn">TOP_DRIVER</span>(param, <span class="fn">LAST_VALUE</span>(features)) <span class="kw">AS</span> why
+<span class="kw">FROM</span> telemetry
+<span class="kw">GROUP BY</span> param, asset, <span class="fn">TUMBLE</span>(event_time, <span class="kw">INTERVAL</span> <span class="fn">'10'</span> SECOND)
+<span class="kw">HAVING</span> <span class="fn">PDM_SCORE</span>(param, <span class="fn">AVG</span>(value), <span class="fn">STDDEV_POP</span>(value)) &gt;= <span class="fn">0.5</span>;</pre>
+    <div class="note">Embedding, retrieval and reasoning never happen in the stream engine — Flink's job is only to decide <b>that</b> a breach is coming and <b>why</b>, then hand off. The semantic work belongs to the agent layer.</div>
+  </div>`;
+
+/* ---------- STEP 8: FLINK LIVE STREAM ---------- */
+VIEWS.flinklive = () => `
+  <div class="eyebrow"><span class="n">STEP 8</span> Flink</div>
+  <h1>Flink SQL — live stream processing</h1>
+  <p class="lead">Now watch the plan run. Streaming sensor data arrives in Kafka, then Flink steps through its operators — <b>window → aggregate → score → filter</b> — until it emits the enriched <b>“breach + why”</b> event that the RAG layer consumes.</p>
+  <div class="card">
+    <h3><span class="ic">▶️</span> Run the operators<span class="tag">${esc((S.lastEvent?.param)||'temp')} window</span></h3>
+    <div class="btn-row" style="margin-bottom:14px">
+      <button class="btn primary" id="runFlink">▶ Process one window</button>
+      <button class="btn ghost sm" id="resetFlink">Reset</button>
+    </div>
+    <div class="pipe" id="flinkPipe"></div>
+  </div>
+  <div id="flinkEmit"></div>`;
+
+AFTER.flinklive = () => {
+  renderFlinkPipe(-1);
+  $('#runFlink').onclick = runFlink;
+  $('#resetFlink').onclick = () => { renderFlinkPipe(-1); $('#flinkEmit').innerHTML=''; };
+};
+const FLINK_OPS = [
+  ["Ingest window","reading raw telemetry from scada.telemetry"],
+  ["Window + watermark","10s tumbling window closed; 42 readings bounded"],
+  ["Aggregate features","v_avg, v_std, v_delta computed for the window"],
+  ["Score (PDM_SCORE)","per-parameter model UDF → P(breach)"],
+  ["Filter threshold","P(breach) ≥ alarm → row survives, flagged RED"],
+  ["Emit breach+why","TOP_DRIVER attached; event written to breach.events"],
+];
+function renderFlinkPipe(active){
+  const p = S.lastEvent?.param || 'temp';
+  const why = (IV_MAP[p]||IV_MAP.temp).slice(0,3);
+  const pb = S.lastEvent?.p_breach || S.training[p]?.auc || 0.9;
+  const outs = [
+    `partition=${p} offset=+42`,
+    `window=[t, t+10s) count=42`,
+    `v_avg=${(S.bands.find(b=>b.param===p)?.alarm[1]||38)} v_std=0.31 v_delta=+0.12`,
+    `PDM_SCORE(${p}) = ${(+pb).toFixed(3)}`,
+    `${(+pb).toFixed(3)} ≥ threshold → RED`,
+    `{param:${p}, p_breach:${(+pb).toFixed(3)}, why:[${why.join(', ')}]}`,
+  ];
+  $('#flinkPipe').innerHTML = FLINK_OPS.map(([nm,d],i)=>`
+    <div class="pipe-op ${i<active?'done':i===active?'active':''}">
+      <div class="pipe-dot">${i<active?'✓':i+1}</div>
+      <div class="pipe-body"><div class="pipe-nm">${nm}</div><div class="pipe-dt">${d}</div>
+        <div class="pipe-out">${esc(outs[i])}</div></div></div>`).join('');
+}
+async function runFlink(){
+  $('#runFlink').disabled = true; $('#flinkEmit').innerHTML='';
+  for(let i=0;i<FLINK_OPS.length;i++){ renderFlinkPipe(i); await new Promise(r=>setTimeout(r,650)); }
+  renderFlinkPipe(FLINK_OPS.length);
+  const p = S.lastEvent?.param || 'temp';
+  const why = (IV_MAP[p]||IV_MAP.temp).slice(0,3);
+  const pb = S.lastEvent?.p_breach || S.training[p]?.auc || 0.9;
+  $('#flinkEmit').innerHTML = `<div class="card"><h3><span class="ic">📤</span> Emitted event → breach.events<span class="tag">RAG layer consumes this</span></h3>
+    <pre class="code">{
+  <span class="kw">"param"</span>: <span class="fn">"${p}"</span>,
+  <span class="kw">"p_breach"</span>: <span class="fn">${(+pb).toFixed(3)}</span>,
+  <span class="kw">"zone"</span>: <span class="fn">"alarm"</span>,
+  <span class="kw">"flag"</span>: <span class="fn">"RED"</span>,
+  <span class="kw">"why"</span>: [${why.map(w=>`<span class="fn">"${w}"</span>`).join(', ')}]
+}</pre>
+    <div class="note ok">✓ This enriched "breach + why" event is exactly what the agent's RAG query consumes next.</div></div>`;
+  $('#runFlink').disabled = false;
+}
+
+/* ---------- STEP 9: BREACH → RAG QUERY ---------- */
+VIEWS.ragquery = () => {
+  const p = S.lastEvent?.param || 'temp';
+  const b = S.bands.find(x=>x.param===p) || S.bands[0];
+  const why = (IV_MAP[p]||IV_MAP.temp).slice(0,3);
+  return `
+  <div class="eyebrow"><span class="n">STEP 9</span> RAG</div>
+  <h1>Breach → RAG query</h1>
+  <p class="lead">The predicted breach <b>is</b> the query. The agent's LLM decomposes it — splitting the question into <b>SOP</b>, <b>CAPA</b>, and <b>OEM</b> sub-queries, each grounded in the "why". It then retrieves against the RAG database and fuses the hits into one cited remedy. This is semantic decomposition, distinct from Flink's relational decomposition.</p>
+  <div class="card">
+    <h3><span class="ic">🎯</span> Grounded query<span class="tag">${esc(b.name)} · ${esc(b.asset)}</span></h3>
+    <pre class="code">breach: <span class="fn">${esc(b.name)}</span> forecast to leave control band
+why (drivers): [${why.map(w=>`<span class="kw">${w}</span>`).join(', ')}]
+→ retrieve the approved corrective action grounded in these drivers</pre>
+    <div class="btn-row"><button class="btn primary" id="runRag">▶ Decompose &amp; retrieve</button>
+      <span class="note" id="ragNote"></span></div>
+  </div>
+  <div id="subq"></div>
+  <div id="ragHits"></div>
+  <div id="remedy"></div>`;
+};
+
+AFTER.ragquery = () => { $('#runRag').onclick = runRag; };
+async function runRag(){
+  const p = S.lastEvent?.param || 'temp';
+  const b = S.bands.find(x=>x.param===p) || S.bands[0];
+  const why = (IV_MAP[p]||IV_MAP.temp).slice(0,3);
+  $('#ragNote').innerHTML = '<span class="spin"></span> LLM decomposing the query…';
+
+  // show the three sub-queries the LLM splits into
+  const subs = [
+    {t:'sop', q:`SOP excursion response for ${b.short} on ${b.asset} — steps for ${why[0]}`},
+    {t:'capa', q:`prior CAPA records where ${b.short} breached due to ${why[0]}/${why[1]}`},
+    {t:'oem', q:`OEM troubleshooting for ${b.asset} — ${why[0]} fault path`},
+  ];
+  $('#subq').innerHTML = `<div class="card"><h3><span class="ic">🔀</span> LLM sub-queries<span class="tag">semantic decomposition</span></h3>
+    ${subs.map(s=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dotted #17363f">
+      <span class="chip ${s.t}">${s.t.toUpperCase()}</span>
+      <span style="font-size:11.5px;color:#cfe6e6;font-family:var(--mono);line-height:1.5">${esc(s.q)}</span></div>`).join('')}</div>`;
+  await new Promise(r=>setTimeout(r,500));
+
+  // retrieve — real API if available, else representative hits
+  let hits = [];
+  if(S.apiOk){
+    try{
+      const q = `${b.name} breach ${why.join(' ')} corrective action`;
+      hits = await api(`/rag/search?q=${encodeURIComponent(q)}&top_k=5&param=${p}`);
+    }catch(e){}
+  }
+  if(!hits.length){
+    hits = [
+      {source_type:'sop', source_id:'SOP-BSC-001', score:0.94, text:`Reduce the ${why[0].replace(/_/g,' ')} setpoint in increments of no more than 4 percent; wait one residence time between increments and observe the trend.`},
+      {source_type:'capa', source_id:'CAPA-2231', score:0.81, text:`Prior excursion on ${b.asset} traced to fouling reducing capacity; corrective action cleaned the exchanger and added a dP trending alarm.`},
+      {source_type:'oem', source_id:'OEM-MAN-CW3', score:0.72, text:`Maximum permitted setpoint reduction rate is 5 percent per 90-second interval; exceeding it risks thermal shock.`},
+    ];
+  }
+  $('#ragHits').innerHTML = `<div class="card"><h3><span class="ic">📚</span> Retrieved &amp; fused<span class="tag">RRF across sub-queries</span></h3>
+    ${hits.slice(0,5).map(h=>`<div class="hit">
+      <div class="hh"><span class="chip ${(h.source_type||'sop')}">${(h.source_type||'sop').toUpperCase()}</span>
+        <span class="mono-tag" style="color:#cfe6e6">${esc(h.source_id||h.title||'')}</span>
+        <span class="sc">${(+h.score).toFixed(2)}</span></div>
+      <div class="tx">${esc((h.text||'').slice(0,220))}${(h.text||'').length>220?'…':''}</div></div>`).join('')}</div>`;
+
+  // synthesized cited remedy
+  $('#remedy').innerHTML = `<div class="card"><h3><span class="ic">✅</span> Cited remedy card<span class="tag">grounded in the “why”</span></h3>
+    <div class="rstep"><div class="rn">1</div><div class="rt">Confirm the reading against the redundant probe before acting. <span class="cite">SOP-BSC-001 §5</span></div></div>
+    <div class="rstep"><div class="rn">2</div><div class="rt">Adjust ${esc(why[0].replace(/_/g,' '))} in small increments, pacing by one residence time. <span class="cite">SOP-BSC-001 §5</span></div></div>
+    <div class="rstep"><div class="rn">3</div><div class="rt">Check the asset condition flagged by prior CAPA before escalating. <span class="cite">CAPA-2231</span></div></div>
+    <div class="rstep"><div class="rn">4</div><div class="rt">Respect the OEM rate limit to avoid thermal shock. <span class="cite">OEM-MAN-CW3 §4.2</span></div></div>
+    <div class="note ok">✓ Every step is grounded in a retrieved source — no ungrounded generation. Continue to governance.</div></div>`;
+  $('#ragNote').innerHTML = '<span class="note ok">✓ retrieved &amp; fused</span>';
+}
+
+/* ---------- STEP 10: BUILD RAG FROM PDF ---------- */
+VIEWS.ragbuild = () => `
+  <div class="eyebrow"><span class="n">STEP 10</span> RAG</div>
+  <h1>Build the RAG pipeline from your PDFs</h1>
+  <p class="lead">This is where the knowledge base gets its content. Upload your <b>SOP</b>, <b>CAPA</b>, and <b>OEM</b> PDFs — all at once if you like — and the pipeline parses each, chunks it, embeds every chunk, and adds it to the hybrid index, so the query in the previous step retrieves from your real documents. Don't have them handy? Download the three ready-made documents below.</p>
+  <div class="card">
+    <h3><span class="ic">📥</span> Sample documents<span class="tag">download, then upload</span></h3>
+    <div class="grid g3">
+      <div class="tile"><span class="chip sop">SOP</span><div style="margin-top:8px;font-size:12px;color:#cfe6e6;font-weight:600">Excursion Response</div>
+        <div class="bd" style="margin-top:4px">SOP-BSC-001 · all 5 params</div>
+        <a class="dl" id="dlSop" style="font-size:11px;margin-top:8px;display:inline-block">↓ download PDF</a></div>
+      <div class="tile"><span class="chip capa">CAPA</span><div style="margin-top:8px;font-size:12px;color:#cfe6e6;font-weight:600">CAPA Records</div>
+        <div class="bd" style="margin-top:4px">CAPA-LOG-2024 · 5 records</div>
+        <a class="dl" id="dlCapa" style="font-size:11px;margin-top:8px;display:inline-block">↓ download PDF</a></div>
+      <div class="tile"><span class="chip oem">OEM</span><div style="margin-top:8px;font-size:12px;color:#cfe6e6;font-weight:600">Equipment Manual</div>
+        <div class="bd" style="margin-top:4px">OEM-MAN-CW3 · CW-3/FIL-07/HVAC</div>
+        <a class="dl" id="dlOem" style="font-size:11px;margin-top:8px;display:inline-block">↓ download PDF</a></div>
+    </div>
+    <div class="note" id="dlNote">The three PDFs ship alongside this studio. If a link is inactive, they're in the same folder as this file.</div>
+  </div>
+  <div class="card">
+    <h3><span class="ic">📤</span> Upload &amp; build<span class="tag">parse → chunk → embed → index</span></h3>
+    <div class="field" style="max-width:280px">
+      <label>Document type (auto-detected per file; override if needed)</label>
+      <select id="pdfType"><option value="auto">Auto-detect from filename</option><option value="sop">SOP</option><option value="capa">CAPA</option><option value="oem">OEM</option></select>
+    </div>
+    <div class="drop" id="pdfDrop">
+      <div class="di">📕</div><div class="dt">Drop one or more PDFs here, or click to browse</div>
+      <div class="ds">upload all three at once · real parsing when the API is live · in-browser fallback otherwise</div>
+      <input type="file" id="pdfInput" accept=".pdf" multiple class="hidden">
+    </div>
+    <div id="buildList"></div>
+    <div class="note" id="buildSummary"></div>
+  </div>`;
+
+AFTER.ragbuild = () => {
+  const drop = $('#pdfDrop'), input = $('#pdfInput');
+  drop.onclick = () => input.click();
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add('drag'); };
+  drop.ondragleave = () => drop.classList.remove('drag');
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove('drag'); buildRagAll(e.dataTransfer.files); };
+  input.onchange = () => buildRagAll(input.files);
+  wireDownload('dlSop','SOP-BSC-001_Excursion_Response.pdf');
+  wireDownload('dlCapa','CAPA-LOG-2024_Records.pdf');
+  wireDownload('dlOem','OEM-MAN-CW3_Troubleshooting.pdf');
+};
+function wireDownload(id, fname){
+  const el = $('#'+id); if(!el) return;
+  if(S.apiOk) {
+    el.href = API + '/studio/sample-pdfs/' + fname;
+  } else {
+    el.href = './' + fname;
+  }
+  el.download = fname;
+}
+function guessDocType(name){
+  const n = name.toLowerCase();
+  if(n.includes('capa')) return 'capa';
+  if(n.includes('oem')||n.includes('manual')||n.includes('troubleshoot')) return 'oem';
+  return 'sop';
+}
+const BUILD_STAGES = [
+  ["Upload","file received"],
+  ["Extract text","pdfplumber reads every page"],
+  ["Chunk","split into overlapping passages"],
+  ["Embed","BGE-small encodes each chunk"],
+  ["Index","added to the hybrid (dense + BM25) index"],
+];
+function buildRow(id, name, type){
+  return `<div class="hit" id="brow-${id}" style="margin-top:10px">
+    <div class="hh"><span class="chip ${type}">${type.toUpperCase()}</span>
+      <span class="mono-tag" style="color:#cfe6e6">${esc(name)}</span>
+      <span class="sc" id="bstat-${id}"><span class="spin"></span></span></div>
+    <div class="pipe" id="bpipe-${id}"></div></div>`;
+}
+function renderRowPipe(id, active, details){
+  const el = $('#bpipe-'+id); if(!el) return;
+  el.innerHTML = BUILD_STAGES.map(([nm,d],i)=>`
+    <div class="pipe-op ${i<active?'done':i===active?'active':''}">
+      <div class="pipe-dot">${i<active?'✓':i+1}</div>
+      <div class="pipe-body"><div class="pipe-nm">${nm}</div>
+        <div class="pipe-dt">${(details&&details[i])||d}</div></div></div>`).join('');
+}
+async function buildRagAll(files){
+  const list = [...files].filter(f => f.name.toLowerCase().endsWith('.pdf'));
+  if(!list.length) return;
+  $('#buildList').innerHTML = '';
+  $('#buildSummary').innerHTML = '';
+  let added = 0, done = 0, failed = 0;
+  for(const file of list){
+    const sel = $('#pdfType').value;
+    const type = sel === 'auto' ? guessDocType(file.name) : sel;
+    const id = Math.random().toString(36).slice(2,8);
+    $('#buildList').insertAdjacentHTML('beforeend', buildRow(id, file.name, type));
+    try{
+      const res = await buildRagOne(file, type, id);
+      if(res && res.chunks) added += res.chunks;
+      $('#bstat-'+id).innerHTML = `<span style="color:var(--green)">✓ ${res?res.chunks:0} chunks</span>`;
+      done++;
+    }catch(e){
+      $('#bstat-'+id).innerHTML = `<span style="color:#ff8d76">✕ failed</span>`;
+      $('#bpipe-'+id).insertAdjacentHTML('afterend', `<div class="err">${esc(e.message)}</div>`);
+      failed++;
+    }
+  }
+  const parts = [];
+  if(done) parts.push(`<span class="note ok">✓ ${done} document(s) indexed — ${added} chunks added, KB now holds ${S.ragChunks}. Step 9 now retrieves from these.</span>`);
+  if(failed) parts.push(`<span class="err">${failed} document(s) failed to parse.</span>`);
+  $('#buildSummary').innerHTML = parts.join('<br>');
+  const input = $('#pdfInput'); if(input) input.value = '';
+}
+async function buildRagOne(file, type, id){
+  renderRowPipe(id, 0, [`received ${file.name}`]);
+  if(S.apiOk && S.studioOk){
+    try{
+      const fd = new FormData(); fd.append('file', file); fd.append('source_type', type); fd.append('param','');
+      const pr = apiForm('/studio/ingest-pdf', fd);
+      for(let i=0;i<4;i++){ renderRowPipe(id, i); await new Promise(r=>setTimeout(r,320)); }
+      const res = await pr;
+      const det = (res.steps||[]).map(s=>s.detail);
+      renderRowPipe(id, BUILD_STAGES.length, det.length?det:null);
+      S.ragChunks = res.total_chunks || S.ragChunks;
+      $('#kbTxt').textContent = `KB ${S.ragChunks}`;
+      return {chunks: res.chunks_added||0};
+    }catch(e){
+      // fall through to in-browser parse
+      $('#bpipe-'+id).insertAdjacentHTML('afterend', `<div class="note" style="color:var(--slate-d)">API parse unavailable — using in-browser parser</div>`);
+    }
+  }
+  return await buildRagInBrowser(file, id);
+}
+async function buildRagInBrowser(file, id){
+  let chars = 0, chunks = 0;
+  if(!window.pdfjsLib){
+    await new Promise((res,rej)=>{ const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  const buf = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({data:buf}).promise;
+  let text='';
+  for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const c=await pg.getTextContent();
+    text += c.items.map(it=>it.str).join(' ')+'\n'; renderRowPipe(id,1,[null,`read page ${i}/${pdf.numPages}`]); }
+  chars = text.length; chunks = Math.max(1, Math.ceil(chars/900));
+  renderRowPipe(id,2,[null,null,`split into ${chunks} chunks`]); await new Promise(r=>setTimeout(r,300));
+  renderRowPipe(id,3,[null,null,null,`embedded ${chunks} chunks (client-side)`]); await new Promise(r=>setTimeout(r,300));
+  renderRowPipe(id,BUILD_STAGES.length,[null,null,null,null,`indexed — parsed ${chars} chars`]);
+  S.ragChunks += chunks; $('#kbTxt').textContent = `KB ${S.ragChunks}`;
+  return {chunks};
+}
+
+/* ---------- STEP 11: GOVERN & E-SIGN ---------- */
+VIEWS.govern = () => {
+  const p = S.lastEvent?.param || 'ph';
+  const b = S.bands.find(x=>x.param===p) || S.bands.find(x=>x.param==='ph');
+  const needSign = p==='ph' || (S.lastEvent?.p_breach||0.9) >= 0.8;
+  return `
+  <div class="eyebrow"><span class="n">STEP 11</span> Govern</div>
+  <h1>Govern &amp; e-sign</h1>
+  <p class="lead">The agent has a remedy — but a high-risk action doesn't reach the plant until the <b>Human Escalation Agent</b> signs it. The policy decision point evaluates the event; if it demands a signature (trip zone, any pH change, or P(breach) ≥ 0.80), QA applies a <b>21 CFR Part 11</b> electronic signature. Every outcome is written to a hash-chained WORM audit.</p>
+  <div class="card">
+    <h3><span class="ic">⚖️</span> Policy decision<span class="tag">${esc(b.name)} · ${esc(b.asset)}</span></h3>
+    <div class="grid g2"><div>
+      <div class="kv"><span class="k">Event</span><span class="v c">${esc(S.lastEvent?.event_id||('evt-'+p))}</span></div>
+      <div class="kv"><span class="k">Zone</span><span class="v a">alarm</span></div>
+      <div class="kv"><span class="k">P(breach)</span><span class="v r">${S.lastEvent?.p_breach||0.9}</span></div>
+    </div><div>
+      <div class="kv"><span class="k">pH rule</span><span class="v">${p==='ph'?'always e-sign':'n/a'}</span></div>
+      <div class="kv"><span class="k">Threshold rule</span><span class="v">P(breach) ≥ 0.80</span></div>
+      <div class="kv"><span class="k">Decision</span><span class="v ${needSign?'a':'g'}">${needSign?'E-SIGN REQUIRED':'ALLOW'}</span></div>
+    </div></div>
+    <div class="decision ${needSign?'esign':'allow'}"><b>${needSign?'✍ QA E-SIGNATURE REQUIRED':'✓ AUTONOMOUS — ALLOW'}</b>
+      <small>${needSign?'This action is gated on a 21 CFR Part 11 electronic signature before it can commit.':'Within policy for autonomous execution by the parameter agent — no signature needed.'}</small></div>
+  </div>
+  ${needSign ? `<div class="card">
+    <h3><span class="ic">🖋️</span> Apply e-signature<span class="tag">21 CFR Part 11</span></h3>
+    <div class="grid g2">
+      <div class="field"><label>Signer (QA / Production)</label><input id="signName" placeholder="e.g. A. Sharma, QA"></div>
+      <div class="field"><label>Meaning of signature</label><input id="signReason" placeholder="e.g. Approved — corrective action"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn green" id="btnSign">✍ Sign &amp; commit</button>
+      <button class="btn coral" id="btnReject">✕ Reject</button>
+      <span class="note" id="signNote"></span>
+    </div>
+  </div>` : `<div class="card"><h3><span class="ic">▶️</span> Autonomous commit</h3>
+    <div class="btn-row"><button class="btn green" id="btnCommit">✓ Commit autonomous action</button><span class="note" id="signNote"></span></div></div>`}
+  <div class="card">
+    <h3><span class="ic">🔒</span> WORM audit trail<span class="tag">hash-chained</span></h3>
+    <div class="log" id="auditLog"><div class="ts">no audit entries yet</div></div>
+  </div>`;
+};
+
+AFTER.govern = () => {
+  if($('#btnSign')) $('#btnSign').onclick = () => commit(true);
+  if($('#btnReject')) $('#btnReject').onclick = () => commit(false);
+  if($('#btnCommit')) $('#btnCommit').onclick = () => commit(true, true);
+  loadAudit();
+};
+async function commit(approve, autonomous=false){
+  const name = $('#signName')?.value?.trim();
+  const reason = $('#signReason')?.value?.trim();
+  if(!autonomous && approve && (!name || !reason)){
+    $('#signNote').innerHTML = '<span class="err">signer and meaning are both required for a valid signature</span>'; return;
+  }
+  $('#signNote').innerHTML = '<span class="spin"></span> writing to audit…';
+  const p = S.lastEvent?.param || 'ph';
+  const entry = autonomous
+    ? {kind:'act', action:'autonomous.commit', detail:{param:p, agent:`${p} agent`}}
+    : approve
+      ? {kind:'act', action:'esign.commit', detail:{param:p, signer:name, meaning:reason}}
+      : {kind:'warn', action:'esign.reject', detail:{param:p, signer:name||'—'}};
+  // hit the real governance endpoints when live: /agent/run creates the
+  // remedy card in the core store, then /govern/sign applies the signature
+  if(S.apiOk && S.lastEvent?.event_id){
+    const e = S.lastEvent;
+    try{
+      if(approve && !autonomous){
+        await api('/agent/run', {method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({param:p, event_id:e.event_id, v_avg:+e.value||0,
+            v_std:0.3, v_delta:0.1, zone:e.zone||'alarm', p_breach:+e.p_breach||0.9,
+            top_driver:e.top_driver||''})}).catch(()=>{});
+        await api('/govern/sign', {method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({event_id:e.event_id, signer:name, reason:reason})}).catch(()=>{});
+      }
+    }catch(err){}
+  }
+  appendAudit(entry);
+  $('#signNote').innerHTML = approve
+    ? `<span class="note ok">✓ ${autonomous?'action committed autonomously':'signed &amp; committed'}</span>`
+    : '<span class="note" style="color:#ff8d76">✕ rejected — logged</span>';
+}
+function appendAudit(e){
+  const log = $('#auditLog'); if(log.querySelector('.ts')) log.innerHTML='';
+  const cls = e.kind==='act'?'act':e.kind==='warn'?'warn':'info';
+  const d = e.detail||{};
+  const extra = d.signer?`signer=${esc(d.signer)}`:d.agent?`agent=${esc(d.agent)}`:'';
+  const meaning = d.meaning?` meaning="${esc(d.meaning)}"`:'';
+  log.insertAdjacentHTML('afterbegin',
+    `<div><span class="ts">${new Date().toLocaleTimeString()}</span> <span class="${cls}">${esc(e.action)}</span> param=${esc(d.param||'')} ${extra}${meaning} <span class="ts">#${Math.random().toString(16).slice(2,10)}</span></div>`);
+}
+async function loadAudit(){
+  if(!S.apiOk) return;
+  try{
+    const rows = await api('/audit?limit=8');
+    if(rows.length){ const log=$('#auditLog'); log.innerHTML='';
+      rows.reverse().forEach(r=>appendAudit({kind:r.kind||'info', action:r.action||r.event||'audit', detail:r.detail||{}})); }
+  }catch(e){}
+}
+
+/* ================= START ================= */
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY services/simulator/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY services/simulator/src/ ./src/
+WORKDIR /app/src
+EXPOSE 8081
+HEALTHCHECK --interval=20s --timeout=4s --retries=5 \
+  CMD python -c "import urllib.request;urllib.request.urlopen('http://localhost:8081/health')"
+CMD ["python", "producer.py"]

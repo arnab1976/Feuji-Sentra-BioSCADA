@@ -1,0 +1,6 @@
+sentence-transformers>=3.0
+rank-bm25>=0.2.2
+qdrant-client>=1.9
+numpy>=1.24
+# optional document parsing:
+PyMuPDF>=1.24

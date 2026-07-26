@@ -1,0 +1,3 @@
+-r ../rag/requirements.txt
+# optional alternative orchestration (no LangChain/LangGraph needed):
+haystack-ai>=2.6

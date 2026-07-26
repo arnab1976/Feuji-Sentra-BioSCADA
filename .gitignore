@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# trained artifacts and built indexes are reproducible
+services/ml/models/*.joblib
+services/ml/models/metrics.json
+services/rag/index/
+
+# local env
+.env
+*.log

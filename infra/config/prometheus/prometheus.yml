@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: bioscada-api
+    static_configs: [{targets: ['api:8000']}]
+  - job_name: flink
+    static_configs: [{targets: ['flink-jobmanager:8081']}]
+  - job_name: redpanda
+    static_configs: [{targets: ['redpanda:9644']}]

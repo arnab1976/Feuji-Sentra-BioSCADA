@@ -1,0 +1,10 @@
+wo_id,asset,component,parameter,completed,trigger,action,findings,downtime_min,note
+WO-8821,BR-12,Heat exchanger HX-1,temp,2024-04-19,dP exceeded 35 kPa,Clean-in-place of plate pack,Moderate protein fouling on process side,180,dP returned to 18 kPa after clean
+WO-8847,BR-12,Chiller CW-3 condenser,temp,2024-06-03,Discharge temperature above 8 degC,Condenser coil cleaning,Heavy dust loading on condenser fins,120,Discharge returned to 6.2 degC
+WO-8902,BR-12,Dosing pump P-2,ph,2024-02-12,CAPA-1987 corrective action,Actuator replacement,Original actuator response time 4.2s against 1.5s specification,240,Response time after replacement 1.1s
+WO-8955,BR-12,pH probe PH-1201,ph,2024-03-23,Calibration drift,Probe replacement and recalibration,Reference junction fouled,60,Offset within 2 mV after replacement
+WO-9012,FIL-07,Filter cartridge,press,2024-03-15,Bubble point failure,Filter cartridge replacement,Cartridge at 118 percent of validated throughput,90,dP returned to 102 kPa
+WO-9077,FIL-07,Exhaust line,press,2024-05-08,Restricted exhaust flow,Condensate trap installation,Standing condensate in horizontal run,150,Exhaust flow restored to 78 units
+WO-9134,WFI-02,Resin bed,cond,2024-07-16,Cycle count exceeded,Resin bed regeneration,Resin at 162 cycles against 150 limit,300,Conductivity returned to 780 uS/cm
+WO-9201,CR-A1,HVAC cooling coil,hum,2024-01-26,RH out of band,Coil cleaning and control loop retune,Coil approach temperature elevated by 3.1 degC,240,RH stabilised at 46 percent
+WO-9255,CR-A1,HEPA filter bank,hum,2024-09-11,HEPA dP elevated,HEPA filter replacement,Filters at 92 percent of loading limit,180,Airflow restored to design

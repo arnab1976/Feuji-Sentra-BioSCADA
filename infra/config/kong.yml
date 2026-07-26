@@ -1,0 +1,17 @@
+_format_version: "3.0"
+services:
+  - name: bioscada-api
+    url: http://api:8000
+    routes:
+      - name: api-route
+        paths: ["/api"]
+    plugins:
+      - name: rate-limiting
+        config: {minute: 300, policy: local}
+      - name: cors
+        config:
+          origins: ["*"]
+          methods: [GET, POST, OPTIONS]
+      # Enable once Keycloak realm is imported:
+      # - name: jwt
+      #   config: {claims_to_verify: [exp]}
