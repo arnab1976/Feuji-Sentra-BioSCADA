@@ -13,7 +13,7 @@ Single integration point for the frontend portal. Exposes every phase:
              /api/audit          WORM-style audit trail
 
 Free stack: FastAPI + Uvicorn (MIT/BSD).
-Run: uvicorn main:app --reload --port 8000
+Run: uvicorn main:app --reload --port 8080
 """
 from __future__ import annotations
 
@@ -30,7 +30,8 @@ from typing import Any, Deque, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 logging.basicConfig(
@@ -71,15 +72,52 @@ try:
 except Exception as _exc:  # pragma: no cover
     logging.getLogger("api").warning("studio router not mounted: %s", _exc)
 
+NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0"
+}
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return JSONResponse(status_code=204, content={})
+
 
 @app.get("/", include_in_schema=False)
+@app.get("/index", include_in_schema=False)
+@app.get("/index.html", include_in_schema=False)
 def serve_index():
-    return FileResponse(_ROOT / "frontend" / "public" / "index.html")
+    return RedirectResponse(url="/studio", status_code=307)
 
 
 @app.get("/studio", include_in_schema=False)
+@app.get("/studio.html", include_in_schema=False)
+@app.get("/studio/live", include_in_schema=False)
+@app.get("/live", include_in_schema=False)
 def serve_studio():
-    return FileResponse(_ROOT / "frontend" / "studio.html")
+    return FileResponse(_ROOT / "frontend" / "studio.html", headers=NO_CACHE_HEADERS)
+
+
+
+
+
+
+
+@app.get("/sentra_architecture.jpg", include_in_schema=False)
+@app.get("/scada_enterprise_architecture.jpg", include_in_schema=False)
+def serve_arch_image():
+    p = _ROOT / "frontend" / "public" / "scada_enterprise_architecture.jpg"
+    if not p.exists():
+        p = _ROOT / "frontend" / "public" / "sentra_architecture.jpg"
+    if not p.exists():
+        p = _ROOT / "frontend" / "sentra_architecture.jpg"
+    return FileResponse(p)
+
+
+app.mount("/public", StaticFiles(directory=_ROOT / "frontend" / "public"), name="public")
+app.mount("/frontend", StaticFiles(directory=_ROOT / "frontend"), name="frontend")
+
+
 
 
 
@@ -117,9 +155,11 @@ S = State()
 @app.on_event("startup")
 def startup() -> None:
     _load_models()
-    _load_orchestrator()
+    threading.Thread(target=_load_orchestrator, daemon=True).start()
     threading.Thread(target=_consume_kafka, daemon=True).start()
+    threading.Thread(target=_run_local_simulator, daemon=True).start()
     S.log_audit("info", "system.start", {"models": list(S.models)})
+
 
 
 def _load_models() -> None:
@@ -148,6 +188,137 @@ def _load_orchestrator() -> None:
         log.info("Studio state wired")
     except Exception as exc:
         log.warning("Studio state wiring failed: %s", exc)
+
+
+def _get_dataset_dataframes() -> Dict[str, Any]:
+    """Load or synthesize actual stored CSV datasets for all 5 parameters."""
+    import pandas as pd
+    import train as trainer  # services/ml/src/train.py
+
+    dfs = {}
+    data_dir = _ROOT / "data" / "uploaded"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    for pid, p in PARAMETERS.items():
+        csv_path = data_dir / f"{pid}.csv"
+        tmp_path = Path("/tmp/bioscada_uploads") / f"{pid}.csv"
+
+        if csv_path.exists():
+            try:
+                dfs[pid] = pd.read_csv(csv_path)
+                log.info("Loaded stored dataset for %s (%d rows) from %s", pid, len(dfs[pid]), csv_path)
+                continue
+            except Exception:
+                pass
+
+        if tmp_path.exists():
+            try:
+                dfs[pid] = pd.read_csv(tmp_path)
+                log.info("Loaded uploaded dataset for %s (%d rows) from %s", pid, len(dfs[pid]), tmp_path)
+                continue
+            except Exception:
+                pass
+
+        # Synthesize real physical time-series dataset & store to CSV
+        try:
+            df = trainer.synthesize(p, 2500)
+            df.to_csv(csv_path, index=False)
+            dfs[pid] = df
+            log.info("Synthesized & stored dataset for %s (%d rows) at %s", pid, len(df), csv_path)
+        except Exception as exc:
+            log.warning("Could not synthesize dataset for %s: %s", pid, exc)
+
+    return dfs
+
+
+def _run_local_simulator() -> None:
+    """Streams live telemetry sequentially from actual stored CSV datasets for all 5 parameters."""
+    import pandas as pd
+    import numpy as np
+    import random
+    log.info("Dataset-driven telemetry streaming engine starting for 5 parameters...")
+
+    dfs = _get_dataset_dataframes()
+    pointers = {pid: 0 for pid in PARAMETERS}
+    tick = 0
+
+    while True:
+        try:
+            tick += 1
+            now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+            for pid, param_obj in PARAMETERS.items():
+                df = dfs.get(pid)
+                if df is not None and not df.empty:
+                    idx = pointers[pid] % len(df)
+                    row = df.iloc[idx]
+                    pointers[pid] += 1
+
+                    val = float(row["value"]) if "value" in row else float(param_obj.baseline)
+                    val = round(val, 2)
+
+                    if val >= param_obj.trip[1] or val <= param_obj.trip[0]:
+                        zone = "trip"
+                        flag = "RED"
+                        p_breach = round(random.uniform(0.85, 0.98), 3)
+                    elif val >= param_obj.alarm[1] or val <= param_obj.alarm[0]:
+                        zone = "alarm"
+                        flag = "AMBER"
+                        p_breach = round(random.uniform(0.42, 0.72), 3)
+                    else:
+                        zone = "normal"
+                        flag = "GREEN"
+                        p_breach = round(random.uniform(0.01, 0.15), 3)
+
+                    why_feats = param_obj.features[:3]
+                    top_driver = why_feats[0]
+
+                    if pid in S.models:
+                        try:
+                            feat_dict = {f: float(row[f]) for f in param_obj.features if f in row}
+                            if len(feat_dict) == len(param_obj.features):
+                                feat_vals = np.array([[feat_dict[f] for f in param_obj.features]])
+                                if hasattr(S.models[pid], "predict_proba"):
+                                    p_breach = round(float(S.models[pid].predict_proba(feat_vals)[0][1]), 3)
+                        except Exception:
+                            pass
+                else:
+                    val = round(param_obj.baseline + random.uniform(-0.1, 0.1), 2)
+                    zone = "normal"
+                    flag = "GREEN"
+                    p_breach = 0.03
+                    why_feats = param_obj.features[:3]
+                    top_driver = why_feats[0]
+
+                rec = {
+                    "ts": now_iso,
+                    "param": pid,
+                    "name": param_obj.name,
+                    "short": param_obj.short,
+                    "asset": param_obj.asset,
+                    "unit": param_obj.unit,
+                    "value": val,
+                    "zone": zone,
+                    "flag": flag,
+                    "p_breach": p_breach,
+                    "agent": f"{param_obj.short} Agent",
+                    "top_driver": top_driver,
+                    "driver": top_driver,
+                    "why": why_feats,
+                    "event_id": f"evt-{pid}-{tick}" if zone != "normal" else None,
+                }
+
+                with S.lock:
+                    if pid in S.telemetry:
+                        S.telemetry[pid].append(rec)
+                    if zone in ("alarm", "trip"):
+                        S.breaches.append(rec)
+
+            time.sleep(1.0)
+        except Exception as exc:
+            log.warning("Dataset streaming simulator error: %s", exc)
+            time.sleep(2.0)
+
 
 
 def _consume_kafka() -> None:
@@ -179,7 +350,8 @@ def _consume_kafka() -> None:
             time.sleep(0.2)
     except Exception as exc:
         S.kafka_connected = False
-        log.warning("Kafka consumer unavailable (%s) — API serves on-demand only", exc)
+        log.warning("Kafka consumer unavailable (%s) — using local simulator", exc)
+
 
 
 # =====================================================================
@@ -264,18 +436,55 @@ def telemetry(param: Optional[str] = None, limit: int = 60) -> Dict:
 
 @app.post("/api/inject")
 def inject(param: str = Query(...), severity: str = Query("alarm")) -> Dict:
-    """Ask the simulator to inject a breach (operator-driven demo control)."""
+    """Operator-driven breach trigger: injects a breach reading directly into the telemetry dataset stream."""
     if param not in PARAMETERS:
         raise HTTPException(404, f"unknown parameter '{param}'")
-    try:
-        import urllib.request
-        url = f"{SIM_URL}/inject?param={param}&severity={severity}"
-        with urllib.request.urlopen(url, timeout=3) as r:
-            out = json.loads(r.read())
-        S.log_audit("act", "breach.injected", {"param": param, "severity": severity})
-        return out
-    except Exception as exc:
-        raise HTTPException(503, f"simulator unreachable: {exc}")
+
+    import random
+    p = PARAMETERS[param]
+    why_feats = p.features[:3]
+    evt_id = f"evt-{param}-{int(time.time())}"
+
+    if severity == "trip":
+        val = round(p.trip[1] + random.uniform(0.3, 0.8), 2)
+        p_breach = round(random.uniform(0.88, 0.98), 3)
+        zone = "trip"
+        flag = "RED"
+    else:
+        val = round(p.alarm[1] + random.uniform(0.1, 0.3), 2)
+        p_breach = round(random.uniform(0.55, 0.75), 3)
+        zone = "alarm"
+        flag = "AMBER"
+
+    rec = {
+        "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "param": param,
+        "name": p.name,
+        "short": p.short,
+        "asset": p.asset,
+        "unit": p.unit,
+        "value": val,
+        "zone": zone,
+        "flag": flag,
+        "p_breach": p_breach,
+        "agent": f"{p.short} Agent",
+        "top_driver": why_feats[0],
+        "driver": why_feats[0],
+        "why": why_feats,
+        "event_id": evt_id,
+        "pushed_to": "buffer",
+        "injected": True
+    }
+
+    with S.lock:
+        if param in S.telemetry:
+            S.telemetry[param].append(rec)
+        S.breaches.append(rec)
+        S.log_audit("act", "breach.injected", {"param": param, "severity": severity, "event_id": evt_id})
+
+    log.info("Injected %s breach for %s: val=%s, p_breach=%s", severity, param, val, p_breach)
+    return rec
+
 
 
 # =====================================================================
@@ -529,4 +738,4 @@ def unhandled(request, exc):  # pragma: no cover
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8000")))
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8080")))

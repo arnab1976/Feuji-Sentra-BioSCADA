@@ -115,6 +115,29 @@ pre.code{font-family:var(--mono);font-size:11px;line-height:1.65;background:#061
 .decision small{display:block;color:var(--slate);font-size:11px;margin-top:5px}
 .note{font-size:11.5px;color:var(--slate);margin-top:8px}
 .err{color:#ff8d76;font-size:11.5px;margin-top:8px}
+
+/* Enterprise Home Page Styles */
+.hero-banner{background:linear-gradient(135deg,rgba(18,110,130,.25),rgba(15,61,62,.4));border:1px solid var(--teal);border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.3);position:relative;overflow:hidden}
+.hero-banner::after{content:"";position:absolute;right:-50px;bottom:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(43,179,192,.15) 0%,transparent 70%);pointer-events:none}
+.hero-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:8px;background:linear-gradient(135deg,#fff 60%,var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-desc{font-size:14px;color:#b2d4d4;line-height:1.65;max-width:850px;margin-bottom:18px}
+.hero-img-box{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#06161a;margin-top:16px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.hero-img-box img{width:100%;max-height:420px;object-fit:cover;display:block;transition:transform .3s ease}
+.hero-img-box:hover img{transform:scale(1.01)}
+.hero-img-caption{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;background:linear-gradient(0deg,rgba(6,22,26,.95),rgba(6,22,26,0));display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--slate)}
+
+.arch-stage{background:linear-gradient(180deg,#0d272f,#091a1f);border:1px solid var(--line);border-radius:10px;padding:16px;position:relative;transition:.2s}
+.arch-stage:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.3)}
+.arch-stage .stage-num{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--cyan);padding:2px 8px;border-radius:12px;background:rgba(43,179,192,.15);display:inline-block;margin-bottom:8px}
+.arch-stage h4{font-size:14px;color:#fff;font-weight:600;margin-bottom:6px}
+.arch-stage p{font-size:12px;color:var(--slate);line-height:1.5;margin-bottom:10px}
+.arch-stage .stage-link{font-size:11.5px;font-weight:600;color:var(--mint);text-decoration:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.arch-stage .stage-link:hover{color:#fff;text-decoration:underline}
+
+.metric-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px}
+.metric-pill{background:#0a1f25;border:1px solid var(--line);border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.metric-pill .lbl{font-size:11px;color:var(--slate);font-weight:500}
+.metric-pill .val{font-family:var(--mono);font-size:13px;font-weight:700;color:#fff}
 </style>
 </head>
 <body>
@@ -130,25 +153,102 @@ pre.code{font-family:var(--mono);font-size:11px;line-height:1.65;background:#061
 
 <div class="shell">
   <aside class="nav">
+    <div class="navgroup">Overview</div>
+    <div class="navitem active" data-v="home"><span>Home Platform</span><span class="num">HQ</span></div>
     <div class="navgroup">Pipeline</div>
-    <div class="navitem active" data-v="live"><span>Control Room</span><span class="num">P0</span></div>
+    <div class="navitem" data-v="live"><span>Control Room</span><span class="num">P0</span></div>
     <div class="navitem" data-v="flink"><span>Flink SQL</span><span class="num">P1</span></div>
     <div class="navitem" data-v="predict"><span>Prediction</span><span class="num">P2</span></div>
     <div class="navitem" data-v="agent"><span>Agent &amp; RAG</span><span class="num">P3</span></div>
     <div class="navitem" data-v="govern"><span>Govern &amp; Sign</span><span class="num">P4</span></div>
-    <div class="navgroup">Knowledge</div>
+    <div class="navgroup">Knowledge &amp; Trust</div>
     <div class="navitem" data-v="kb"><span>Knowledge Base</span></div>
     <div class="navitem" data-v="audit"><span>Audit Trail</span></div>
   </aside>
 
   <main class="main">
-    <!-- ============ CONTROL ROOM ============ -->
-    <section class="view on" id="v-live">
-      <div class="eyebrow">Phase 0 · Ingestion</div>
-      <h1>Control room</h1>
-      <p class="lead">Live SCADA telemetry streaming through Kafka. Inject a breach to drive the pipeline end to end.</p>
+    <!-- ============ HOME PLATFORM ============ -->
+    <section class="view on" id="v-home">
+      <div class="eyebrow">Enterprise Autonomous Intelligence</div>
+      <h1 style="font-size:26px;margin-bottom:8px">BioSCADA AI — Threshold Monitoring &amp; Agentic Maintenance</h1>
+      <p class="lead" style="max-width:920px">
+        An end-to-end, multi-agent AI ecosystem that automates SCADA breach diagnosis, retrieves validated SOP remedies from a governed knowledge base, and executes corrective actions under zero-trust, 21 CFR Part 11 GxP compliance.
+      </p>
+
+      <!-- Hero Image & Telemetry Section -->
+      <div class="hero-banner">
+        <h2 class="hero-title">Streaming Event-Driven Telemetry &amp; Multi-Agent AI Architecture</h2>
+        <p class="hero-desc">
+          High-frequency IoT sensor telemetry is ingested through Kafka/Redpanda and continuously aggregated by Apache Flink SQL. Machine learning models predict parameter excursions in real time, while autonomous parameter agents query structured CAPA records and unstructured SOPs to formulate cited, compliant remedies.
+        </p>
+
+        <div class="hero-img-box">
+          <img src="/scada_enterprise_architecture.jpg" alt="BioSCADA Enterprise Streaming & Multi-Agent Architecture" onerror="this.src='sentra_architecture.jpg'">
+          <div class="hero-img-caption">
+            <span><b>BioSCADA AI Platform</b> — Real-time telemetry ingestion, Flink stream processing, predictive ML, &amp; zero-trust governance</span>
+            <span class="pill" style="background:rgba(43,179,192,.2);color:var(--mint)">Enterprise System Topology</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enterprise Level Architecture Section -->
       <div class="card">
-        <h3>Operator controls<span class="tag">simulator</span></h3>
+        <h3>Enterprise System Architecture &amp; Execution Pipeline<span class="tag">5 Core Phases</span></h3>
+        <div class="grid g3" style="margin-top:14px">
+          
+          <div class="arch-stage">
+            <span class="stage-num">PHASE 0</span>
+            <h4>Streaming Telemetry Ingestion</h4>
+            <p>High-rate sensors stream reactor temp, pH, differential pressure, conductivity, and cleanroom humidity into Kafka/Redpanda topics.</p>
+            <a class="stage-link" onclick="switchNav('live')">Open Control Room &rarr;</a>
+          </div>
+
+          <div class="arch-stage">
+            <span class="stage-num">PHASE 1</span>
+            <h4>Flink Stream Processing</h4>
+            <p>Apache Flink SQL computes rolling window aggregates, evaluates UDF risk scores, and emits structured breach events.</p>
+            <a class="stage-link" onclick="switchNav('flink')">Inspect Flink SQL Plan &rarr;</a>
+          </div>
+
+          <div class="arch-stage">
+            <span class="stage-num">PHASE 2</span>
+            <h4>Predictive Maintenance (PdM)</h4>
+            <p>Per-parameter ML models (GBM, Random Forest, ANN) forecast breach probability and isolate top drivers via SHAP analysis.</p>
+            <a class="stage-link" onclick="switchNav('predict')">Run Predictive Models &rarr;</a>
+          </div>
+
+          <div class="arch-stage">
+            <span class="stage-num">PHASE 3</span>
+            <h4>Agentic RAG Orchestration</h4>
+            <p>Autonomous ParameterAgents decompose complex questions into sub-queries, performing hybrid vector fusion across SOPs &amp; CAPA records.</p>
+            <a class="stage-link" onclick="switchNav('agent')">Activate AI Agents &rarr;</a>
+          </div>
+
+          <div class="arch-stage">
+            <span class="stage-num">PHASE 4</span>
+            <h4>Zero-Trust GxP Governance</h4>
+            <p>Open Policy Agent (OPA) evaluates RBAC policies and mandates 21 CFR Part 11 electronic signatures for high-risk setpoint updates.</p>
+            <a class="stage-link" onclick="switchNav('govern')">Govern &amp; E-Sign &rarr;</a>
+          </div>
+
+          <div class="arch-stage" style="background:linear-gradient(180deg,#10343e,#0c252d)">
+            <span class="stage-num" style="color:var(--mint);background:rgba(143,214,189,.15)">TRUST &amp; AUDIT</span>
+            <h4>WORM Compliance Ledger</h4>
+            <p>Every sensor telemetry reading, ML prediction, agent decision, and operator signature is committed to an append-only, hash-chained audit log.</p>
+            <a class="stage-link" onclick="switchNav('audit')">View Audit Trail &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTROL ROOM ============ -->
+    <section class="view" id="v-live">
+      <div class="eyebrow">Phase 0 · Ingestion &amp; Live Simulation</div>
+      <h1>Live SCADA Telemetry Control Room</h1>
+      <p class="lead">Live SCADA telemetry streaming through Kafka. Use operator controls to simulate threshold breaches and trigger downstream processing.</p>
+      <div class="card">
+        <h3>Operator Controls<span class="tag">telemetry simulator</span></h3>
         <div class="row" id="injectRow"></div>
         <div class="note" id="injectNote"></div>
       </div>
@@ -276,8 +376,7 @@ const API = (() => {
   const override = new URLSearchParams(location.search).get('api');
   if (override) return override.replace(/\/$/, '');
   if (location.protocol === 'file:') return 'http://localhost:8000/api';
-  if (location.port === '' || location.port === '3000' || location.port === '80') return '/api';
-  return 'http://localhost:8000/api';
+  return location.origin + '/api';
 })();
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -290,15 +389,19 @@ async function api(path, opts={}){
 }
 
 /* ---------------- nav ---------------- */
-$$('.navitem').forEach(n => n.onclick = () => {
-  $$('.navitem').forEach(x => x.classList.remove('active'));
-  n.classList.add('active');
+function switchNav(target){
+  $$('.navitem').forEach(x => {
+    if(x.dataset.v === target) x.classList.add('active');
+    else x.classList.remove('active');
+  });
   $$('.view').forEach(v => v.classList.remove('on'));
-  $('#v-' + n.dataset.v).classList.add('on');
-  if(n.dataset.v === 'audit') loadAudit();
-  if(n.dataset.v === 'kb') loadKbStats();
-  if(n.dataset.v === 'flink') loadFlink();
-});
+  const el = $('#v-' + target);
+  if(el) el.classList.add('on');
+  if(target === 'audit') loadAudit();
+  if(target === 'kb') loadKbStats();
+  if(target === 'flink') loadFlink();
+}
+$$('.navitem').forEach(n => n.onclick = () => switchNav(n.dataset.v));
 
 /* ---------------- boot ---------------- */
 async function boot(){
@@ -325,7 +428,7 @@ async function boot(){
 
   PARAMS.forEach(p => hist[p.id] = []);
   renderTiles();
-  setInterval(pollTelemetry, 2000);
+  setInterval(pollTelemetry, 1000);
   pollTelemetry();
   loadFlink();
 }

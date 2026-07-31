@@ -2,7 +2,7 @@
 # Everything here uses free / open-source tooling only.
 
 PY      ?= python3
-PORT    ?= 8000
+PORT    ?= 8080
 SAMPLES ?= 30000
 PARAM   ?= ph
 
@@ -38,11 +38,11 @@ demo:  ## Drive every phase through the running API (PARAM=ph|temp|press|cond|hu
 	./scripts/demo.sh $(PARAM)
 
 setup: install train kb test  ## Full local setup from scratch
-	@echo "\nSetup complete. Run 'make api', then open frontend/public/index.html"
+	@echo "\nSetup complete. Run 'make api', then open http://localhost:8080/studio"
 
 docker-up:  ## Start the core stack (broker, simulator, api, frontend)
 	cd infra && docker compose up -d redpanda simulator api frontend
-	@echo "Portal: http://localhost:3000   API: http://localhost:8000/docs"
+	@echo "Portal Studio: http://localhost:8080/studio   API: http://localhost:8080/docs"
 
 docker-full:  ## Start everything (adds Keycloak, Kong, OPA, MinIO, MLflow, Grafana, Ollama)
 	cd infra && docker compose --profile full up -d

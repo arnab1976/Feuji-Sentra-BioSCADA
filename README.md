@@ -115,7 +115,7 @@ bioscada-ai/
 ```bash
 cd infra
 docker compose up -d redpanda simulator api frontend
-# open http://localhost:3000
+# open http://localhost:8080/studio
 ```
 
 Add the optional tier (Keycloak, Kong, MinIO, MLflow, Grafana, Ollama):
@@ -138,10 +138,10 @@ python services/rag/src/knowledge_base.py --no-qdrant
 
 # 3. start the API
 pip install -r services/api/requirements.txt
-uvicorn main:app --app-dir services/api/src --port 8000
+uvicorn main:app --app-dir services/api/src --port 8080
 
-# 4. open the portal
-open frontend/public/index.html      # talks to http://localhost:8000
+# 4. open the portal studio
+# open http://localhost:8080/studio
 ```
 
 The portal degrades gracefully: without Kafka it still serves prediction,

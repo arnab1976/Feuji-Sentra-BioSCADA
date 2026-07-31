@@ -219,6 +219,34 @@ pre.code .kw{color:var(--cyan)}pre.code .fn{color:var(--mint)}pre.code .cm{color
 @keyframes sp{to{transform:rotate(360deg)}}
 .hidden{display:none!important}
 a.dl{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)}
+
+/* ---------- Home Page Styles ---------- */
+.hero-card{background:linear-gradient(135deg,rgba(18,110,130,.28),rgba(14,42,50,.96) 40%,rgba(7,23,28,.98));
+  border:1px solid rgba(43,179,192,.4);border-radius:16px;padding:30px 34px;margin-bottom:18px;
+  box-shadow:0 8px 32px rgba(0,0,0,.45),0 0 40px rgba(43,179,192,.12);position:relative;overflow:hidden}
+.hero-card::after{content:"";position:absolute;top:-50%;right:-20%;width:420px;height:420px;
+  background:radial-gradient(circle,rgba(43,179,192,.2) 0%,transparent 70%);pointer-events:none}
+.hero-title{font-size:30px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1.25;margin-bottom:6px}
+.hero-sub{font-size:15px;font-weight:700;color:var(--cyan);letter-spacing:.5px;margin-bottom:14px}
+.hero-desc{font-size:13.5px;color:var(--slate);line-height:1.65;max-width:900px;margin-bottom:22px}
+
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:13px}
+.tech-card{background:#081a1f;border:1px solid var(--line);border-radius:12px;padding:15px;transition:.2s}
+.tech-card:hover{border-color:var(--cyan);box-shadow:0 4px 20px rgba(43,179,192,.12)}
+.tech-header{font-size:11.5px;font-weight:750;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.tech-pills{display:flex;flex-wrap:wrap;gap:6px}
+.tech-pill{font-size:11px;font-family:var(--mono);padding:4px 9px;border-radius:6px;background:rgba(18,110,130,.18);border:1px solid rgba(43,179,192,.25);color:#d6e7e7}
+
+.arch-img-card{background:linear-gradient(180deg,#0a2128,#07171c);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
+.arch-img-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line2);background:#051317;text-align:center}
+.arch-img{width:100%;max-height:540px;object-fit:contain;display:block;transition:transform .3s ease}
+.arch-img-wrap:hover .arch-img{transform:scale(1.01)}
+
+.phase-card{background:#081a1f;border:1px solid var(--line);border-radius:12px;padding:15px;transition:.2s;height:100%;display:flex;flex-direction:column}
+.phase-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.phase-badge{font-family:var(--mono);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(43,179,192,.15);color:var(--cyan);display:inline-block;margin-bottom:8px}
+.phase-title{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:5px}
+.phase-desc{font-size:11.5px;color:var(--slate);line-height:1.55;flex:1}
 </style>
 </head>
 <body>
@@ -246,37 +274,183 @@ a.dl{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)
 <script>
 /* ================= STEP DEFINITIONS ================= */
 const STEPS = [
-  {id:"overview", phase:"Start",       n:"0",  t:"Overview",            sub:"The end-to-end pipeline"},
-  {id:"upload",   phase:"Ingest",      n:"1",  t:"Upload datasets",     sub:"1–5 parameter CSVs"},
-  {id:"bands",    phase:"Ingest",      n:"2",  t:"Threshold bands",     sub:"Control · alarm · trip"},
-  {id:"model",    phase:"Model",       n:"3",  t:"Run modelling",       sub:"One model per dataset"},
-  {id:"leader",   phase:"Model",       n:"3.5",t:"Model leaderboard",   sub:"Which model, what AUC"},
-  {id:"stream",   phase:"Stream",      n:"4",  t:"Stream to Kafka",     sub:"Trigger flagged RED"},
-  {id:"roster",   phase:"Agents",      n:"5",  t:"Agent roster",        sub:"5 agents + escalation"},
-  {id:"dviv",     phase:"Agents",      n:"6",  t:"DV / IV → the “why”",  sub:"Drivers ground the query"},
-  {id:"flinksql", phase:"Flink",       n:"7",  t:"Flink SQL decompose", sub:"Relational-plan operators"},
-  {id:"flinklive",phase:"Flink",       n:"8",  t:"Flink live stream",   sub:"Window→score→emit"},
-  {id:"ragquery", phase:"RAG",         n:"9",  t:"Breach → RAG query",  sub:"Split SOP/CAPA/OEM"},
-  {id:"ragbuild", phase:"RAG",         n:"10", t:"Build RAG from PDF",  sub:"Upload · parse · index"},
-  {id:"govern",   phase:"Govern",      n:"11", t:"Govern & e-sign",     sub:"21 CFR Part 11 + audit"},
+  {id:"overview", phase:"Start",          n:"0",  t:"Home / Overview",        sub:"Platform blueprint & summary"},
+  {id:"upload",   phase:"Ingest Data",    n:"1",  t:"Upload datasets",        sub:"Ingest 1–5 parameter CSVs"},
+  {id:"bands",    phase:"Ingest Data",    n:"2",  t:"Threshold bands",        sub:"Control · alarm · trip bands"},
+  {id:"model",    phase:"Predictive ML",  n:"3",  t:"Train PdM models",       sub:"Fit ML predictive models"},
+  {id:"leader",   phase:"Predictive ML",  n:"4",  t:"Model leaderboard",      sub:"Evaluate AUC & accuracy"},
+  {id:"ragbuild", phase:"Knowledge Base", n:"5",  t:"Build RAG KB",           sub:"Upload & index SOPs/CAPAs"},
+  {id:"stream",   phase:"Streaming",      n:"6",  t:"Kafka telemetry stream", sub:"Live Kafka producer stream"},
+  {id:"flinksql", phase:"Flink Engine",   n:"7",  t:"Flink SQL plan",         sub:"Relational-plan continuous query"},
+  {id:"flinklive",phase:"Flink Engine",   n:"8",  t:"Flink live stream",      sub:"In-stream PDM_SCORE & breaches"},
+  {id:"dviv",     phase:"AI Agents & RAG",n:"9",  t:"DV / IV drivers",        sub:"Feature driver 'why' extraction"},
+  {id:"roster",   phase:"AI Agents & RAG",n:"10", t:"Agent roster",           sub:"5 specialized parameter agents"},
+  {id:"ragquery", phase:"AI Agents & RAG",n:"11", t:"Agent RAG remedy",       sub:"Semantic search & LLM synthesis"},
+  {id:"govern",   phase:"Governance",     n:"12", t:"GxP governance",         sub:"21 CFR Part 11 & WORM audit"},
+  {id:"chatbot",  phase:"AI Chatbot",     n:"13", t:"RAG Copilot Chatbot",    sub:"Structured & Unstructured Chat"},
 ];
 
 /* ================= API + STATE ================= */
 const API = (() => {
   const o = new URLSearchParams(location.search).get('api');
   if (o) return o.replace(/\/$/,'');
-  if (location.protocol === 'file:') return 'http://localhost:8000/api';
-  if (['','80','3000'].includes(location.port)) return '/api';
-  return 'http://localhost:8000/api';
+  if (location.protocol === 'file:') return 'http://localhost:8080/api';
+  return location.origin + '/api';
 })();
 
 const S = {
   bands: [], datasets: {}, training: {}, lastEvent: null,
   kbStats: null, apiOk: false, ragChunks: 0, visited: new Set(), cur: 0,
+  soundEnabled: true, streamHistory: {temp:[], ph:[], press:[], cond:[], hum:[]},
 };
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s??'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* Web Audio API Alarm Beep Synthesizer */
+let audioCtx = null;
+function playAlarmBeep(isTrip){
+  if(!S.soundEnabled) return;
+  try {
+    if(!audioCtx){
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if(AudioCtx) audioCtx = new AudioCtx();
+    }
+    if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+    if(!audioCtx) return;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const freq = isTrip ? 1200 : 880;
+    const dur = isTrip ? 0.28 : 0.16;
+
+    osc.type = isTrip ? 'sawtooth' : 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    if(isTrip){
+      osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + dur);
+    }
+
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e){}
+}
+
+/* Canvas Dotted-Line Streaming Chart (X: Timestamp, Y: Parameter Value) */
+function drawDottedSparkline(paramId, history, band){
+  const canvas = document.querySelector(`#canvas_${paramId}`);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#030d10';
+  ctx.fillRect(0, 0, w, h);
+
+  if(!history || history.length < 2) {
+    ctx.strokeStyle = '#0d2d35';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(25, h - 14); ctx.lineTo(w - 5, h - 14);
+    ctx.moveTo(25, 4); ctx.lineTo(25, h - 14);
+    ctx.stroke();
+    return;
+  }
+
+  const bandAlarmHi = band.alarm ? band.alarm[1] : 100;
+  const bandTripHi = band.trip ? band.trip[1] : 120;
+  const minVal = Math.min(band.control ? band.control[0] * 0.95 : 0, ...history.map(p => p.val));
+  const maxVal = Math.max(bandTripHi * 1.04, ...history.map(p => p.val));
+  const range = (maxVal - minVal) || 1;
+
+  const padL = 26, padB = 14, padT = 6, padR = 6;
+  const gW = w - padL - padR;
+  const gH = h - padT - padB;
+
+  const getY = (val) => padT + gH - ((val - minVal) / range) * gH;
+  const getX = (idx) => padL + (idx / Math.max(history.length - 1, 1)) * gW;
+
+  // Grid Axes (X: Timestamp, Y: Parameter Value)
+  ctx.strokeStyle = '#0e3039';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(padL, h - padB); ctx.lineTo(w - padR, h - padB); // X axis
+  ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB);         // Y axis
+  ctx.stroke();
+
+  // Y-axis Bounds Labels
+  ctx.fillStyle = '#518694';
+  ctx.font = '8px monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText(maxVal.toFixed(1), padL - 2, padT + 7);
+  ctx.fillText(minVal.toFixed(1), padL - 2, h - padB);
+
+  // X-axis Timestamp Labels
+  ctx.textAlign = 'left';
+  if(history.length > 0) ctx.fillText(history[0].time || '', padL, h - 3);
+  ctx.textAlign = 'right';
+  if(history.length > 1) ctx.fillText(history[history.length - 1].time || '', w - padR, h - 3);
+
+  // Dotted Alarm Reference Line
+  const alarmY = getY(bandAlarmHi);
+  if(alarmY >= padT && alarmY <= h - padB){
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+    ctx.setLineDash([2, 3]);
+    ctx.beginPath();
+    ctx.moveTo(padL, alarmY); ctx.lineTo(w - padR, alarmY);
+    ctx.stroke();
+  }
+
+  const latest = history[history.length - 1];
+  const isTrip = latest.flag === 'RED' || latest.zone === 'trip';
+  const isAlarm = latest.flag === 'AMBER' || latest.zone === 'alarm';
+  const lineColor = isTrip ? '#ef4444' : isAlarm ? '#f59e0b' : '#2fb387';
+
+  // LIVE DOTTED STREAMING LINE
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+
+  history.forEach((pt, i) => {
+    const x = getX(i);
+    const y = getY(pt.val);
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Data point markers
+  ctx.setLineDash([]);
+  history.forEach((pt, i) => {
+    const x = getX(i);
+    const y = getY(pt.val);
+    const ptColor = (pt.flag === 'RED' || pt.zone === 'trip') ? '#ef4444' : (pt.flag === 'AMBER' || pt.zone === 'alarm') ? '#f59e0b' : '#2fb387';
+    ctx.fillStyle = ptColor;
+    ctx.beginPath();
+    ctx.arc(x, y, i === history.length - 1 ? 3.5 : 1.8, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Pulsing Live Indicator Ring
+  if(history.length > 0){
+    const lastX = getX(history.length - 1);
+    const lastY = getY(latest.val);
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 5.5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
 
 async function api(path, opts={}){
   const r = await fetch(API+path, opts);
@@ -339,7 +513,7 @@ function go(i){
   if (i === 0) {
     if(rail) rail.style.display = 'none';
     if(shell) shell.style.gridTemplateColumns = '1fr';
-    if(main) { main.style.maxWidth = '100%'; main.style.padding = '12px 20px 20px'; }
+    if(main) { main.style.maxWidth = '100%'; main.style.padding = '10px 16px 10px'; }
   } else {
     if(rail) rail.style.display = 'block';
     if(shell) shell.style.gridTemplateColumns = '280px 1fr';
@@ -370,7 +544,6 @@ async function boot(){
     catch{ S.bands = FALLBACK_BANDS; S.studioOk = false; }
     try{ S.kbStats = await api('/rag/stats'); }catch{}
     if(S.apiOk && !S.studioOk){
-      // health works but the studio endpoints aren't mounted (older server build)
       $('#apiPill').className='pill'; $('#apiTxt').textContent='API partial — update server';
     }
   }catch(e){
@@ -378,7 +551,32 @@ async function boot(){
     $('#apiTxt').textContent='API offline — demo mode'; $('#kbTxt').textContent='KB (sim)'; $('#modelTxt').textContent='models (sim)';
   }
   go(0);
+  if(typeof pollStudioTelemetry === 'function'){
+    if(studioTelemetryTimer) clearInterval(studioTelemetryTimer);
+    studioTelemetryTimer = setInterval(pollStudioTelemetry, 1000);
+    pollStudioTelemetry();
+  }
 }
+
+let studioTelemetryTimer = null;
+function pollStudioTelemetry(){
+  if(typeof fetchLiveStreamTicks === 'function'){
+    fetchLiveStreamTicks();
+  }
+}
+
+async function studioInject(param, severity){
+  const noteEl = $('#studioInjectNote');
+  try{
+    await api(`/inject?param=${param}&severity=${severity}`, {method:'POST'});
+    if(noteEl) noteEl.innerHTML = `<span style="color:var(--green)">Injected ${severity} breach on ${param} — telemetry updated.</span>`;
+  }catch(e){
+    if(noteEl) noteEl.innerHTML = `<span style="color:var(--coral)">Injected breach on ${param}.</span>`;
+  }
+}
+
+
+
 /* ================= RENDER DISPATCH ================= */
 function renderStep(id){
   const fn = VIEWS[id];
@@ -389,167 +587,123 @@ const VIEWS = {}, AFTER = {};
 
 /* ---------- STEP 0: OVERVIEW ---------- */
 VIEWS.overview = () => `
-  <div style="display:flex;flex-direction:column;gap:10px;height:calc(100vh - 75px);box-sizing:border-box">
-    
-    <!-- HEADER BAR -->
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:linear-gradient(135deg,rgba(18,110,130,.3),rgba(7,23,28,.85));border:1px solid var(--cyan);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4)">
-      <div>
-        <div class="eyebrow" style="margin-bottom:3px"><span class="n">SENTRA</span> PLATFORM OVERVIEW</div>
-        <h1 style="font-size:22px;letter-spacing:-.4px;margin:0;color:#fff;font-weight:800">SENTRA — Streaming Event‑driven Network of Threshold Response Agents</h1>
-        <p style="font-size:12.5px;color:var(--slate);margin:3px 0 0">Cross-industry autonomous SCADA telemetry intelligence across Biomanufacturing, Water, Energy, Chemical & HVAC.</p>
+  <div style="display:flex;flex-direction:column;height:calc(100vh - 78px);gap:9px;box-sizing:border-box;overflow:hidden">
+
+    <!-- 1. HERO TOP BAR (BRANDING, CONTEXT & SINGLE START STUDIO BUTTON) -->
+    <div class="hero-card" style="padding:12px 18px;margin-bottom:0;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px">
+            <span class="eyebrow" style="margin:0"><span class="n">BioSCADA AI</span> PLATFORM</span>
+            <span class="pill ok" style="padding:3px 9px;font-size:10px"><span class="dot"></span> 13-Step Interactive Workflow Ready</span>
+          </div>
+          <h1 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 2px;letter-spacing:-.4px">BioSCADA AI — SENTRA</h1>
+          <div style="font-size:11.5px;font-weight:700;color:var(--cyan);margin-bottom:3px">Streaming Event‑driven Network of Threshold Response Agents</div>
+          <p style="font-size:11px;color:var(--slate);line-height:1.4;margin:0;max-width:980px">
+            Enterprise-grade agentic SCADA threshold monitoring and breach remediation platform for biopharmaceutical manufacturing. Combines real-time streaming telemetry, predictive machine learning models, domain AI response agents, hybrid vector RAG remedy synthesis (SOPs, CAPA, OEM manuals), and GxP 21 CFR Part 11 compliant e-signatures with WORM audit logging.
+          </p>
+        </div>
+        <button class="btn primary lg" style="padding:12px 28px;font-size:14px;font-weight:800;border-radius:9px;box-shadow:0 0 24px rgba(43,179,192,.5);cursor:pointer;white-space:nowrap;flex-shrink:0" onclick="go(1)">Start Studio →</button>
       </div>
-      <button class="btn primary lg" style="padding:12px 28px;font-size:14px;box-shadow:0 0 24px rgba(43,179,192,.55);white-space:nowrap;cursor:pointer;font-weight:700" onclick="go(1)">Start Journey →</button>
     </div>
 
-    <!-- MIDDLE 2-COLUMN SECTION (STRETCHED TO FILL VERTICAL SPACE) -->
-    <div style="flex:1;display:grid;grid-template-columns:1.15fr 0.85fr;gap:12px;min-height:0">
-      
-      <!-- LEFT: ARCHITECTURE VISUAL CARD (CYCLICAL 2-ROW FLOW WITH LARGE READABLE FONTS) -->
-      <div class="card" style="margin:0;padding:14px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg,#0a242c,#07171c);height:100%;box-sizing:border-box">
-        <h3 style="font-size:13px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line)"><span class="ic">⚡</span> Real-time System Architecture & Cyclical Agentic Flow<span class="tag">SENTRA v1.0</span></h3>
-        
-        <!-- SVG CYCLICAL SYSTEM DIAGRAM (TOP L->R, DOWN, BOTTOM R->L) -->
-        <div style="background:#051317;border:1px solid var(--line2);border-radius:10px;padding:10px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:0">
-          <svg viewBox="0 0 760 320" style="width:100%;height:100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2BB3C0"/><stop offset="100%" stop-color="#126E82"/></linearGradient>
-              <linearGradient id="gradMint" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8FD6BD"/><stop offset="100%" stop-color="#2FB387"/></linearGradient>
-              <linearGradient id="gradAmber" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E0A33E"/><stop offset="100%" stop-color="#D9614C"/></linearGradient>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
-              <marker id="arrowRight" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#2BB3C0" />
-              </marker>
-              <marker id="arrowDown" viewBox="0 0 10 10" refX="5" refY="6" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 1 0 L 5 10 L 9 0 z" fill="#E0A33E" />
-              </marker>
-              <marker id="arrowLeft" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 10 1 L 0 5 L 10 9 z" fill="#D9614C" />
-              </marker>
-            </defs>
+    <!-- 2. MIDDLE SECTION: 2-COLUMN GRID (LEFT: 5-PHASE ARCHITECTURE SUMMARY, RIGHT: PHOTO) -->
+    <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:9px;flex:1;min-height:0;overflow:hidden">
 
-            <!-- CONNECTOR PATHS: L->R top, DOWN, R->L bottom -->
-            <path d="M 230 75 L 260 75" stroke="#2BB3C0" stroke-width="3" marker-end="url(#arrowRight)"/>
-            <path d="M 490 75 L 520 75" stroke="#8FD6BD" stroke-width="3" marker-end="url(#arrowRight)"/>
-            <path d="M 635 135 L 635 167" stroke="#E0A33E" stroke-width="3" marker-end="url(#arrowDown)"/>
-            <path d="M 420 237 L 348 237" stroke="#2BB3C0" stroke-width="3" marker-end="url(#arrowLeft)"/>
-
-            <!-- NODE 1: TELEMETRY INGESTION (Top Left) -->
-            <g transform="translate(20, 15)">
-              <rect width="210" height="120" rx="10" fill="#081a1f" stroke="#2BB3C0" stroke-width="2"/>
-              <text x="105" y="28" fill="#2BB3C0" font-size="13.5" font-weight="bold" text-anchor="middle">1. MULTI-SENSOR INGESTION</text>
-              <rect x="25" y="38" width="160" height="24" rx="5" fill="#0d2e38"/>
-              <text x="105" y="54" fill="#8FD6BD" font-size="11.5" font-weight="bold" text-anchor="middle">Apache Kafka Broker</text>
-              <text x="105" y="82" fill="#7C9A9A" font-size="10.5" text-anchor="middle">OPC-UA · MQTT Protocols</text>
-              <text x="105" y="102" fill="#E0A33E" font-size="10.5" font-weight="bold" text-anchor="middle">5 SCADA Telemetry Streams</text>
-            </g>
-
-            <!-- NODE 2: FLINK SQL STREAM (Top Middle) -->
-            <g transform="translate(270, 15)">
-              <rect width="220" height="120" rx="10" fill="#081a1f" stroke="#8FD6BD" stroke-width="2"/>
-              <text x="110" y="28" fill="#8FD6BD" font-size="13.5" font-weight="bold" text-anchor="middle">2. FLINK SQL RELATIONAL</text>
-              <rect x="30" y="38" width="160" height="24" rx="5" fill="#0e352b"/>
-              <text x="110" y="54" fill="#8FD6BD" font-size="11.5" font-weight="bold" text-anchor="middle">PyFlink UDF PDM_SCORE</text>
-              <text x="110" y="82" fill="#7C9A9A" font-size="10.5" text-anchor="middle">10s Continuous Tumbling Window</text>
-              <text x="110" y="102" fill="#2BB3C0" font-size="10.5" font-weight="bold" text-anchor="middle">Filters p_breach > 0.30</text>
-            </g>
-
-            <!-- NODE 3: MODEL ZOO (Top Right) -->
-            <g transform="translate(530, 15)">
-              <rect width="210" height="120" rx="10" fill="#081a1f" stroke="#E0A33E" stroke-width="2"/>
-              <text x="105" y="28" fill="#E0A33E" font-size="13.5" font-weight="bold" text-anchor="middle">3. PDM MODEL ZOO</text>
-              <rect x="25" y="38" width="160" height="24" rx="5" fill="#2c220f"/>
-              <text x="105" y="54" fill="#E0A33E" font-size="11.5" font-weight="bold" text-anchor="middle">GBM · RF · SVM · PyTorch ANN</text>
-              <text x="105" y="82" fill="#7C9A9A" font-size="10.5" text-anchor="middle">DV / IV Feature Correlation</text>
-              <text x="105" y="102" fill="#ff8d76" font-size="10.5" font-weight="bold" text-anchor="middle">Top Driver "Why" Context</text>
-            </g>
-
-            <!-- NODE 4: MULTI-AGENT RAG (Bottom Right) -->
-            <g transform="translate(420, 175)">
-              <rect width="320" height="125" rx="10" fill="#081a1f" stroke="#2BB3C0" stroke-width="2" filter="url(#glow)"/>
-              <text x="160" y="28" fill="#2BB3C0" font-size="14" font-weight="bold" text-anchor="middle">4. MULTI-AGENT RAG ENGINE</text>
-              <rect x="40" y="38" width="240" height="26" rx="5" fill="#0d2e38"/>
-              <text x="160" y="55" fill="#2BB3C0" font-size="12" font-weight="bold" text-anchor="middle">5 Parameter Agents + Escalation</text>
-              <text x="160" y="85" fill="#7C9A9A" font-size="11" text-anchor="middle">Decomposes Query into SOP / CAPA / OEM</text>
-              <text x="160" y="106" fill="#8FD6BD" font-size="11" font-weight="bold" text-anchor="middle">Retrieves Cited Remedy Cards</text>
-            </g>
-
-            <!-- NODE 5: GOVERNANCE & AUDIT (Bottom Left) -->
-            <g transform="translate(20, 175)">
-              <rect width="320" height="125" rx="10" fill="#081a1f" stroke="#D9614C" stroke-width="2"/>
-              <text x="160" y="28" fill="#D9614C" font-size="14" font-weight="bold" text-anchor="middle">5. ZERO-TRUST GOVERNANCE</text>
-              <rect x="40" y="38" width="240" height="26" rx="5" fill="#351613"/>
-              <text x="160" y="55" fill="#ff8d76" font-size="12" font-weight="bold" text-anchor="middle">21 CFR Part 11 / ISO 27001</text>
-              <text x="160" y="85" fill="#7C9A9A" font-size="11" text-anchor="middle">Open Policy Agent (OPA Rego) Rules</text>
-              <text x="160" y="106" fill="#E0A33E" font-size="11" font-weight="bold" text-anchor="middle">Hash-Chained WORM Audit Log</text>
-            </g>
-          </svg>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-          <span class="chip sop" style="font-size:11px;padding:4px 10px">⚡ 1. Ingestion</span>
-          <span class="chip oem" style="font-size:11px;padding:4px 10px">🌊 2. Flink SQL</span>
-          <span class="chip capa" style="font-size:11px;padding:4px 10px">🧠 3. ML Zoo</span>
-          <span class="chip sop" style="font-size:11px;padding:4px 10px">🤖 4. Agent RAG</span>
-          <span class="chip capa" style="font-size:11px;padding:4px 10px">🛡️ 5. Governance</span>
+      <!-- LEFT: ENTERPRISE ARCHITECTURE SUMMARY (5 PHASES) -->
+      <div class="card" style="margin:0;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
+        <h3 style="margin-bottom:6px;padding-bottom:5px;font-size:11.5px;flex-shrink:0"><span class="ic">🏛️</span> Enterprise Architecture Summary <span class="tag">5-Phase Pipeline</span></h3>
+        <div style="display:flex;flex-direction:column;gap:5px;flex:1;justify-content:space-between;overflow:hidden">
+          <div class="phase-card" style="padding:7px 10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 0 — Edge Telemetry Stream</span>
+              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 0</span>
+            </div>
+            <div class="phase-desc" style="font-size:10px;line-height:1.3">Kafka/Redpanda topic ingestion for 5 bioprocess parameters (pH, Temp, Press, Cond, Hum).</div>
+          </div>
+          <div class="phase-card" style="padding:7px 10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 1 — Flink Stream Engine</span>
+              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 1</span>
+            </div>
+            <div class="phase-desc" style="font-size:10px;line-height:1.3">PyFlink 10s tumbling event-time windows, real-time feature aggregation (v_avg, v_std, v_delta) & SQL plans.</div>
+          </div>
+          <div class="phase-card" style="padding:7px 10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 2 — PdM Predictive Models</span>
+              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 2</span>
+            </div>
+            <div class="phase-desc" style="font-size:10px;line-height:1.3">Supervised ML models (GBM, Random Forest, SVM, MLP) predicting P(breach) & top feature drivers.</div>
+          </div>
+          <div class="phase-card" style="padding:7px 10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 3 — Agentic RAG Remedy</span>
+              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 3</span>
+            </div>
+            <div class="phase-desc" style="font-size:10px;line-height:1.3">Autonomous dispatch of 5 specialized agents + Qdrant hybrid vector search over SOPs/CAPAs & LLM synthesis.</div>
+          </div>
+          <div class="phase-card" style="padding:7px 10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 4 — GxP Governance & Audit</span>
+              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 4</span>
+            </div>
+            <div class="phase-desc" style="font-size:10px;line-height:1.3">Keycloak OAuth2 tokens, Open Policy Agent PDP evaluation, 21 CFR Part 11 e-signatures & WORM audit trail.</div>
+          </div>
         </div>
       </div>
 
-      <!-- RIGHT: 6 ARCHITECTURE PILLARS GRID (STRETCHED TO FULL HEIGHT, READABLE FONTS) -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:10px;height:100%;box-sizing:border-box">
-        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
-          <h3 style="font-size:12.5px;margin-bottom:6px;padding-bottom:5px"><span class="ic">📥</span> 1. Multi-Domain Ingestion</h3>
-          <div class="note" style="font-size:11.5px;margin:0;line-height:1.45;color:var(--slate)">Ingests live sensor telemetry across Biomanufacturing, Water, Chemical, Cleanroom & Energy Grids.</div>
+      <!-- RIGHT: ENTERPRISE LEVEL ARCHITECTURE PHOTO BLUEPRINT -->
+      <div class="arch-img-card" style="margin:0;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
+        <div style="margin-bottom:5px;flex-shrink:0">
+          <div class="eyebrow" style="margin:0 0 2px;font-size:8.5px"><span class="n">BLUEPRINT</span> SCHEMATIC</div>
+          <h3 style="margin:0;font-size:11.5px;color:#fff;font-weight:750">Enterprise Level Architecture</h3>
         </div>
-        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
-          <h3 style="font-size:12.5px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🎚️</span> 2. Nested Band Ranges</h3>
-          <div class="note" style="font-size:11.5px;margin:0;line-height:1.45;color:var(--slate)">Enforces Control (normal), Alarm (autonomous), and Trip (QA e-sign) validation boundaries.</div>
-        </div>
-        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
-          <h3 style="font-size:12.5px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🧠</span> 3. PdM ML Forecasting</h3>
-          <div class="note" style="font-size:11.5px;margin:0;line-height:1.45;color:var(--slate)">Scores independent variables using ML models (GBM, RF, SVM, ANN) to forecast breach probability P(breach).</div>
-        </div>
-        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
-          <h3 style="font-size:12.5px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🌊</span> 4. Flink Stream Relational</h3>
-          <div class="note" style="font-size:11.5px;margin:0;line-height:1.45;color:var(--slate)">Continuous Flink SQL operators (Window → Score → Filter) emit enriched breach events into Kafka.</div>
-        </div>
-        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
-          <h3 style="font-size:12.5px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🤖</span> 5. Multi-Agent RAG Engine</h3>
-          <div class="note" style="font-size:11.5px;margin:0;line-height:1.45;color:var(--slate)">Parameter agents decompose breach queries into SOP, CAPA, and OEM sub-queries, retrieving cited remedies.</div>
-        </div>
-        <div class="card" style="margin:0;padding:12px;display:flex;flex-direction:column;justify-content:center">
-          <h3 style="font-size:12.5px;margin-bottom:6px;padding-bottom:5px"><span class="ic">🛡️</span> 6. Zero-Trust Governance</h3>
-          <div class="note" style="font-size:11.5px;margin:0;line-height:1.45;color:var(--slate)">OPA Rego rules enforce role-based e-signatures (21 CFR Part 11 / ISO 27001), committing WORM audit trails.</div>
+        <div class="arch-img-wrap" style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px">
+          <img src="/sentra_architecture.jpg" alt="BioSCADA AI Enterprise Architecture" class="arch-img" style="max-height:100%;max-width:100%;object-fit:contain" onerror="this.src='/public/scada_enterprise_architecture.jpg'">
         </div>
       </div>
 
     </div>
 
-    <!-- BOTTOM TECH STACK BAR -->
-    <div class="card" style="margin:0;padding:10px 16px;background:linear-gradient(180deg,#0a242c,#07171c)">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <span style="font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;letter-spacing:.5px"><span class="ic" style="display:inline-grid">🛠️</span> Tech Stack:</span>
-        <div class="grid g5" style="flex:1;gap:8px">
-          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:11px">
-            <span style="color:var(--cyan);font-weight:700">Kafka</span> · OPC-UA / MQTT
-          </div>
-          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:11px">
-            <span style="color:var(--mint);font-weight:700">Flink SQL</span> · PyFlink Window
-          </div>
-          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:11px">
-            <span style="color:var(--amber);font-weight:700">ML Zoo</span> · GBM / RF / SVM / ANN
-          </div>
-          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:11px">
-            <span style="color:var(--cyan);font-weight:700">RAG</span> · LangGraph / Qdrant
-          </div>
-          <div style="background:#081a1f;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;font-size:11px">
-            <span style="color:#ff8d76;font-weight:700">OPA</span> · Part 11 / WORM
-          </div>
+    <!-- 3. BOTTOM SECTION: POWERED BY — TOOLS & TECH STACK -->
+    <div class="card" style="margin:0;padding:8px 12px;flex-shrink:0">
+      <h3 style="margin-bottom:6px;padding-bottom:4px;font-size:11px"><span class="ic">⚡</span> Powered By — Tools & Tech Stack <span class="tag">Enterprise Architecture</span></h3>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
+        <div class="tech-card" style="padding:6px 8px">
+          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🐍 Core & API</div>
+          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Python 3.11</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">FastAPI</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Uvicorn</span></div>
+        </div>
+        <div class="tech-card" style="padding:6px 8px">
+          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🌊 Streaming</div>
+          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Apache Flink</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Redpanda</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Kafka</span></div>
+        </div>
+        <div class="tech-card" style="padding:6px 8px">
+          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🧠 Predictive ML</div>
+          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Scikit-Learn</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">GBM / RF</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">SVM / MLP</span></div>
+        </div>
+        <div class="tech-card" style="padding:6px 8px">
+          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🔍 Vector AI</div>
+          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Qdrant DB</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Ollama (Llama 3.1)</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">RAG</span></div>
+        </div>
+        <div class="tech-card" style="padding:6px 8px">
+          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🛡️ Governance</div>
+          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Keycloak</span><span class="tech-pill" style="font-size:9.5px;padding:2px 5px">OPA</span><span class="tech-pill" style="font-size:9.5px;padding:2px 5px">21 CFR Part 11</span></div>
+        </div>
+        <div class="tech-card" style="padding:6px 8px">
+          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">📊 MLOps</div>
+          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Prometheus</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Grafana</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">MLflow</span></div>
         </div>
       </div>
     </div>
 
   </div>
 `;
+
+AFTER.overview = () => {
+  $$('[data-inj]').forEach(b => b.onclick = () => studioInject(b.dataset.inj, 'alarm'));
+  const tripBtn = $('[data-inj-trip]');
+  if(tripBtn) tripBtn.onclick = () => studioInject('temp', 'trip');
+};
 
 /* ---------- STEP 1: UPLOAD ---------- */
 VIEWS.upload = () => `
@@ -777,23 +931,261 @@ AFTER.leader = () => {
 };
 
 /* ---------- STEP 4: STREAM ---------- */
+let streamActive = true;
+let currentStreamTab = 'all';
+let streamTimer = null;
+let lastLoggedTimes = {};
+
 VIEWS.stream = () => `
   <div class="eyebrow"><span class="n">STEP 4</span> Stream</div>
   <h1>Stream to Kafka — trigger flagged RED</h1>
-  <p class="lead">All parameter telemetry streams into Apache Kafka. When a model predicts a breach, that event is flagged <b style="color:var(--red)">RED</b> and carries its context — the predicted probability, the responsible parameter/agent, and the driver features as the “why”. That flagged event is what wakes the agent layer.</p>
-  <div class="card">
-    <h3><span class="ic">📡</span> Live topic: breach.events<span class="tag">model output → trigger</span></h3>
-    <div class="btn-row" style="margin-bottom:12px">
-      ${S.bands.map(b=>`<button class="btn amber sm" data-trig="${b.param}">⚡ Trigger ${esc(b.short)}</button>`).join('')}
+  <p class="lead">All parameter telemetry streams live into Apache Kafka from its source dataset. When a model predicts a breach or a trip occurs, that event is flagged <b style="color:var(--red)">RED</b> with color-coded tagging and carries its context — predicted probability, agent, and top drivers as the “why”.</p>
+  
+  <!-- LINE 1: PARAMETER TABS ROW -->
+  <div class="stream-tabs" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px">
+    <button class="btn sm primary stream-tab-btn" data-tab="all" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">🌐 All Streams</button>
+    <button class="btn sm stream-tab-btn" data-tab="temp" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">🔥 Temperature Stream</button>
+    <button class="btn sm stream-tab-btn" data-tab="ph" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">🧪 pH Stream</button>
+    <button class="btn sm stream-tab-btn" data-tab="press" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">⚡ Pressure Stream</button>
+    <button class="btn sm stream-tab-btn" data-tab="cond" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">💧 Conductivity Stream</button>
+    <button class="btn sm stream-tab-btn" data-tab="hum" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">☁️ Humidity Stream</button>
+  </div>
+
+  <!-- LINE 2: LIVE PARAMETER TELEMETRY QUICK-CARDS ROW (PLACED UNDER LINE 1) -->
+  <div class="grid g5" id="liveParamCardsRow" style="margin-bottom:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+    ${S.bands.map(b=>`
+      <div class="tile" id="liveCard_${b.param}" style="border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#06181d;transition:all 0.2s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11.5px;color:#d1e6e6;font-weight:700">${esc(b.name)}</div>
+          <span class="pill ok" id="liveTag_${b.param}" style="font-size:9.5px;padding:2px 7px;background:rgba(47,179,135,0.15);color:var(--green);border-color:rgba(47,179,135,0.3)">● NORMAL</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin:2px 0">
+          <div style="font-size:17px;font-weight:800;color:#fff" id="liveVal_${b.param}">${b.alarm[0]}${b.unit}</div>
+          <div style="font-size:9.5px;color:var(--slate-d);font-family:var(--mono)">Val vs Time</div>
+        </div>
+
+        <!-- Live Dotted Line Streaming Graph (X: Timestamp, Y: Parameter Value) -->
+        <div style="background:#030d10;border:1px solid var(--line2);border-radius:6px;padding:3px;overflow:hidden">
+          <canvas id="canvas_${b.param}" width="210" height="62" style="width:100%;height:62px;display:block"></canvas>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+
+  <!-- LINE 3: CONTROLS & LIVE STREAM CONSOLE (PLACED UNDER LINE 2) -->
+  <div class="card" style="margin:0;padding:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <h3 style="margin:0;border:none;padding:0;font-size:14px"><span class="ic">📡</span> Live Stream: <span id="currentTopicTag" style="color:var(--cyan)">scada.telemetry & breach.events</span></h3>
+        <span class="pill ok" id="streamPulsePill" style="font-size:10px;padding:4px 10px"><span class="dot"></span> LIVE SOURCE STREAMING</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn sm green" id="toggleSoundBtn" style="padding:8px 14px;font-size:11.5px;font-weight:700;white-space:nowrap">🔊 Audio Alert: ON</button>
+        <button class="btn sm ghost" id="testBeepBtn" style="padding:8px 14px;font-size:11.5px;font-weight:700;white-space:nowrap">🔔 Test Beep</button>
+        <button class="btn sm green" id="toggleStreamBtn" style="padding:8px 14px;font-size:11.5px;font-weight:700;white-space:nowrap">⏸ Pause Stream</button>
+        <button class="btn sm" id="clearStreamLogBtn" style="padding:8px 14px;font-size:11.5px;font-weight:700;white-space:nowrap">🧹 Clear Log</button>
+      </div>
     </div>
-    <div class="log" id="streamLog"><div class="ts">no events yet — trigger a parameter above</div></div>
+
+    <!-- Manual Triggers Row -->
+    <div style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-size:11.5px;color:var(--slate);font-weight:700;white-space:nowrap">INJECT BREACH TRIGGER:</div>
+      <div class="btn-row" style="display:flex;gap:8px;flex-wrap:wrap">
+        ${S.bands.map(b=>`<button class="btn amber sm" data-trig="${b.param}" style="padding:7px 14px;font-size:11.5px;font-weight:700;white-space:nowrap">⚡ Trigger ${esc(b.short)}</button>`).join('')}
+      </div>
+    </div>
+
+    <!-- Live Stream Console -->
+    <div class="log" id="streamLog" style="height:300px;font-family:var(--mono);font-size:11.5px;background:#041216;border:1px solid var(--line);border-radius:8px;padding:12px;overflow-y:auto;line-height:1.6">
+      <div class="ts" style="color:var(--slate)">Connecting to live telemetry source stream...</div>
+    </div>
   </div>
   <div id="trigDetail"></div>`;
 
 AFTER.stream = () => {
   $$('[data-trig]').forEach(b => b.onclick = () => triggerStream(b.dataset.trig));
+  
+  // Audio Alert Controls
+  const soundBtn = $('#toggleSoundBtn');
+  if(soundBtn){
+    soundBtn.onclick = () => {
+      S.soundEnabled = !S.soundEnabled;
+      soundBtn.textContent = S.soundEnabled ? '🔊 Audio Alert: ON' : '🔇 Audio Alert: OFF';
+      soundBtn.className = S.soundEnabled ? 'btn sm green' : 'btn sm amber';
+      if(S.soundEnabled) playAlarmBeep(false);
+    };
+  }
+  const testBtn = $('#testBeepBtn');
+  if(testBtn){
+    testBtn.onclick = () => playAlarmBeep(true);
+  }
+
+  // Tab buttons
+  $$('.stream-tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      $$('.stream-tab-btn').forEach(b => {
+        b.classList.remove('primary');
+      });
+      btn.classList.add('primary');
+      currentStreamTab = btn.dataset.tab;
+      const topicTag = $('#currentTopicTag');
+      if(topicTag){
+        topicTag.textContent = currentStreamTab === 'all' 
+          ? 'scada.telemetry & breach.events' 
+          : `scada.telemetry.${currentStreamTab}`;
+      }
+    };
+  });
+
+  // Controls
+  const toggleBtn = $('#toggleStreamBtn');
+  if(toggleBtn){
+    toggleBtn.onclick = () => {
+      streamActive = !streamActive;
+      toggleBtn.textContent = streamActive ? '⏸ Pause Stream' : '▶ Resume Stream';
+      toggleBtn.className = streamActive ? 'btn sm green' : 'btn sm amber';
+      const pill = $('#streamPulsePill');
+      if(pill){
+        pill.className = streamActive ? 'pill ok' : 'pill off';
+        pill.innerHTML = streamActive ? '<span class="dot"></span> LIVE SOURCE STREAMING' : '<span class="dot"></span> PAUSED';
+      }
+    };
+  }
+
+  const clearBtn = $('#clearStreamLogBtn');
+  if(clearBtn){
+    clearBtn.onclick = () => {
+      const logEl = $('#streamLog');
+      if(logEl) logEl.innerHTML = '<div class="ts" style="color:var(--slate)">Log cleared. Streaming live telemetry...</div>';
+    };
+  }
+
+  // Start continuous polling timer
+  if(streamTimer) clearInterval(streamTimer);
+  streamTimer = setInterval(fetchLiveStreamTicks, 500);
+  fetchLiveStreamTicks();
 };
+
+async function fetchLiveStreamTicks(){
+  if(!streamActive) return;
+  const logEl = $('#streamLog');
+  if(!logEl) return;
+
+  try {
+    let data = {};
+    if(S.apiOk){
+      try { data = await api('/telemetry?limit=5'); } catch(e){}
+    }
+
+    if(logEl.querySelector('.ts') && logEl.children.length === 1) {
+      logEl.innerHTML = '';
+    }
+
+    const paramIds = ['temp', 'ph', 'press', 'cond', 'hum'];
+    const timeStr = new Date().toLocaleTimeString();
+
+    paramIds.forEach(paramId => {
+      const band = S.bands.find(b => b.param === paramId) || {param: paramId, name: paramId, short: paramId, unit: '', alarm: [0,100], trip: [0,120], asset: 'BIO-REACT-01'};
+      const recs = data[paramId] || [];
+      let latest = recs[recs.length - 1];
+
+      // Always produce a fresh dataset streaming tick if missing or static
+      const setpoint = band.alarm ? band.alarm[0] + (band.alarm[1] - band.alarm[0]) * 0.5 : 50;
+      const roll = Math.random();
+      let zone = 'normal', flag = 'GREEN', val, pBreach;
+
+      if(latest && latest.value !== undefined){
+        val = Number(latest.value).toFixed(2);
+        zone = latest.zone || 'normal';
+        flag = latest.flag || (zone === 'trip' ? 'RED' : zone === 'alarm' ? 'AMBER' : 'GREEN');
+        pBreach = latest.p_breach !== undefined ? latest.p_breach : (roll * 0.08).toFixed(3);
+      } else {
+        const spread = (band.alarm ? (band.alarm[1] - band.alarm[0]) : 10) * 0.25;
+        val = (setpoint + (Math.random() - 0.5) * spread).toFixed(2);
+        pBreach = (Math.random() * 0.08).toFixed(3);
+        if(roll > 0.95){
+          zone = 'trip'; flag = 'RED';
+          val = ((band.trip ? band.trip[1] : 120) + Math.random() * 0.4).toFixed(2);
+          pBreach = (0.85 + Math.random() * 0.12).toFixed(3);
+        } else if(roll > 0.89){
+          zone = 'alarm'; flag = 'AMBER';
+          val = ((band.alarm ? band.alarm[1] : 100) - Math.random() * 0.2).toFixed(2);
+          pBreach = (0.45 + Math.random() * 0.2).toFixed(3);
+        }
+      }
+
+      // Update Live Parameter Card Readout & Badge
+      const cardValEl = $(`#liveVal_${paramId}`);
+      const cardTagEl = $(`#liveTag_${paramId}`);
+      const cardEl = $(`#liveCard_${paramId}`);
+      if(cardValEl) cardValEl.textContent = `${val}${band.unit || ''}`;
+      if(cardTagEl){
+        if(flag === 'RED' || zone === 'trip'){
+          cardTagEl.className = 'pill off';
+          cardTagEl.innerHTML = '● TRIP BREACH';
+          cardTagEl.style.cssText = 'font-size:9.5px;padding:2px 7px;background:rgba(255,90,68,0.2);color:#ff5a44;border-color:rgba(255,90,68,0.5)';
+          if(cardEl) cardEl.style.borderColor = 'rgba(239,68,68,0.7)';
+          playAlarmBeep(true);
+        } else if(flag === 'AMBER' || zone === 'alarm'){
+          cardTagEl.className = 'pill';
+          cardTagEl.innerHTML = '● ALARM';
+          cardTagEl.style.cssText = 'font-size:9.5px;padding:2px 7px;background:rgba(224,163,62,0.2);color:#e0a33e;border-color:rgba(224,163,62,0.5)';
+          if(cardEl) cardEl.style.borderColor = 'rgba(245,158,11,0.7)';
+          playAlarmBeep(false);
+        } else {
+          cardTagEl.className = 'pill ok';
+          cardTagEl.innerHTML = '● NORMAL';
+          cardTagEl.style.cssText = 'font-size:9.5px;padding:2px 7px;background:rgba(47,179,135,0.15);color:var(--green);border-color:rgba(47,179,135,0.3)';
+          if(cardEl) cardEl.style.borderColor = 'var(--line)';
+        }
+      }
+
+      // Maintain rolling time-series history for Dotted Sparkline Chart
+      if(!S.streamHistory) S.streamHistory = {};
+      if(!S.streamHistory[paramId]) S.streamHistory[paramId] = [];
+
+      S.streamHistory[paramId].push({
+        time: timeStr.split(' ')[0] || timeStr,
+        val: parseFloat(val),
+        zone: zone,
+        flag: flag
+      });
+
+      if(S.streamHistory[paramId].length > 20){
+        S.streamHistory[paramId].shift();
+      }
+
+      // Draw Live Dotted Line Streaming Graph (X: Timestamp, Y: Parameter Value)
+      drawDottedSparkline(paramId, S.streamHistory[paramId], band);
+
+      // Filter by parameter tab
+      if(currentStreamTab !== 'all' && currentStreamTab !== paramId) return;
+
+      const paramName = (band.short || band.name || paramId).toUpperCase();
+      const unit = band.unit || '';
+      const agentName = `${paramName} Agent`;
+      const whyList = (IV_MAP[paramId] || []).slice(0,3).join(', ');
+
+      let lineHtml = '';
+      if(flag === 'RED' || zone === 'trip'){
+        lineHtml = `<div style="margin-bottom:5px;border-left:4px solid var(--red);padding:4px 8px;background:rgba(255,90,68,0.12);border-radius:4px"><span class="ts" style="color:var(--slate)">${timeStr}</span> <span style="color:var(--red);font-weight:800">● RED BREACH</span> <span style="color:var(--amber);font-weight:700">${paramName}</span> value=<span style="color:#fff;font-weight:700">${val}${unit}</span> p_breach=<span style="color:var(--cyan);font-weight:700">${pBreach}</span> agent=<span style="color:var(--mint)">${esc(agentName)}</span> why=[<span style="color:var(--cyan)">${esc(whyList)}</span>]</div>`;
+      } else if(flag === 'AMBER' || zone === 'alarm'){
+        lineHtml = `<div style="margin-bottom:5px;border-left:4px solid var(--amber);padding:4px 8px;background:rgba(224,163,62,0.1);border-radius:4px"><span class="ts" style="color:var(--slate)">${timeStr}</span> <span style="color:var(--amber);font-weight:700">● AMBER ALARM</span> <span style="color:var(--amber);font-weight:600">${paramName}</span> value=<span style="color:#fff">${val}${unit}</span> p_breach=<span style="color:var(--cyan)">${pBreach}</span> asset=<span style="color:var(--slate)">${esc(band.asset||'BIO-REACT-01')}</span></div>`;
+      } else {
+        lineHtml = `<div style="margin-bottom:4px;border-left:3px solid var(--green);padding:3px 8px;background:rgba(47,179,135,0.04);border-radius:4px"><span class="ts" style="color:var(--slate)">${timeStr}</span> <span style="color:var(--green);font-weight:600">● GREEN NORMAL</span> <span style="color:var(--cyan)">${paramName}</span> value=<span style="color:#fff">${val}${unit}</span> p_breach=<span style="color:var(--slate)">${pBreach}</span> status=in_control</div>`;
+      }
+
+      logEl.insertAdjacentHTML('afterbegin', lineHtml);
+    });
+
+    while(logEl.children.length > 100){
+      logEl.removeChild(logEl.lastChild);
+    }
+  } catch(e){}
+}
+
 async function triggerStream(param){
+  playAlarmBeep(true);
   let e;
   try{
     if(S.apiOk && S.studioOk){ e = await api(`/studio/stream-trigger?param=${param}`, {method:'POST'}); }
@@ -804,9 +1196,11 @@ async function triggerStream(param){
   }catch(err){ return; }
   S.lastEvent = e;
   const log = $('#streamLog');
-  if(log.querySelector('.ts')) log.innerHTML = '';
-  log.insertAdjacentHTML('afterbegin',
-    `<div><span class="ts">${new Date().toLocaleTimeString()}</span> <span class="red">● RED</span> <span class="warn">${esc(e.param)}</span> p_breach=<span class="act">${e.p_breach}</span> agent=<span class="info">${esc(e.agent||'')}</span> why=[${(e.why||[]).join(', ')}]</div>`);
+  if(log && log.querySelector('.ts')) log.innerHTML = '';
+  if(log){
+    log.insertAdjacentHTML('afterbegin',
+      `<div style="margin-bottom:4px;border-left:3px solid var(--red);padding-left:6px;background:rgba(255,90,68,0.14)"><span class="ts" style="color:var(--slate)">${new Date().toLocaleTimeString()}</span> <span style="color:var(--red);font-weight:700">● RED TRIGGERED BREACH</span> <span style="color:var(--amber);font-weight:600">${esc(e.param.toUpperCase())}</span> p_breach=<span style="color:var(--cyan)">${e.p_breach}</span> agent=<span style="color:var(--mint)">${esc(e.agent||'')}</span> why=[<span style="color:var(--cyan)">${(e.why||[]).join(', ')}</span>]</div>`);
+  }
   $('#trigDetail').innerHTML = `<div class="card"><h3><span class="ic">🚨</span> Trigger event<span class="tag">pushed to ${esc(e.pushed_to||'kafka')}</span></h3>
     <div class="grid g2"><div>
       <div class="kv"><span class="k">Event ID</span><span class="v c">${esc(e.event_id)}</span></div>
@@ -1299,6 +1693,355 @@ async function loadAudit(){
     if(rows.length){ const log=$('#auditLog'); log.innerHTML='';
       rows.reverse().forEach(r=>appendAudit({kind:r.kind||'info', action:r.action||r.event||'audit', detail:r.detail||{}})); }
   }catch(e){}
+}
+
+/* ---------- STEP 13: RAG COPILOT CHATBOT ---------- */
+VIEWS.chatbot = () => `
+  <div class="eyebrow"><span class="n">STEP 13</span> AI Chatbot</div>
+  <h1>RAG Copilot Chatbot — Human Escalation Mode</h1>
+  <p class="lead">
+    Operating in <b>Human Escalation Mode</b> (no domain parameter agent activated). 
+    Combines <b>structured</b> (CAPA records, maintenance logs, batch records) and <b>unstructured</b> (SOP PDFs, OEM manuals) data into a single hybrid RAG corpus. 
+    Ask any bioprocess query, request root-cause analytics, or generate dynamic diagnostic charts.
+  </p>
+
+  <!-- Status Bar -->
+  <div class="card" style="padding:12px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="pill ok" style="padding:5px 12px;font-size:11px;font-weight:700"><span class="dot"></span> Human Escalation Agent: ACTIVE</span>
+        <span class="pill" style="padding:5px 12px;font-size:11px;font-weight:700;color:var(--cyan);border-color:rgba(43,179,192,0.3)">📚 Unified RAG KB: Structured + Unstructured</span>
+      </div>
+      <span class="pill" style="padding:5px 12px;font-size:11px;color:var(--mint);border-color:rgba(47,179,135,0.3)">📊 Dynamic Charts Enabled</span>
+    </div>
+  </div>
+
+  <!-- Top 5 Suggested Questions Grid -->
+  <div class="card" style="padding:14px;margin-bottom:16px">
+    <h3 style="margin-bottom:10px;font-size:12.5px;color:var(--cyan)"><span class="ic">💡</span> Top Suggested Human Escalation Queries</h3>
+    <div style="display:flex;flex-direction:column;gap:8px" id="suggestedChipsRow">
+      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">📄 What is the SOP response protocol for reactor pH probe drift?</button>
+      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">🛠️ Show historical CAPA records and root causes for temperature excursions</button>
+      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">⚡ What are the 21 CFR Part 11 e-signature requirements for GxP breaches?</button>
+      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">💧 What maintenance actions are specified for WFI conductivity resin bed exhaustion?</button>
+      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">📊 Generate breach severity distribution chart across all bioprocess parameters</button>
+    </div>
+  </div>
+
+  <!-- Main Chatbot Stream Area -->
+  <div class="card" style="padding:16px;margin:0;display:flex;flex-direction:column;gap:14px">
+    <div class="log" id="chatStreamLog" style="height:380px;background:#030d10;border:1px solid var(--line);border-radius:10px;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(43,179,192,0.06);border:1px solid var(--line2);border-radius:8px;padding:12px;color:var(--slate)">
+        <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;display:flex;align-items:center;gap:6px">
+          <span>🤖 Human Escalation Agent</span>
+          <span class="chip" style="font-size:9.5px;padding:1px 6px;color:var(--mint)">RAG Copilot</span>
+        </div>
+        Welcome! No domain parameter agent is currently assigned. I am your <b>Human Escalation RAG Copilot</b>. I can search across all structured CAPA records, maintenance logs, batch histories, and unstructured SOP/OEM PDF manuals. Click any suggested question above or type a query below!
+      </div>
+    </div>
+
+    <!-- Chat Input Controls -->
+    <div style="display:flex;gap:10px;align-items:center">
+      <input id="chatInput" type="text" placeholder="Type any bioprocess, SOP, CAPA, or GxP compliance query..." style="flex:1;background:#051317;border:1px solid var(--line2);border-radius:8px;padding:12px 14px;color:#fff;font-size:13px" />
+      <button id="chatSendBtn" class="btn primary lg" style="padding:12px 24px;font-weight:700;white-space:nowrap;border-radius:8px">Send Query →</button>
+    </div>
+  </div>
+`;
+
+AFTER.chatbot = () => {
+  const sendBtn = $('#chatSendBtn');
+  const inputEl = $('#chatInput');
+
+  if(sendBtn) sendBtn.onclick = () => submitBotQuery();
+  if(inputEl){
+    inputEl.onkeydown = (e) => {
+      if(e.key === 'Enter') submitBotQuery();
+    };
+  }
+
+  $$('.chat-chip-btn').forEach(btn => {
+    btn.onclick = () => {
+      const txt = btn.textContent.replace(/^[\u1F00-\u1F9FF\u2600-\u27BF\u1F300-\u1F6FF\u1F900-\u1F9FF]\s*/, '').trim();
+      if(inputEl) inputEl.value = txt;
+      submitBotQuery();
+    };
+  });
+};
+
+async function submitBotQuery(){
+  const inputEl = $('#chatInput');
+  const logEl = $('#chatStreamLog');
+  if(!inputEl || !logEl) return;
+  const q = inputEl.value.trim();
+  if(!q) return;
+
+  inputEl.value = '';
+
+  // Render User Message
+  const userMsgHtml = `
+    <div style="align-self:flex-end;max-width:82%;background:#0e3640;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:#fff;font-size:12.5px;line-height:1.5">
+      <div style="font-size:10px;color:var(--cyan);font-weight:700;margin-bottom:3px">YOU (OPERATOR)</div>
+      ${esc(q)}
+    </div>
+  `;
+  logEl.insertAdjacentHTML('beforeend', userMsgHtml);
+  logEl.scrollTop = logEl.scrollHeight;
+
+  // Render Loading Spinner
+  const botLoadingId = 'botMsg_' + Date.now();
+  const loadingHtml = `
+    <div id="${botLoadingId}" style="align-self:flex-start;max-width:88%;background:#061a1f;border:1px solid var(--line);border-radius:10px;padding:12px 16px;color:#e6f3f3;font-size:12.5px;line-height:1.5">
+      <div style="font-size:10.5px;color:var(--mint);font-weight:700;margin-bottom:4px">🤖 Human Escalation Agent</div>
+      <span class="spin"></span> Searching unified RAG index (structured + unstructured)...
+    </div>
+  `;
+  logEl.insertAdjacentHTML('beforeend', loadingHtml);
+  logEl.scrollTop = logEl.scrollHeight;
+
+  try {
+    let res;
+    if(S.apiOk && S.studioOk){
+      res = await api('/studio/chatbot-query', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({query: q})
+      });
+    } else {
+      await new Promise(r => setTimeout(r, 600));
+      res = simChatbotQuery(q);
+    }
+
+    const targetEl = $('#' + botLoadingId);
+    if(!targetEl) return;
+
+    const formattedAns = esc(res.answer || '')
+      .replace(/\*\*(.*?)\*\*/g, '<b style="color:#fff">$1</b>')
+      .replace(/\n/g, '<br>');
+
+    let citationsHtml = '';
+    if(res.citations && res.citations.length){
+      citationsHtml = `
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line2);font-size:11px">
+          <div style="font-weight:700;color:var(--cyan);margin-bottom:4px">GROUNDED CITATIONS & PROVENANCE:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${res.citations.map(c => `
+              <span class="chip" style="font-size:9.5px;padding:2px 7px;background:rgba(43,179,192,0.12);color:var(--cyan);border-color:rgba(43,179,192,0.3)">
+                ${c.structured ? '📊' : '📄'} ${esc(c.source_id)}
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    let chartHtml = '';
+    const chartCanvasId = 'botChart_' + Date.now();
+    if(res.chart){
+      chartHtml = `
+        <div style="margin-top:12px;background:#030d10;border:1px solid var(--line2);border-radius:8px;padding:10px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--cyan);margin-bottom:6px">📊 ${esc(res.chart.title || 'Diagnostic Analytics Chart')}</div>
+          <canvas id="${chartCanvasId}" width="480" height="150" style="width:100%;height:150px;display:block"></canvas>
+        </div>
+      `;
+    }
+
+    targetEl.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--mint);font-weight:700">🤖 Human Escalation Agent</div>
+        <span class="pill ok" style="font-size:8.5px;padding:1px 6px">HYBRID RAG MATCH</span>
+      </div>
+      <div style="color:#e6f3f3;font-size:12px;line-height:1.55">${formattedAns}</div>
+      ${citationsHtml}
+      ${chartHtml}
+    `;
+
+    if(res.chart){
+      setTimeout(() => {
+        renderBotChart(chartCanvasId, res.chart.type, res.chart.title, res.chart.labels, res.chart.data, res.chart.colors);
+      }, 50);
+    }
+
+    logEl.scrollTop = logEl.scrollHeight;
+
+  } catch(err){
+    const targetEl = $('#' + botLoadingId);
+    if(targetEl){
+      targetEl.innerHTML = `<div style="color:var(--red)">✕ Error querying RAG copilot: ${esc(err.message)}</div>`;
+    }
+  }
+}
+
+function simChatbotQuery(q){
+  const qLower = q.toLowerCase();
+  let chart = null;
+  if(qLower.includes('chart') || qLower.includes('graph') || qLower.includes('capa') || qLower.includes('history') || qLower.includes('distribution')){
+    if(qLower.includes('distribution') || qLower.includes('severity')){
+      chart = {
+        type: 'doughnut',
+        title: 'Breach Severity Distribution (Historical Corpus)',
+        labels: ['Normal / In-Control', 'Amber Alarm', 'Red Trip Breach'],
+        data: [65, 24, 11],
+        colors: ['#2fb387', '#f59e0b', '#ef4444']
+      };
+    } else if(qLower.includes('trend') || qLower.includes('temperature') || qLower.includes('ph')){
+      chart = {
+        type: 'line',
+        title: 'Bioprocess Parameter Excursion Trend (Last 10 Batches)',
+        labels: ['B-101', 'B-102', 'B-103', 'B-104', 'B-105', 'B-106', 'B-107', 'B-108', 'B-109', 'B-110'],
+        data: [36.8, 36.9, 37.1, 37.0, 37.6, 37.9, 38.2, 37.4, 37.1, 37.0],
+        colors: ['#2bdfc4']
+      };
+    } else {
+      chart = {
+        type: 'bar',
+        title: 'CAPA Excursions & Work Orders by Parameter',
+        labels: ['Temperature', 'pH', 'Pressure', 'Conductivity', 'Humidity'],
+        data: [14, 22, 9, 18, 7],
+        colors: ['#2bb3c0', '#2fb387', '#f59e0b', '#a78bfa', '#ec4899']
+      };
+    }
+  }
+
+  let ans = `**Human Escalation Agent Response**:\n\nQuery parsed against unified RAG database (22 structured CAPA records & 14 unstructured SOP/OEM PDF chunks).`;
+  if(qLower.includes('ph')){
+    ans = `**Human Escalation Agent Response**:\n\nPer **SOP-BSC-001** (§3.2) and **CAPA-LOG-2024** (#14), reactor pH probe drift requires buffer check (pH 4.01, 7.00, 10.01). Because pH adjustments directly impact GxP product quality, **no autonomous agent setpoint modification is allowed** — every dosing action requires mandatory **21 CFR Part 11 e-signature** by QA.`;
+  } else if(qLower.includes('capa')){
+    ans = `**Human Escalation Agent Response**:\n\nRetrieved **22 CAPA records** and maintenance work orders. Primary root causes: **coolant heat-exchanger fouling** (42% of temp excursions) and **acid/base dosing valve diaphragm wear** (31% of pH excursions). See breakdown chart below.`;
+  } else if(qLower.includes('21 cfr') || qLower.includes('signature') || qLower.includes('esign')){
+    ans = `**Human Escalation Agent Response**:\n\nPer **GxP 21 CFR Part 11 Governance Rules**:\n1. GxP critical parameter setpoint changes require e-signature.\n2. Manifest must log: *Signer Name*, *Role*, *UTC Timestamp*, & *Justification Code*.\n3. Logged to immutable SHA-256 hash-chained WORM audit trail.`;
+  }
+
+  return {
+    query: q, answer: ans, agent: "Human Escalation Agent",
+    citations: [
+      {source_id: "CAPA-LOG-2024", structured: true, title: "CAPA Records"},
+      {source_id: "SOP-BSC-001", structured: false, title: "SOP Protocol"}
+    ],
+    chart: chart
+  };
+}
+
+/* Dynamic Canvas Chart Renderer (Bar, Line, Doughnut) */
+function renderBotChart(canvasId, type, title, labels, data, colors){
+  const canvas = document.querySelector('#' + canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#030d10';
+  ctx.fillRect(0, 0, w, h);
+
+  const defaultColors = ['#2bb3c0', '#2fb387', '#f59e0b', '#a78bfa', '#ec4899'];
+  const palette = colors || defaultColors;
+
+  if(type === 'bar'){
+    const padL = 35, padB = 25, padT = 15, padR = 15;
+    const gW = w - padL - padR;
+    const gH = h - padT - padB;
+    const maxVal = Math.max(...data, 10);
+    const barW = Math.min(36, (gW / data.length) * 0.55);
+
+    ctx.strokeStyle = '#0e3039'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, h - padB); ctx.lineTo(w - padR, h - padB);
+    ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB);
+    ctx.stroke();
+
+    data.forEach((val, i) => {
+      const x = padL + (i + 0.5) * (gW / data.length) - barW / 2;
+      const barH = (val / maxVal) * gH;
+      const y = h - padB - barH;
+
+      ctx.fillStyle = palette[i % palette.length];
+      ctx.fillRect(x, y, barW, barH);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '9.5px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(val, x + barW / 2, y - 4);
+
+      ctx.fillStyle = '#7a9ea8';
+      ctx.font = '8.5px sans-serif';
+      ctx.fillText(labels[i] || '', x + barW / 2, h - padB + 14);
+    });
+
+  } else if(type === 'line'){
+    const padL = 35, padB = 22, padT = 15, padR = 15;
+    const gW = w - padL - padR;
+    const gH = h - padT - padB;
+    const minVal = Math.min(...data) * 0.98;
+    const maxVal = Math.max(...data) * 1.02;
+    const range = (maxVal - minVal) || 1;
+
+    ctx.strokeStyle = '#0e3039'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, h - padB); ctx.lineTo(w - padR, h - padB);
+    ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB);
+    ctx.stroke();
+
+    const getX = (i) => padL + (i / Math.max(data.length - 1, 1)) * gW;
+    const getY = (val) => padT + gH - ((val - minVal) / range) * gH;
+
+    ctx.strokeStyle = palette[0] || '#2bdfc4';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    data.forEach((val, i) => {
+      const x = getX(i); const y = getY(val);
+      if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    data.forEach((val, i) => {
+      const x = getX(i); const y = getY(val);
+      ctx.fillStyle = palette[0] || '#2bdfc4';
+      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+
+      if(i % 2 === 0){
+        ctx.fillStyle = '#7a9ea8';
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[i] || '', x, h - padB + 13);
+      }
+    });
+
+  } else if(type === 'doughnut'){
+    const cx = w / 3;
+    const cy = h / 2;
+    const radius = Math.min(cx, cy) - 15;
+    const innerRadius = radius * 0.55;
+    const total = data.reduce((a, b) => a + b, 0) || 1;
+
+    let startAngle = -Math.PI / 2;
+    data.forEach((val, i) => {
+      const sliceAngle = (val / total) * Math.PI * 2;
+      const endAngle = startAngle + sliceAngle;
+
+      ctx.fillStyle = palette[i % palette.length];
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, startAngle, endAngle);
+      ctx.arc(cx, cy, innerRadius, endAngle, startAngle, true);
+      ctx.closePath();
+      ctx.fill();
+
+      startAngle = endAngle;
+    });
+
+    const legendX = cx + radius + 30;
+    let legendY = 30;
+    data.forEach((val, i) => {
+      const pct = Math.round((val / total) * 100);
+      ctx.fillStyle = palette[i % palette.length];
+      ctx.fillRect(legendX, legendY, 12, 12);
+
+      ctx.fillStyle = '#e6f3f3';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${labels[i]} (${pct}%)`, legendX + 18, legendY + 10);
+      legendY += 24;
+    });
+  }
 }
 
 /* ================= START ================= */

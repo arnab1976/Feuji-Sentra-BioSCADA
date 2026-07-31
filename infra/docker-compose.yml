@@ -230,7 +230,7 @@ services:
     <<: *common
     build: {context: .., dockerfile: infra/docker/Dockerfile.frontend}
     depends_on: [api]
-    ports: ["3000:80"]
+    ports: ["8080:80"]
 
 networks:
   bioscada:

@@ -289,3 +289,26 @@ class TestAuditChain:
         good = self.chain([("t1", "a", {"x": 1}), ("t2", "b", {"y": 2})])
         bad = self.chain([("t1", "a", {"x": 999}), ("t2", "b", {"y": 2})])
         assert good != bad, "modifying an earlier row must invalidate later hashes"
+
+
+# =====================================================================
+# Studio routing & redirection
+# =====================================================================
+class TestStudioRouting:
+    def test_root_redirects_to_studio(self):
+        from fastapi.testclient import TestClient
+        sys.path.insert(0, str(ROOT / "services/api/src"))
+        import main
+        client = TestClient(main.app, follow_redirects=False)
+        response = client.get("/")
+        assert response.status_code == 307
+        assert response.headers["location"] == "/studio"
+
+    def test_studio_endpoint_serves_html(self):
+        from fastapi.testclient import TestClient
+        sys.path.insert(0, str(ROOT / "services/api/src"))
+        import main
+        client = TestClient(main.app)
+        response = client.get("/studio")
+        assert response.status_code == 200
+        assert "SENTRA" in response.text

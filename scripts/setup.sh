@@ -37,7 +37,7 @@ cat <<'DONE'
 Setup complete.
 
   Start the API:      ./scripts/run-local.sh
-  Open the portal:    frontend/public/index.html
+  Open Studio:        http://localhost:8080/studio
   Or use Docker:      cd infra && docker compose up -d
 
 DONE

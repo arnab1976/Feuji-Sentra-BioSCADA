@@ -290,12 +290,15 @@ class Embedder:
         self.dim = 384
         self._model = None
         try:
+            import os
+            if os.getenv("EMBEDDER_OFFLINE", "1") == "1":
+                raise RuntimeError("Fast offline embedding mode enabled")
             from sentence_transformers import SentenceTransformer
-            self._model = SentenceTransformer(model_name)
+            self._model = SentenceTransformer(model_name, local_files_only=True)
             self.dim = self._model.get_sentence_embedding_dimension()
             log.info("Embedder: %s (dim=%d)", model_name, self.dim)
         except Exception as exc:
-            log.warning("sentence-transformers unavailable (%s) -> hashing fallback", exc)
+            log.warning("sentence-transformers offline/unavailable (%s) -> fast hashing fallback", exc)
 
     def encode(self, texts: List[str]):
         import numpy as np
