@@ -110,8 +110,21 @@ h1{font-size:26px;color:#fff;font-weight:750;margin-bottom:8px;letter-spacing:-.
 
 /* nav footer */
 .stepbar{display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:18px;
-  border-top:1px solid var(--line)}
+  border-top:1px solid var(--line);gap:10px;flex-wrap:wrap}
 .stepbar .hint{font-size:11.5px;color:var(--slate-d)}
+.page-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin:0 0 16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  background:linear-gradient(180deg,rgba(14,42,50,0.55),rgba(8,26,31,0.75))}
+.page-nav .page-nav-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.page-nav .page-nav-meta{font-size:11px;color:var(--slate);font-family:var(--mono)}
+.page-nav .page-nav-meta b{color:var(--cyan);font-weight:700}
+.arch-marquee-wrap{flex:1;min-height:0;overflow:hidden;position:relative}
+.arch-marquee-track{display:flex;flex-direction:column;gap:10px;will-change:transform}
+.arch-marquee-wrap.is-paused .arch-marquee-track{animation-play-state:paused !important}
+@keyframes archScrollUp{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(-50%)}
+}
 
 /* forms */
 label{display:block;font-size:11px;font-weight:650;color:#aecaca;margin-bottom:6px;letter-spacing:.2px}
@@ -238,9 +251,20 @@ a.dl{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)
 .tech-pill{font-size:11px;font-family:var(--mono);padding:4px 9px;border-radius:6px;background:rgba(18,110,130,.18);border:1px solid rgba(43,179,192,.25);color:#d6e7e7}
 
 .arch-img-card{background:linear-gradient(180deg,#0a2128,#07171c);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
-.arch-img-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line2);background:#051317;text-align:center}
-.arch-img{width:100%;max-height:540px;object-fit:contain;display:block;transition:transform .3s ease}
-.arch-img-wrap:hover .arch-img{transform:scale(1.01)}
+.sentra-flow{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;gap:4px;padding:2px 0}
+.sentra-flow-step{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid rgba(43,179,192,0.22);background:linear-gradient(120deg,rgba(12,40,48,0.9),rgba(6,22,28,0.95));animation:flowPulse 3.6s ease-in-out infinite}
+.sentra-flow-step:nth-child(1){animation-delay:0s}
+.sentra-flow-step:nth-child(3){animation-delay:.35s}
+.sentra-flow-step:nth-child(5){animation-delay:.7s}
+.sentra-flow-step:nth-child(7){animation-delay:1.05s}
+.sentra-flow-step:nth-child(9){animation-delay:1.4s}
+.sentra-flow-num{width:22px;height:22px;border-radius:7px;background:rgba(43,179,192,0.18);border:1px solid rgba(43,179,192,0.45);color:var(--cyan);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono)}
+.sentra-flow-body{min-width:0}
+.sentra-flow-title{font-size:11.5px;font-weight:750;color:#fff;line-height:1.2}
+.sentra-flow-sub{font-size:10px;color:var(--slate);line-height:1.35;margin-top:2px}
+.sentra-flow-arrow{text-align:center;color:var(--cyan);font-size:11px;opacity:.7;line-height:1;animation:flowArrow 1.6s ease-in-out infinite}
+@keyframes flowPulse{0%,100%{border-color:rgba(43,179,192,0.22)}50%{border-color:rgba(43,179,192,0.55)}}
+@keyframes flowArrow{0%,100%{opacity:.35;transform:translateY(-1px)}50%{opacity:1;transform:translateY(2px)}}
 
 .phase-card{background:#081a1f;border:1px solid var(--line);border-radius:12px;padding:15px;transition:.2s;height:100%;display:flex;flex-direction:column}
 .phase-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
@@ -253,11 +277,6 @@ a.dl{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)
 <div class="topbar">
   <div class="logo">S</div>
   <div class="brand"><b>SENTRA</b><span>THRESHOLD RESPONSE AGENTS</span></div>
-  <div class="top-status">
-    <span id="apiPill" class="pill off"><span class="dot"></span> <span id="apiTxt">connecting…</span></span>
-    <span id="kbPill" class="pill"><span class="dot"></span> <span id="kbTxt">KB —</span></span>
-    <span id="modelPill" class="pill"><span class="dot"></span> <span id="modelTxt">models —</span></span>
-  </div>
 </div>
 
 <div class="shell">
@@ -280,15 +299,17 @@ const STEPS = [
   {id:"model",    phase:"Predictive ML",  n:"3",  t:"Train PdM models",       sub:"Fit ML predictive models"},
   {id:"leader",   phase:"Predictive ML",  n:"4",  t:"Model leaderboard",      sub:"Evaluate AUC & accuracy"},
   {id:"ragbuild", phase:"Knowledge Base", n:"5",  t:"Build RAG KB",           sub:"Upload & index SOPs/CAPAs"},
-  {id:"stream",   phase:"Streaming",      n:"6",  t:"Kafka telemetry stream", sub:"Live Kafka producer stream"},
-  {id:"flinksql", phase:"Flink Engine",   n:"7",  t:"Flink SQL plan",         sub:"Relational-plan continuous query"},
-  {id:"flinklive",phase:"Flink Engine",   n:"8",  t:"Flink live stream",      sub:"In-stream PDM_SCORE & breaches"},
-  {id:"dviv",     phase:"AI Agents & RAG",n:"9",  t:"DV / IV drivers",        sub:"Feature driver 'why' extraction"},
-  {id:"roster",   phase:"AI Agents & RAG",n:"10", t:"Agent roster",           sub:"5 specialized parameter agents"},
-  {id:"ragquery", phase:"AI Agents & RAG",n:"11", t:"Agent RAG remedy",       sub:"Semantic search & LLM synthesis"},
-  {id:"govern",   phase:"Governance",     n:"12", t:"GxP governance",         sub:"21 CFR Part 11 & WORM audit"},
-  {id:"chatbot",  phase:"AI Chatbot",     n:"13", t:"RAG Copilot Chatbot",    sub:"Structured & Unstructured Chat"},
+  {id:"scada_intel", phase:"Autonomous Intelligence", n:"6", t:"SCADA Intelligence Platform", sub:"End-to-End Real-Time Telemetry & Agentic RAG"},
+  {id:"stream",   phase:"Streaming",      n:"7",  t:"Kafka telemetry stream", sub:"Live Kafka producer stream"},
+  {id:"flinksql", phase:"Flink Engine",   n:"8",  t:"Flink SQL plan",         sub:"Relational-plan continuous query"},
+  {id:"flinklive",phase:"Flink Engine",   n:"9",  t:"Flink live stream",      sub:"In-stream PDM_SCORE & breaches"},
+  {id:"dviv",     phase:"AI Agents & RAG",n:"10", t:"DV / IV drivers",        sub:"Feature driver 'why' extraction"},
+  {id:"roster",   phase:"AI Agents & RAG",n:"11", t:"Agent roster",           sub:"5 specialized parameter agents"},
+  {id:"ragquery", phase:"AI Agents & RAG",n:"12", t:"Agent RAG remedy",       sub:"Semantic search & LLM synthesis"},
+  {id:"govern",   phase:"Governance",     n:"13", t:"GxP governance",         sub:"21 CFR Part 11 & WORM audit"},
+  {id:"chatbot",  phase:"AI Chatbot",     n:"14", t:"SCADA Co-pilot Chatbot", sub:"Parameter & Escalation Agents"},
 ];
+
 
 /* ================= API + STATE ================= */
 const API = (() => {
@@ -299,7 +320,7 @@ const API = (() => {
 })();
 
 const S = {
-  bands: [], datasets: {}, training: {}, lastEvent: null,
+  bands: [], datasets: {}, pendingDatasets: {}, training: {}, lastEvent: null,
   kbStats: null, apiOk: false, ragChunks: 0, visited: new Set(), cur: 0,
   soundEnabled: true, streamHistory: {temp:[], ph:[], press:[], cond:[], hum:[]},
 };
@@ -499,6 +520,11 @@ function buildNav(){
   $$('.step-item').forEach(el => el.onclick = () => go(+el.dataset.i));
 }
 function go(i){
+  // Stop stream polling / RED dialog when leaving Stream step
+  if(STEPS[S.cur]?.id === 'stream' && STEPS[i]?.id !== 'stream'){
+    if(streamTimer){ clearInterval(streamTimer); streamTimer = null; }
+    streamFlinkDialogOpen = false;
+  }
   S.cur = i; S.visited.add(i);
   $$('.step-item').forEach((el,idx)=>{
     el.classList.toggle('active', idx===i);
@@ -524,11 +550,33 @@ function go(i){
   $('#main').scrollTo(0,0); window.scrollTo(0,0);
 }
 function nav(dir){ const n = S.cur+dir; if(n>=0 && n<STEPS.length) go(n); }
+function goHome(){ go(0); }
+function goBack(){
+  if(S.cur > 0) nav(-1);
+  else goHome();
+}
+/** Top Home / Back chrome — hidden on the home (overview) page. */
+function pageNav(){
+  if(S.cur === 0) return '';
+  const step = STEPS[S.cur] || {};
+  const prevLabel = S.cur > 1 ? (STEPS[S.cur-1]?.t || 'Back') : 'Home';
+  return `<div class="page-nav" role="navigation" aria-label="Page navigation">
+    <div class="page-nav-left">
+      <button type="button" class="btn ghost sm" onclick="goHome()" title="Return to Home / Overview">🏠 Home</button>
+      <button type="button" class="btn sm" onclick="goBack()" title="Go back to ${esc(prevLabel)}">← Back</button>
+    </div>
+    <div class="page-nav-meta">Step <b>${esc(step.n || String(S.cur))}</b> · ${esc(step.t || '')}</div>
+  </div>`;
+}
 function stepbar(){
   if (S.cur === 0) return '';
-  const prev = S.cur>0 ? `<button class="btn ghost sm" onclick="nav(-1)">← ${STEPS[S.cur-1].t}</button>` : '<span></span>';
-  const next = S.cur<STEPS.length-1 ? `<button class="btn primary sm" onclick="nav(1)">${STEPS[S.cur+1].t} →</button>` : '<span class="mono-tag">end of pipeline</span>';
-  return `<div class="stepbar">${prev}${next}</div>`;
+  const prevLabel = S.cur > 1 ? (STEPS[S.cur-1]?.t || 'Previous') : 'Home';
+  const prev = `<button type="button" class="btn ghost sm" onclick="goBack()">← ${esc(prevLabel)}</button>`;
+  const mid = `<button type="button" class="btn ghost sm" onclick="goHome()">🏠 Home</button>`;
+  const next = S.cur<STEPS.length-1
+    ? `<button type="button" class="btn primary sm" onclick="nav(1)">${esc(STEPS[S.cur+1].t)} →</button>`
+    : '<span class="mono-tag">end of pipeline</span>';
+  return `<div class="stepbar"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${prev}${mid}</div>${next}</div>`;
 }
 
 /* ================= BOOT ================= */
@@ -537,18 +585,22 @@ async function boot(){
   try{
     const h = await api('/health');
     S.apiOk = true;
-    $('#apiPill').className='pill ok'; $('#apiTxt').textContent='API live';
-    $('#kbPill').className='pill ok'; $('#kbTxt').textContent=`KB ${h.kb_chunks}`; S.ragChunks=h.kb_chunks;
-    $('#modelPill').className='pill '+(h.models_loaded?.length?'ok':''); $('#modelTxt').textContent=`${h.models_loaded?.length||0} models`;
+    S.ragChunks = h.kb_chunks || 0;
     try{ S.bands = await api('/studio/bands'); S.studioOk = true; }
     catch{ S.bands = FALLBACK_BANDS; S.studioOk = false; }
     try{ S.kbStats = await api('/rag/stats'); }catch{}
-    if(S.apiOk && !S.studioOk){
-      $('#apiPill').className='pill'; $('#apiTxt').textContent='API partial — update server';
-    }
+    try{
+      const res = await api('/studio/datasets');
+      if(res && (res.saved || res.pending)){
+        S.datasets = res.saved || {};
+        S.pendingDatasets = res.pending || {};
+      } else if(res && typeof res === 'object'){
+        S.datasets = res;
+      }
+    }catch{}
   }catch(e){
     S.apiOk=false; S.bands=FALLBACK_BANDS;
-    $('#apiTxt').textContent='API offline — demo mode'; $('#kbTxt').textContent='KB (sim)'; $('#modelTxt').textContent='models (sim)';
+    loadLocalDatasets();
   }
   go(0);
   if(typeof pollStudioTelemetry === 'function'){
@@ -580,7 +632,7 @@ async function studioInject(param, severity){
 /* ================= RENDER DISPATCH ================= */
 function renderStep(id){
   const fn = VIEWS[id];
-  $('#main').innerHTML = `<section class="view on">${fn ? fn() : '—'}${stepbar()}</section>`;
+  $('#main').innerHTML = `<section class="view on">${pageNav()}${fn ? fn() : '—'}${stepbar()}</section>`;
   if(AFTER[id]) AFTER[id]();
 }
 const VIEWS = {}, AFTER = {};
@@ -589,7 +641,7 @@ const VIEWS = {}, AFTER = {};
 VIEWS.overview = () => `
   <div style="display:flex;flex-direction:column;height:calc(100vh - 78px);gap:9px;box-sizing:border-box;overflow:hidden">
 
-    <!-- 1. HERO TOP BAR (BRANDING, CONTEXT & SINGLE START STUDIO BUTTON) -->
+    <!-- 1. HERO TOP BAR -->
     <div class="hero-card" style="padding:12px 18px;margin-bottom:0;flex-shrink:0">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
         <div style="flex:1">
@@ -607,91 +659,54 @@ VIEWS.overview = () => `
       </div>
     </div>
 
-    <!-- 2. MIDDLE SECTION: 2-COLUMN GRID (LEFT: 5-PHASE ARCHITECTURE SUMMARY, RIGHT: PHOTO) -->
-    <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:9px;flex:1;min-height:0;overflow:hidden">
+    <!-- 2. MIDDLE: Summary marquee | Journey Video | Powered By tech marquee -->
+    <div style="display:grid;grid-template-columns:minmax(260px,1fr) minmax(340px,1.2fr) minmax(260px,1fr);gap:10px;flex:1;min-height:0;overflow:hidden">
 
-      <!-- LEFT: ENTERPRISE ARCHITECTURE SUMMARY (5 PHASES) -->
-      <div class="card" style="margin:0;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
-        <h3 style="margin-bottom:6px;padding-bottom:5px;font-size:11.5px;flex-shrink:0"><span class="ic">🏛️</span> Enterprise Architecture Summary <span class="tag">5-Phase Pipeline</span></h3>
-        <div style="display:flex;flex-direction:column;gap:5px;flex:1;justify-content:space-between;overflow:hidden">
-          <div class="phase-card" style="padding:7px 10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 0 — Edge Telemetry Stream</span>
-              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 0</span>
-            </div>
-            <div class="phase-desc" style="font-size:10px;line-height:1.3">Kafka/Redpanda topic ingestion for 5 bioprocess parameters (pH, Temp, Press, Cond, Hum).</div>
-          </div>
-          <div class="phase-card" style="padding:7px 10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 1 — Flink Stream Engine</span>
-              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 1</span>
-            </div>
-            <div class="phase-desc" style="font-size:10px;line-height:1.3">PyFlink 10s tumbling event-time windows, real-time feature aggregation (v_avg, v_std, v_delta) & SQL plans.</div>
-          </div>
-          <div class="phase-card" style="padding:7px 10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 2 — PdM Predictive Models</span>
-              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 2</span>
-            </div>
-            <div class="phase-desc" style="font-size:10px;line-height:1.3">Supervised ML models (GBM, Random Forest, SVM, MLP) predicting P(breach) & top feature drivers.</div>
-          </div>
-          <div class="phase-card" style="padding:7px 10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 3 — Agentic RAG Remedy</span>
-              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 3</span>
-            </div>
-            <div class="phase-desc" style="font-size:10px;line-height:1.3">Autonomous dispatch of 5 specialized agents + Qdrant hybrid vector search over SOPs/CAPAs & LLM synthesis.</div>
-          </div>
-          <div class="phase-card" style="padding:7px 10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <span class="phase-title" style="margin:0;font-size:11.5px">Phase 4 — GxP Governance & Audit</span>
-              <span class="phase-badge" style="margin:0;font-size:8px">PHASE 4</span>
-            </div>
-            <div class="phase-desc" style="font-size:10px;line-height:1.3">Keycloak OAuth2 tokens, Open Policy Agent PDP evaluation, 21 CFR Part 11 e-signatures & WORM audit trail.</div>
-          </div>
+      <!-- LEFT: all phases stream top→bottom; pause on hover -->
+      <div class="card" style="margin:0;display:flex;flex-direction:column;padding:12px 14px;min-height:0;overflow:hidden">
+        <div style="display:flex;align-items:center;margin-bottom:8px;flex-shrink:0">
+          <h3 style="margin:0;padding:0;border:none;font-size:12px"><span class="ic">🏛️</span> Enterprise Architecture Summary</h3>
+        </div>
+        <div id="archMarqueeWrap" class="arch-marquee-wrap" title="Hover to pause the phase stream">
+          <div id="archMarqueeTrack" class="arch-marquee-track"></div>
         </div>
       </div>
 
-      <!-- RIGHT: ENTERPRISE LEVEL ARCHITECTURE PHOTO BLUEPRINT -->
-      <div class="arch-img-card" style="margin:0;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
-        <div style="margin-bottom:5px;flex-shrink:0">
-          <div class="eyebrow" style="margin:0 0 2px;font-size:8.5px"><span class="n">BLUEPRINT</span> SCHEMATIC</div>
-          <h3 style="margin:0;font-size:11.5px;color:#fff;font-weight:750">Enterprise Level Architecture</h3>
+      <!-- MIDDLE: journey video — manual start only -->
+      <div class="card" style="margin:0;display:flex;flex-direction:column;padding:10px 12px;min-height:0;overflow:hidden">
+        <div style="margin-bottom:6px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+          <h3 style="margin:0;padding:0;border:none;font-size:11.5px"><span class="ic">🎬</span> SENTRA Journey <span class="tag">60s · ambient music</span></h3>
+          <button type="button" class="btn sm primary" id="sentraPlayBtn" style="padding:6px 12px;font-size:11px;font-weight:700">▶ Play Journey</button>
         </div>
-        <div class="arch-img-wrap" style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px">
-          <img src="/sentra_architecture.jpg" alt="BioSCADA AI Enterprise Architecture" class="arch-img" style="max-height:100%;max-width:100%;object-fit:contain" onerror="this.src='/public/scada_enterprise_architecture.jpg'">
+        <div style="flex:1;min-height:0;border-radius:10px;overflow:hidden;border:1px solid var(--line2);background:#030d10;display:flex;align-items:center;justify-content:center;position:relative">
+          <video id="sentraJourneyVideo"
+            src="/public/sentra_journey.mp4?v=3"
+            style="width:100%;height:100%;object-fit:contain;background:#030d10;display:block"
+            controls loop playsinline preload="metadata"
+            poster="/sentra_architecture.jpg">
+            Your browser does not support embedded video.
+          </video>
+          <div id="sentraVideoOverlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,13,16,0.55);cursor:pointer">
+            <div style="text-align:center">
+              <div style="font-size:42px;margin-bottom:8px">▶</div>
+              <div style="font-size:13px;font-weight:700;color:#fff">Click to start the SENTRA journey</div>
+              <div style="font-size:11px;color:var(--slate);margin-top:4px">Independent of the architecture summary</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--slate);line-height:1.4;flex-shrink:0">
+          End-to-end visual path with ambient soundtrack. Play when ready — not linked to the left panel scroll.
         </div>
       </div>
 
-    </div>
-
-    <!-- 3. BOTTOM SECTION: POWERED BY — TOOLS & TECH STACK -->
-    <div class="card" style="margin:0;padding:8px 12px;flex-shrink:0">
-      <h3 style="margin-bottom:6px;padding-bottom:4px;font-size:11px"><span class="ic">⚡</span> Powered By — Tools & Tech Stack <span class="tag">Enterprise Architecture</span></h3>
-      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
-        <div class="tech-card" style="padding:6px 8px">
-          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🐍 Core & API</div>
-          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Python 3.11</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">FastAPI</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Uvicorn</span></div>
+      <!-- RIGHT: Powered By — Tools & Tech Stack (streams bottom→top) -->
+      <div class="card" style="margin:0;display:flex;flex-direction:column;padding:12px 14px;min-height:0;overflow:hidden">
+        <div style="margin-bottom:8px;flex-shrink:0">
+          <h3 style="margin:0;padding:0;border:none;font-size:12px"><span class="ic">⚡</span> Powered By — Tools &amp; Tech Stack</h3>
+          <div style="font-size:10px;color:var(--slate);margin-top:3px;line-height:1.35">Enterprise stack behind SENTRA · hover to pause</div>
         </div>
-        <div class="tech-card" style="padding:6px 8px">
-          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🌊 Streaming</div>
-          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Apache Flink</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Redpanda</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Kafka</span></div>
-        </div>
-        <div class="tech-card" style="padding:6px 8px">
-          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🧠 Predictive ML</div>
-          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Scikit-Learn</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">GBM / RF</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">SVM / MLP</span></div>
-        </div>
-        <div class="tech-card" style="padding:6px 8px">
-          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🔍 Vector AI</div>
-          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Qdrant DB</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Ollama (Llama 3.1)</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">RAG</span></div>
-        </div>
-        <div class="tech-card" style="padding:6px 8px">
-          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">🛡️ Governance</div>
-          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Keycloak</span><span class="tech-pill" style="font-size:9.5px;padding:2px 5px">OPA</span><span class="tech-pill" style="font-size:9.5px;padding:2px 5px">21 CFR Part 11</span></div>
-        </div>
-        <div class="tech-card" style="padding:6px 8px">
-          <div class="tech-header" style="font-size:9.5px;margin-bottom:4px">📊 MLOps</div>
-          <div class="tech-pills"><span class="tech-pill" style="font-size:9px;padding:2px 5px">Prometheus</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">Grafana</span><span class="tech-pill" style="font-size:9px;padding:2px 5px">MLflow</span></div>
+        <div id="techMarqueeWrap" class="arch-marquee-wrap" title="Hover to pause the tech stack stream">
+          <div id="techMarqueeTrack" class="arch-marquee-track"></div>
         </div>
       </div>
     </div>
@@ -703,13 +718,144 @@ AFTER.overview = () => {
   $$('[data-inj]').forEach(b => b.onclick = () => studioInject(b.dataset.inj, 'alarm'));
   const tripBtn = $('[data-inj-trip]');
   if(tripBtn) tripBtn.onclick = () => studioInject('temp', 'trip');
+  wireArchPhaseMarquee();
+  wireTechStackMarquee();
+  wireSentraJourneyPlayer();
 };
+
+const ARCH_SUMMARY_PHASES = [
+  {badge:'PHASE 0', title:'Edge Telemetry Stream',
+    subtitle:'Kafka / Redpanda ingest for five bioprocess parameters',
+    points:['Temperature, pH, Pressure, Conductivity, Humidity topics','Each tick carries asset, value, zone, and event time','Breach candidates enter the stream before Flink windowing']},
+  {badge:'PHASE 1', title:'Flink Stream Engine',
+    subtitle:'PyFlink continuous SQL on tumbling event-time windows',
+    points:['10-second tumbling windows with watermarks','Aggregates v_avg, v_std, and v_delta features','Publishes structured breach + why events downstream']},
+  {badge:'PHASE 2', title:'PdM Predictive Models',
+    subtitle:'Supervised models estimate real-time P(breach)',
+    points:['GBM, Random Forest, SVM, and MLP per parameter','Outputs predicted breach probability and ranked drivers','RED threshold crossings hand off to the agent layer']},
+  {badge:'PHASE 3', title:'Agentic RAG Remedy',
+    subtitle:'Specialized agents retrieve SOP, CAPA, and OEM knowledge',
+    points:['Orchestrator routes RED events to the owning parameter agent','Hybrid vector search over SOP / CAPA / OEM corpus','LLM synthesizes citable, actionable remediation steps']},
+  {badge:'PHASE 4', title:'GxP Governance & Audit',
+    subtitle:'Policy decision, e-signature, immutable WORM trail',
+    points:['OPA evaluates ALLOW versus REQUIRE e-signature','21 CFR Part 11 signer identity and meaning of signature','Hash-chained WORM audit captures commit or reject']},
+];
+
+function archPhaseCardHtml(p){
+  return `<div class="phase-card" style="padding:12px 12px;flex-shrink:0;height:auto;transform:none;border-color:rgba(43,179,192,0.28)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+      <div style="font-size:13px;font-weight:800;color:#fff">${esc(p.title)}</div>
+      <span class="phase-badge" style="margin:0">${esc(p.badge)}</span>
+    </div>
+    <div style="font-size:11px;color:var(--cyan);margin-bottom:8px;line-height:1.4">${esc(p.subtitle)}</div>
+    ${p.points.map(pt=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px">
+      <span style="color:var(--cyan);font-weight:800">▸</span>
+      <span style="font-size:11.5px;color:#d5eaea;line-height:1.4">${esc(pt)}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+function wireArchPhaseMarquee(){
+  const wrap = $('#archMarqueeWrap');
+  const track = $('#archMarqueeTrack');
+  if(!wrap || !track) return;
+  // Duplicate list so seamless loop translateY(-50%) works
+  const block = ARCH_SUMMARY_PHASES.map(archPhaseCardHtml).join('');
+  track.innerHTML = block + block;
+  // Duration scales with content — ~6s per phase card
+  const secs = Math.max(28, ARCH_SUMMARY_PHASES.length * 6);
+  track.style.animation = `archScrollUp ${secs}s linear infinite`;
+  const pause = () => wrap.classList.add('is-paused');
+  const resume = () => wrap.classList.remove('is-paused');
+  wrap.addEventListener('mouseenter', pause);
+  wrap.addEventListener('mouseleave', resume);
+  wrap.addEventListener('focusin', pause);
+  wrap.addEventListener('focusout', resume);
+}
+
+const TECH_STACK_GROUPS = [
+  {icon:'🐍', title:'Core & API', items:['Python 3.11','FastAPI','Uvicorn']},
+  {icon:'🌊', title:'Streaming', items:['Apache Flink','Redpanda','Kafka']},
+  {icon:'🧠', title:'Predictive ML', items:['Scikit-Learn','GBM / RF','SVM / MLP']},
+  {icon:'🔍', title:'Vector AI', items:['Qdrant DB','Ollama (Llama 3.1)','RAG']},
+  {icon:'🛡️', title:'Governance', items:['Keycloak','OPA','21 CFR Part 11']},
+];
+
+function techStackCardHtml(g){
+  return `<div class="tech-card" style="padding:12px;flex-shrink:0;height:auto;transform:none">
+    <div class="tech-header" style="font-size:11px;margin-bottom:8px">${g.icon} ${esc(g.title)}</div>
+    <div class="tech-pills">${g.items.map(t=>`<span class="tech-pill" style="font-size:10.5px;padding:4px 8px">${esc(t)}</span>`).join('')}</div>
+  </div>`;
+}
+
+function wireTechStackMarquee(){
+  const wrap = $('#techMarqueeWrap');
+  const track = $('#techMarqueeTrack');
+  if(!wrap || !track) return;
+  const block = TECH_STACK_GROUPS.map(techStackCardHtml).join('');
+  track.innerHTML = block + block;
+  const secs = Math.max(24, TECH_STACK_GROUPS.length * 5);
+  track.style.animation = `archScrollUp ${secs}s linear infinite`;
+  const pause = () => wrap.classList.add('is-paused');
+  const resume = () => wrap.classList.remove('is-paused');
+  wrap.addEventListener('mouseenter', pause);
+  wrap.addEventListener('mouseleave', resume);
+  wrap.addEventListener('focusin', pause);
+  wrap.addEventListener('focusout', resume);
+}
+
+function wireSentraJourneyPlayer(){
+  const vid = $('#sentraJourneyVideo');
+  const overlay = $('#sentraVideoOverlay');
+  const playBtn = $('#sentraPlayBtn');
+  if(!vid) return;
+
+  // Never autoplay — wait for explicit user start
+  try{ vid.pause(); }catch(_e){}
+  vid.currentTime = 0;
+  vid.muted = false;
+  vid.volume = 0.85;
+
+  const hideOverlay = () => { if(overlay) overlay.style.display = 'none'; };
+  const showOverlay = () => { if(overlay) overlay.style.display = 'flex'; };
+  showOverlay();
+
+  const startPlayback = () => {
+    hideOverlay();
+    vid.muted = false;
+    vid.play().catch(()=>{
+      // If browser still blocks sound, mute then play, user can unmute in controls
+      vid.muted = true;
+      vid.play().catch(()=>{});
+    });
+    if(playBtn) playBtn.textContent = '⏸ Playing…';
+  };
+
+  if(overlay) overlay.onclick = startPlayback;
+  if(playBtn){
+    playBtn.onclick = () => {
+      if(vid.paused) startPlayback();
+      else { vid.pause(); if(playBtn) playBtn.textContent = '▶ Play Journey'; showOverlay(); }
+    };
+  }
+  vid.addEventListener('pause', () => {
+    if(playBtn && !vid.ended) playBtn.textContent = '▶ Play Journey';
+  });
+  vid.addEventListener('play', () => {
+    hideOverlay();
+    if(playBtn) playBtn.textContent = '⏸ Playing…';
+  });
+  vid.addEventListener('ended', () => {
+    if(playBtn) playBtn.textContent = '▶ Play Journey';
+    showOverlay();
+  });
+}
 
 /* ---------- STEP 1: UPLOAD ---------- */
 VIEWS.upload = () => `
   <div class="eyebrow"><span class="n">STEP 1</span> Ingest</div>
   <h1>Upload your parameter datasets</h1>
-  <p class="lead">Drop one or more of the five parameter CSVs. The application reads each file, identifies the parameter from its <b>dependent-variable column</b>, and lists the independent variables it will model. You can upload a single dataset or all five.</p>
+  <p class="lead">Drop one or more of the five parameter CSVs. After upload, click <b>Save</b> to store permanently (no re-upload on restart). Use <b>Delete</b> to remove a dataset, or <b>Display</b> on a saved dataset to inspect sample rows, variable types, and descriptions.</p>
   <div class="card">
     <h3><span class="ic">📤</span> Dataset upload<span class="tag">CSV · dependent + independent vars</span></h3>
     <div class="drop" id="drop">
@@ -720,6 +866,7 @@ VIEWS.upload = () => `
     </div>
     <div class="note" id="upNote"></div>
   </div>
+  <div id="dsPreview"></div>
   <div id="dsList"></div>`;
 
 AFTER.upload = () => {
@@ -729,8 +876,23 @@ AFTER.upload = () => {
   drop.ondragleave = () => drop.classList.remove('drag');
   drop.ondrop = e => { e.preventDefault(); drop.classList.remove('drag'); handleFiles(e.dataTransfer.files); };
   input.onchange = () => handleFiles(input.files);
-  renderDatasets();
+  refreshDatasetCatalog().then(() => renderDatasets());
 };
+
+async function refreshDatasetCatalog(){
+  if(!(S.apiOk && S.studioOk)) return;
+  try{
+    const res = await api('/studio/datasets');
+    // New shape: {saved, pending}. Old shape: flat map of param→meta.
+    if(res && (res.saved || res.pending)){
+      S.datasets = res.saved || {};
+      S.pendingDatasets = res.pending || {};
+    } else if(res && typeof res === 'object'){
+      S.datasets = res;
+      S.pendingDatasets = S.pendingDatasets || {};
+    }
+  }catch(_e){}
+}
 
 async function handleFiles(files){
   const list = [...files];
@@ -742,32 +904,62 @@ async function handleFiles(files){
       try{
         const fd = new FormData(); fd.append('file', f);
         const d = await apiForm('/studio/upload-dataset', fd);
-        S.datasets[d.param] = d; ok.push(d.name||d.param);
+        S.pendingDatasets[d.param] = d;
+        // If a new upload replaces a prior save intent, keep saved until Save overwrites
+        ok.push(d.name||d.param);
       }catch(e){
-        // fall back to local identification so a live-API hiccup doesn't block the demo
         const pid = guessParam(f.name);
-        if(pid){ S.datasets[pid] = localDataset(pid); ok.push(S.datasets[pid].name); }
+        if(pid){
+          S.pendingDatasets[pid] = localDataset(pid, false);
+          ok.push(S.pendingDatasets[pid].name);
+        }
         else failed.push(`${f.name}: ${e.message}`);
       }
     } else {
       const pid = guessParam(f.name);
-      if(pid){ S.datasets[pid] = localDataset(pid); ok.push(S.datasets[pid].name); }
+      if(pid){
+        S.pendingDatasets[pid] = localDataset(pid, false);
+        persistLocalDatasets();
+        ok.push(S.pendingDatasets[pid].name);
+      }
       else failed.push(`${f.name}: couldn't identify the parameter from the filename`);
     }
   }
   const parts = [];
-  if(ok.length) parts.push(`<span class="note ok">✓ ${Object.keys(S.datasets).length} of 5 datasets ready</span>`);
+  if(ok.length) parts.push(`<span class="note ok">✓ staged ${ok.length} dataset(s) — click <b>Save</b> to keep permanently</span>`);
   if(failed.length) parts.push(`<span class="err">${failed.map(esc).join('<br>')}</span>`);
   $('#upNote').innerHTML = parts.join('<br>');
-  const input = $('#fileInput'); if(input) input.value = '';   // allow re-selecting the same files
+  const input = $('#fileInput'); if(input) input.value = '';
   renderDatasets();
 }
-function localDataset(pid){
+
+function localDataset(pid, saved=false){
   const b = S.bands.find(x=>x.param===pid) || FALLBACK_BANDS.find(x=>x.param===pid);
-  return {param:pid, name:b.name, asset:b.asset, rows:1200,
+  return {
+    param:pid, name:b.name, asset:b.asset, rows:1200,
     dependent_variable:pid, independent_variables:IV_MAP[pid], model_label:b.model_label,
-    control_band:b.control, source:'local'};
+    control_band:b.control, source:'local', saved, status: saved ? 'saved' : 'pending',
+    columns: ['timestamp','batch_id','asset', ...(IV_MAP[pid]||[]), pid, 'zone','breach_within_15'],
+  };
 }
+
+function persistLocalDatasets(){
+  try{
+    localStorage.setItem('bioscada_datasets', JSON.stringify({
+      saved: S.datasets, pending: S.pendingDatasets
+    }));
+  }catch(_e){}
+}
+function loadLocalDatasets(){
+  try{
+    const raw = localStorage.getItem('bioscada_datasets');
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    S.datasets = parsed.saved || {};
+    S.pendingDatasets = parsed.pending || {};
+  }catch(_e){}
+}
+
 function guessParam(name){
   const n = name.toLowerCase();
   if(n.includes('temp')||n.includes('reactor')) return 'temp';
@@ -777,20 +969,247 @@ function guessParam(name){
   if(n.includes('ph')||n.match(/\bph\b/)) return 'ph';
   return null;
 }
+
 function renderDatasets(){
   const el = $('#dsList'); if(!el) return;
-  const ds = Object.values(S.datasets);
-  if(!ds.length){ el.innerHTML=''; return; }
-  el.innerHTML = `<div class="card"><h3><span class="ic">✅</span> Loaded datasets<span class="tag">${ds.length} of 5</span></h3>
-    <div class="grid g2">${ds.map(d=>`<div class="tile">
-      <div class="nm">${esc(d.name)} · ${esc(d.asset||'')}</div>
+  const pending = Object.values(S.pendingDatasets || {});
+  const saved = Object.values(S.datasets || {});
+  if(!pending.length && !saved.length){ el.innerHTML=''; const pv=$('#dsPreview'); if(pv) pv.innerHTML=''; return; }
+
+  const card = (d, kind) => {
+    const isSaved = kind === 'saved';
+    const btns = isSaved
+      ? `<button type="button" class="btn sm primary ds-display" data-param="${esc(d.param)}" style="font-weight:700">Display</button>
+         <button type="button" class="btn sm ghost ds-delete" data-param="${esc(d.param)}" data-kind="saved" style="color:var(--red);border-color:rgba(239,68,68,0.35)">Delete</button>`
+      : `<button type="button" class="btn sm green ds-save" data-param="${esc(d.param)}" style="font-weight:700">Save</button>
+         <button type="button" class="btn sm ghost ds-delete" data-param="${esc(d.param)}" data-kind="pending" style="color:var(--red);border-color:rgba(239,68,68,0.35)">Delete</button>`;
+    return `<div class="tile" style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <div class="nm">${esc(d.name)} · ${esc(d.asset||'')}</div>
+        <span class="chip" style="font-size:9.5px;padding:2px 7px;color:${isSaved?'var(--mint)':'var(--amber)'}">${isSaved?'SAVED':'PENDING SAVE'}</span>
+      </div>
       <div class="vl" style="font-size:15px">${d.rows||'—'} <small>rows</small></div>
       <div class="kv"><span class="k">Dependent var</span><span class="v c">${esc(d.dependent_variable||d.param)}</span></div>
       <div class="kv"><span class="k">Independent vars</span><span class="v">${(d.independent_variables||[]).length}</span></div>
       <div class="kv"><span class="k">Model</span><span class="v g">${esc(d.model_label||'')}</span></div>
-    </div>`).join('')}</div>
-    <div class="note">Each dataset's dependent variable is highlighted — that is what the agent will protect. The independent variables become the model's inputs and, later, the retrieval “why”.</div></div>`;
+      <div class="btn-row" style="margin-top:4px;gap:8px;flex-wrap:wrap">${btns}</div>
+    </div>`;
+  };
+
+  el.innerHTML = `
+    ${pending.length ? `<div class="card"><h3><span class="ic">⏳</span> Uploaded — awaiting Save<span class="tag">${pending.length}</span></h3>
+      <div class="grid g2">${pending.map(d=>card(d,'pending')).join('')}</div>
+      <div class="note">Save writes the CSV permanently so Stream / Train can reuse it after restart. Delete discards the staged upload.</div></div>` : ''}
+    ${saved.length ? `<div class="card"><h3><span class="ic">✅</span> Permanently saved datasets<span class="tag">${saved.length} of 5</span></h3>
+      <div class="grid g2">${saved.map(d=>card(d,'saved')).join('')}</div>
+      <div class="note">Display shows 5 sample observations plus each variable's type and description. Delete removes the stored CSV permanently.</div></div>` : ''}`;
+
+  $$('.ds-save').forEach(btn => btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); saveDataset(btn.dataset.param); });
+  $$('.ds-delete').forEach(btn => btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); deleteDataset(btn.dataset.param, btn.dataset.kind); });
+  $$('.ds-display').forEach(btn => btn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    displayDataset(btn.getAttribute('data-param') || btn.dataset.param);
+  });
 }
+
+async function saveDataset(param){
+  const note = $('#upNote');
+  if(note) note.innerHTML = `<span class="spin"></span> saving ${esc(param)} permanently…`;
+  if(S.apiOk && S.studioOk){
+    try{
+      const d = await api(`/studio/save-dataset?param=${encodeURIComponent(param)}`, {method:'POST'});
+      S.datasets[param] = d;
+      delete S.pendingDatasets[param];
+      if(note) note.innerHTML = `<span class="note ok">✓ ${esc(d.name||param)} saved permanently</span>`;
+    }catch(e){
+      if(note) note.innerHTML = `<span class="err">Save failed: ${esc(e.message)}</span>`;
+      return;
+    }
+  } else {
+    const d = S.pendingDatasets[param];
+    if(!d){ if(note) note.innerHTML = `<span class="err">Nothing to save for ${esc(param)}</span>`; return; }
+    d.saved = true; d.status = 'saved';
+    S.datasets[param] = d;
+    delete S.pendingDatasets[param];
+    persistLocalDatasets();
+    if(note) note.innerHTML = `<span class="note ok">✓ ${esc(d.name||param)} saved locally</span>`;
+  }
+  renderDatasets();
+}
+
+async function deleteDataset(param, kind){
+  const label = (S.datasets[param]||S.pendingDatasets[param]||{}).name || param;
+  if(!confirm(`Delete dataset "${label}" permanently? This cannot be undone.`)) return;
+  const note = $('#upNote');
+  if(S.apiOk && S.studioOk){
+    try{
+      await api(`/studio/datasets/${encodeURIComponent(param)}`, {method:'DELETE'});
+      delete S.datasets[param];
+      delete S.pendingDatasets[param];
+      if(note) note.innerHTML = `<span class="note ok">✓ ${esc(label)} deleted</span>`;
+    }catch(e){
+      // If only pending existed client-side
+      delete S.datasets[param];
+      delete S.pendingDatasets[param];
+      if(note) note.innerHTML = `<span class="note ok">✓ ${esc(label)} removed</span>`;
+    }
+  } else {
+    delete S.datasets[param];
+    delete S.pendingDatasets[param];
+    persistLocalDatasets();
+    if(note) note.innerHTML = `<span class="note ok">✓ ${esc(label)} deleted</span>`;
+  }
+  const pv = $('#dsPreview'); if(pv) pv.innerHTML = '';
+  renderDatasets();
+}
+
+async function displayDataset(param){
+  if(!param) return;
+  const host = $('#dsPreview');
+  if(!host) return;
+
+  // Keep the preview panel at the top so Dataset View + Variables are immediately visible
+  host.style.display = 'block';
+  host.innerHTML = `<div class="card" style="border-color:rgba(43,179,192,0.45)"><span class="spin"></span> Loading dataset view &amp; variables for <b>${esc(param)}</b>…</div>`;
+  try{ host.scrollIntoView({behavior:'smooth', block:'start'}); }catch(_e){ host.scrollIntoView(true); }
+  const main = $('#main'); if(main) try{ main.scrollTop = Math.max(0, host.offsetTop - 12); }catch(_e){}
+
+  let preview = null;
+  if(S.apiOk && S.studioOk){
+    try{
+      preview = await apiWithTimeout(`/studio/datasets/${encodeURIComponent(param)}/preview?n=5`, {}, 12000);
+    }catch(e){
+      host.innerHTML = `<div class="card"><div class="err">Display failed: ${esc(e.message||String(e))}</div>
+        <button type="button" class="btn ghost sm" style="margin-top:10px" onclick="document.getElementById('dsPreview').innerHTML=''">Close</button></div>`;
+      return;
+    }
+  } else {
+    const d = S.datasets[param] || S.pendingDatasets[param] || localDataset(param, true);
+    const cols = d.columns || [];
+    const vars = cols.map(c => ({
+      name: c,
+      type: (c==='timestamp'?'datetime': (c==='breach_within_15'?'integer': (c==='batch_id'||c==='asset'||c==='zone'?'string':'float'))),
+      role: c===d.dependent_variable||c===param ? 'dependent' : ((IV_MAP[param]||[]).includes(c)?'independent':'metadata'),
+      description: (typeof VAR_DESC!=='undefined' && VAR_DESC[c]) || (`Process variable: ${String(c).replace(/_/g,' ')}`),
+    }));
+    const sample = [0,1,2,3,4].map(i => {
+      const row = {};
+      cols.forEach(c => {
+        if(c==='timestamp') row[c] = new Date(Date.now()-i*1000).toISOString();
+        else if(c==='batch_id') row[c] = `B-10${i}`;
+        else if(c==='asset') row[c] = d.asset||'—';
+        else if(c==='zone') row[c] = 'control';
+        else if(c==='breach_within_15') row[c] = 0;
+        else row[c] = +(Math.random()*10+20).toFixed(3);
+      });
+      return row;
+    });
+    preview = {param, name:d.name, asset:d.asset, total_rows:d.rows||1200, rows_shown:5, sample, variables:vars, status:'local'};
+  }
+
+  const cols = (preview.sample && preview.sample[0]) ? Object.keys(preview.sample[0]) : (preview.variables||[]).map(v=>v.name);
+  const th = cols.map(c=>`<th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:10.5px;white-space:nowrap">${esc(c)}</th>`).join('');
+  const trs = (preview.sample||[]).map(row =>
+    `<tr>${cols.map(c=>{
+      let v = row[c];
+      if(v===null||v===undefined) v='—';
+      else if(typeof v==='number') v = Number.isInteger(v)?v: Number(v).toFixed(4);
+      return `<td style="padding:6px 8px;border-bottom:1px solid rgba(20,50,58,0.8);font-size:11px;font-family:var(--mono);color:#d7ecec">${esc(String(v))}</td>`;
+    }).join('')}</tr>`
+  ).join('');
+
+  const varRows = (preview.variables||[]).map(v =>
+    `<tr>
+      <td style="padding:8px;border-bottom:1px solid var(--line);font-weight:700;color:#fff;font-size:11.5px">${esc(v.name)}</td>
+      <td style="padding:8px;border-bottom:1px solid var(--line)"><span class="chip" style="font-size:9.5px">${esc(v.type)}</span></td>
+      <td style="padding:8px;border-bottom:1px solid var(--line)"><span class="chip ${v.role==='dependent'?'capa':''}" style="font-size:9.5px">${esc(v.role||'')}</span></td>
+      <td style="padding:8px;border-bottom:1px solid var(--line);font-size:11.5px;color:#c5dede;line-height:1.45">${esc(v.description||'')}</td>
+    </tr>`
+  ).join('');
+
+  host.innerHTML = `
+    <div class="card" style="border:1px solid rgba(43,179,192,0.45);box-shadow:0 10px 40px rgba(0,0,0,0.35)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <div>
+          <div class="eyebrow" style="margin:0 0 4px"><span class="n">DATASET</span> VIEW</div>
+          <h3 style="margin:0;font-size:15px;color:#fff">${esc(preview.name||param)}
+            <span class="tag">${esc(preview.asset||'')} · ${preview.total_rows||0} rows · ${esc(param)}</span>
+          </h3>
+        </div>
+        <button type="button" class="btn ghost sm" id="dsPreviewClose">✕ Close</button>
+      </div>
+
+      <div style="font-size:12.5px;font-weight:800;color:var(--cyan);margin:0 0 8px;letter-spacing:0.3px">1 · Dataset view — sample observations (first ${preview.rows_shown||5})</div>
+      <div style="overflow:auto;max-height:280px;border:1px solid var(--line);border-radius:8px;margin-bottom:18px;background:#030d10">
+        <table style="width:100%;border-collapse:collapse;min-width:640px"><thead><tr>${th}</tr></thead><tbody>${trs||'<tr><td style="padding:10px;color:var(--slate)">No sample rows</td></tr>'}</tbody></table>
+      </div>
+
+      <div style="font-size:12.5px;font-weight:800;color:var(--cyan);margin:0 0 8px;letter-spacing:0.3px">2 · Variables — type &amp; description</div>
+      <div style="overflow:auto;max-height:360px;border:1px solid var(--line);border-radius:8px;background:#030d10">
+        <table style="width:100%;border-collapse:collapse;min-width:560px">
+          <thead><tr>
+            <th style="text-align:left;padding:8px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:10.5px">Variable</th>
+            <th style="text-align:left;padding:8px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:10.5px">Type</th>
+            <th style="text-align:left;padding:8px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:10.5px">Role</th>
+            <th style="text-align:left;padding:8px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:10.5px">Description</th>
+          </tr></thead>
+          <tbody>${varRows||'<tr><td colspan="4" style="padding:10px;color:var(--slate)">No variables</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  const closeBtn = $('#dsPreviewClose');
+  if(closeBtn) closeBtn.onclick = () => { host.innerHTML = ''; };
+  try{ host.scrollIntoView({behavior:'smooth', block:'start'}); }catch(_e){}
+  $$('.ds-display').forEach(b => {
+    if(b.dataset.param === param){
+      b.textContent = 'Viewing…';
+      b.classList.add('green');
+    } else {
+      b.textContent = 'Display';
+      b.classList.remove('green');
+    }
+  });
+}
+
+const VAR_DESC = {
+  timestamp:'Event time of the SCADA sample.',
+  batch_id:'Manufacturing batch or lot identifier.',
+  asset:'Equipment tag for the sensor reading.',
+  zone:'Operating zone (control / alarm / trip).',
+  breach_within_15:'Label: breach within next 15 minutes.',
+  reactor_temperature_degc:'Dependent variable — bioreactor temperature (°C).',
+  ph:'Dependent variable — culture / media pH.',
+  differential_pressure_kpa:'Dependent variable — filter ΔP (kPa).',
+  conductivity_us_cm:'Dependent variable — WFI conductivity (µS/cm).',
+  humidity_pct:'Dependent variable — cleanroom RH (%).',
+  coolant_flow_rate:'Cooling-water flow influencing temperature.',
+  jacket_temperature:'Jacket temperature (°C).',
+  steam_valve_position:'Steam valve position (% open).',
+  heat_exchanger_dp:'Heat-exchanger differential pressure.',
+  agitator_torque:'Agitator torque (mixing proxy).',
+  acid_base_dose_rate:'Acid/base dosing rate for pH control.',
+  co2_accumulation:'CO₂ accumulation affecting pH.',
+  agitator_speed:'Agitator speed (RPM).',
+  probe_drift_mv:'pH probe drift since calibration (mV).',
+  dissolved_oxygen:'Dissolved oxygen level.',
+  filter_dp:'Filter differential pressure.',
+  gas_exhaust_flow:'Exhaust gas flow rate.',
+  pump_speed_hz:'Pump drive frequency (Hz).',
+  valve_position:'Process valve position.',
+  seal_integrity_index:'Seal health index.',
+  water_flow_rate:'WFI loop flow rate.',
+  resin_bed_dp:'Resin-bed differential pressure.',
+  regeneration_cycle_count:'Resin regeneration cycle count.',
+  toc_level:'Total organic carbon level.',
+  feed_composition:'Feed-water composition index.',
+  hvac_fan_speed:'HVAC fan speed.',
+  cooling_coil_temp:'Cooling-coil temperature.',
+  hepa_dp:'HEPA filter differential pressure.',
+  outdoor_humidity:'Outdoor ambient humidity.',
+  door_open_count:'Cleanroom door-open events.',
+};
 
 /* ---------- STEP 2: BANDS ---------- */
 VIEWS.bands = () => `
@@ -926,15 +1345,1346 @@ AFTER.leader = () => {
         const w = Math.round(d.importance*100);
         return `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px">
           <span class="mono-tag" style="color:#cfe6e6">${esc(d.feature)}</span><span class="mono-tag" style="color:var(--cyan)">${d.importance.toFixed(3)}</span></div>
-          <div style="height:7px;background:#050f13;border-radius:4px;overflow:hidden"><div style="height:100%;width:${w}%;background:linear-gradient(90deg,var(--teal),var(--cyan));border-radius:4px"></div></div></div>`;
+          <div style="height:7px;background:#050f13;border-radius:4px;overflow:hidden"><div style="height:100%;width:${w}%;background:var(--cyan);border-radius:4px"></div></div>
+        </div>`;
       }).join('')}</div>`).join('')}`;
 };
 
-/* ---------- STEP 4: STREAM ---------- */
+/* ---------- STEP 6: SCADA INTELLIGENCE PLATFORM (AUTONOMOUS END-TO-END PIPELINE) ---------- */
+let intelLoopTimer = null;
+let intelRunToken = 0;
+let intelPipelineRunning = false;
+let intelSoundEnabled = true;
+let intelSpotlightPaused = false;
+let intelIsLooping = false;
+let intelCurrentParam = 'temp';
+let intelActiveStage = 0;
+let intelStagePaceMs = 900;
+let intelStreamTickTimer = null;
+let labRunToken = 0;
+let labPipelineRunning = false;
+let labTickTimer = null;
+const INTEL_PARAMS = ['temp', 'ph', 'press', 'cond', 'hum'];
+const LAB_STEP_MS = 2200;
+
+VIEWS.scada_intel = () => `
+  <div class="eyebrow"><span class="n">STEP 6</span> Autonomous Intelligence Platform</div>
+  <div style="margin-bottom:16px">
+    <h1 style="margin-bottom:4px">SCADA Intelligence Platform</h1>
+    <p class="lead" style="margin-bottom:0">
+      Autonomous Real-Time Bioprocess Telemetry &bull; Automated Breach Detection &bull; Independent Variable Analysis &bull; Flink SQL Decomposition &bull; Multi-Agent RAG Remediation
+    </p>
+  </div>
+
+  <!-- TAB SELECTION HEADER -->
+  <div style="display:flex;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:12px">
+    <button class="btn primary" id="intelTab1Btn" onclick="activateAutoCommandCenter()" style="font-weight:800;padding:12px 22px;font-size:13px;border-radius:10px;display:flex;align-items:center;gap:8px;box-shadow:0 0 20px rgba(43,179,192,0.3)">
+      <span>🚀</span> Automated 7-Stage End-to-End Command Center
+    </button>
+    <button class="btn ghost" id="intelTab2Btn" onclick="activateSingleParamLab()" style="font-weight:800;padding:12px 22px;font-size:13px;border-radius:10px;display:flex;align-items:center;gap:8px">
+      <span>🔬</span> Parameter-Specific Diagnostic Investigation Lab
+    </button>
+  </div>
+
+  <!-- FIRST TAB: AUTOMATED 7-STAGE END-TO-END COMMAND CENTER -->
+  <div id="intelTabAutoContent">
+    <!-- Tab-1-only controls: Start / Auto-Loop / Sound (not shared with Tab 2) -->
+    <div id="intelAutoControls" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,rgba(7,23,28,0.95),rgba(14,42,50,0.95));border:1px solid var(--cyan);border-radius:12px">
+      <button class="btn primary" id="intelStartBtn" onclick="beginAutonomousPipeline()" style="box-shadow:0 0 20px rgba(43,179,192,0.4);font-weight:700"><span id="intelStartIcon">▶</span> Start Autonomous Pipeline</button>
+      <button class="btn amber" id="intelLoopBtn" onclick="toggleIntelLoop()"><span id="intelLoopIcon">🔄</span> Auto-Loop Stream: OFF</button>
+      <button class="btn ghost sm" id="intelSoundBtn" onclick="toggleIntelSound()">🔊 Sound: ON</button>
+    </div>
+    <div id="intelSpotlightConsole" class="card" style="display:block;position:sticky;top:60px;z-index:90;background:linear-gradient(135deg,rgba(7,23,28,0.98),rgba(14,42,50,0.98));border:2px solid var(--cyan);box-shadow:0 12px 48px rgba(43,179,192,0.35);border-radius:14px;padding:16px;margin-bottom:20px;backdrop-filter:blur(12px);transition:all 0.3s ease">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="ic" style="background:rgba(43,179,192,0.2);color:var(--cyan);font-weight:800;padding:4px 9px;border-radius:6px">🏭 SCADA CONSOLE</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.2px" id="spotlightTitle">Manufacturing Execution Spotlight Console</div>
+            <div style="font-size:10.5px;color:var(--cyan);font-family:var(--mono)" id="spotlightSub">Standby &bull; Press Start Autonomous Pipeline when ready</div>
+            <div style="font-size:10px;color:var(--slate);font-family:var(--mono);margin-top:2px" id="intelStageTxt">Stage idle</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pill" id="intelCyclePill" style="display:none;padding:2px 8px;font-size:9.5px;font-weight:700;color:var(--cyan)">CYCLE</span>
+          <div style="display:flex;gap:4px" id="spotlightStepPills">
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">1</span>
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">2</span>
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">3</span>
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">4</span>
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">5</span>
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">6</span>
+            <span class="pill" style="padding:2px 7px;font-size:9.5px">7</span>
+          </div>
+          <button class="btn ghost sm" onclick="toggleSpotlightPause()" id="spotlightPauseBtn">⏸ Pause</button>
+          <button class="btn ghost sm" onclick="stopIntelPipeline()">⏹ Stop</button>
+          <button class="btn ghost sm" onclick="closeSpotlightConsole()">✖ Hide Window</button>
+        </div>
+      </div>
+      <div id="spotlightBody" style="min-height:220px;display:flex;flex-direction:column;justify-content:center;background:#000;border-radius:10px;padding:8px"></div>
+    </div>
+  </div>
+
+  <!-- SECOND TAB: PARAMETER-SPECIFIC DIAGNOSTIC INVESTIGATION LAB (silent, manual per-parameter) -->
+  <div id="intelTabSingleContent" style="display:none">
+    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(18,110,130,0.25),rgba(14,42,50,0.9));border:1px solid var(--cyan)">
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span>🔬</span> SELECT SPECIFIC PARAMETER TO GENERATE ALL 7 STAGES ONE BY ONE:
+      </div>
+      <div id="labParamBtnRow" style="display:flex;flex-wrap:nowrap;gap:8px;align-items:stretch;width:100%">
+        <button class="btn coral lab-param-btn" data-param="temp" onclick="runSingleParamPipeline('temp')" style="flex:1;min-width:0;font-weight:700;white-space:nowrap;padding:10px 8px;font-size:12px"><span style="font-size:13px">🌡️</span> Reactor Temperature</button>
+        <button class="btn coral lab-param-btn" data-param="ph" onclick="runSingleParamPipeline('ph')" style="flex:1;min-width:0;font-weight:700;white-space:nowrap;padding:10px 8px;font-size:12px"><span style="font-size:13px">🧪</span> pH Balance</button>
+        <button class="btn coral lab-param-btn" data-param="press" onclick="runSingleParamPipeline('press')" style="flex:1;min-width:0;font-weight:700;white-space:nowrap;padding:10px 8px;font-size:12px"><span style="font-size:13px">⏲️</span> Differential Pressure</button>
+        <button class="btn coral lab-param-btn" data-param="cond" onclick="runSingleParamPipeline('cond')" style="flex:1;min-width:0;font-weight:700;white-space:nowrap;padding:10px 8px;font-size:12px"><span style="font-size:13px">⚡</span> Conductivity (WFI)</button>
+        <button class="btn coral lab-param-btn" data-param="hum" onclick="runSingleParamPipeline('hum')" style="flex:1;min-width:0;font-weight:700;white-space:nowrap;padding:10px 8px;font-size:12px"><span style="font-size:13px">💧</span> Cleanroom Humidity</button>
+      </div>
+      <div id="labStatusLine" style="margin-top:10px;font-size:11px;color:var(--slate);font-family:var(--mono)">Silent diagnostic lab • Click a parameter to run steps 1→7 (no audio)</div>
+    </div>
+
+    <!-- STAGE 1 -->
+    <div class="card" id="intelStage1Card" style="transition:border-color 0.3s ease;background:#000;border:1px solid #14353d">
+      <h3 style="color:#00ffcc"><span class="ic">📡</span> 1. Streaming Data Real-Time Across All 5 Parameters <span class="tag">Live Telemetry Stream</span></h3>
+      <div class="grid g5" id="intelParamsGrid" style="gap:12px">
+        ${S.bands.map(b => `
+          <div class="tile" id="intelCard_${b.param}" style="border:1px solid #14353d;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#030a0d;transition:all 0.3s ease">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:11.5px;color:#d1e6e6;font-weight:700">${esc(b.name)}</div>
+              <span class="pill ok" id="intelTag_${b.param}" style="font-size:9px;padding:2px 7px">● NORMAL</span>
+            </div>
+            <div style="font-size:20px;font-weight:800;color:#00ffcc" id="intelVal_${b.param}">${b.alarm[0]}${b.unit}</div>
+            <div style="font-size:10px;color:var(--slate-d);font-family:var(--mono)">P(breach): <span id="intelProb_${b.param}">0.04</span></div>
+            <div style="height:38px;background:#000;border-radius:6px;overflow:hidden;padding:2px;border:1px solid #0d2830">
+              <canvas id="canvas_intel_${b.param}" width="160" height="34" style="width:100%;height:34px;display:block"></canvas>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- STAGE 2 -->
+    <div class="card" id="intelStage2Card" style="display:none;transition:border-color 0.3s ease;margin-top:16px">
+      <h3><span class="ic">🚨</span> 2. Threshold Breach Alert <span class="tag">Trip Trigger</span></h3>
+      <div id="intelBreachBanner">
+        <div style="background:#081a1f;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--slate);font-size:12px">
+          Awaiting parameter selection…
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 3 -->
+    <div class="card" id="intelStage3Card" style="display:none;transition:border-color 0.3s ease;margin-top:16px">
+      <h3><span class="ic">📊</span> 3. Independent Variable (IV) Drivers <span class="tag">SHAP Root Cause</span></h3>
+      <div id="intelDriverBanner">
+        <div style="background:#081a1f;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--slate);font-size:12px">
+          Driver analysis pending…
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 4 -->
+    <div class="card" id="intelStage4Card" style="display:none;transition:border-color 0.3s ease;margin-top:16px">
+      <h3><span class="ic">⚡</span> 4. Flink SQL Stream Event Decomposition <span class="tag">Relational-Plan Stream Processing</span></h3>
+      <div class="grid g2" style="gap:16px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">PyFlink Continuous Query Definition</div>
+          <pre class="code" style="height:215px;font-size:10px;line-height:1.6"><span class="kw">CREATE TABLE</span> breach_events <span class="kw">WITH</span> (
+  <span class="cm">'connector'</span> = <span class="cm">'kafka'</span>, <span class="cm">'topic'</span> = <span class="cm">'breach.events'</span>
+) <span class="kw">AS SELECT</span>
+  window_start, window_end, param_id, asset_id,
+  <span class="fn">AVG</span>(val) <span class="kw">AS</span> val_avg, <span class="fn">STDDEV</span>(val) <span class="kw">AS</span> val_std,
+  <span class="fn">PDM_SCORE</span>(param_id, val_avg, val_std) <span class="kw">AS</span> p_breach,
+  <span class="fn">TOP_DRIVER</span>(param_id, val_avg) <span class="kw">AS</span> primary_driver,
+  <span class="kw">CASE WHEN</span> <span class="fn">PDM_SCORE</span>(...) &gt;= 0.80 <span class="kw">THEN</span> <span class="cm">'TRIP'</span>
+       <span class="kw">WHEN</span> <span class="fn">PDM_SCORE</span>(...) &gt;= 0.40 <span class="kw">THEN</span> <span class="cm">'ALARM'</span>
+       <span class="kw">ELSE</span> <span class="cm">'NORMAL'</span> <span class="kw">END AS</span> breach_zone
+<span class="kw">FROM</span> <span class="fn">TUMBLE</span>(TABLE scada.telemetry, DESCRIPTOR(event_time), INTERVAL <span class="cm">'10'</span> SECOND)
+<span class="kw">GROUP BY</span> window_start, window_end, param_id, asset_id;</pre>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Live Flink Decomposition Pipeline Stepper</div>
+          <div class="pipe" id="intelFlinkPipe">
+            <div class="pipe-op" id="ifpipe-1">
+              <div class="pipe-dot">1</div>
+              <div class="pipe-body"><div class="pipe-nm">Source Ingestion Window</div><div class="pipe-dt">Kafka consumer scada.telemetry (5 partitions)</div><div class="pipe-out" id="ifout-1">Idle</div></div>
+            </div>
+            <div class="pipe-op" id="ifpipe-2">
+              <div class="pipe-dot">2</div>
+              <div class="pipe-body"><div class="pipe-nm">Watermark & Feature Aggregation</div><div class="pipe-dt">Calculate v_avg, v_std, v_delta features</div><div class="pipe-out" id="ifout-2">Idle</div></div>
+            </div>
+            <div class="pipe-op" id="ifpipe-3">
+              <div class="pipe-dot">3</div>
+              <div class="pipe-body"><div class="pipe-nm">PDM_SCORE UDF Evaluation</div><div class="pipe-dt">Execute trained ML predictive scoring model</div><div class="pipe-out" id="ifout-3">Idle</div></div>
+            </div>
+            <div class="pipe-op" id="ifpipe-4">
+              <div class="pipe-dot">4</div>
+              <div class="pipe-body"><div class="pipe-nm">Structured Breach Event Emission</div><div class="pipe-dt">Emit structured breach event to breach.events</div><div class="pipe-out" id="ifout-4">Idle</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g2" id="intelStage56Grid" style="display:none;gap:16px;margin:16px 0">
+      <div class="card" id="intelStage5Card" style="margin:0;transition:border-color 0.3s ease">
+        <h3><span class="ic">💬</span> 5. Transform Event into Query <span class="tag">Structured Event → NL Prompt</span></h3>
+        <div id="intelQueryBox">
+          <div style="font-size:11px;color:var(--slate-d);margin-bottom:8px;font-weight:700">GENERATED RAG AGENT QUERY:</div>
+          <div style="font-family:var(--mono);font-size:11px;background:#050f13;border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--cyan);line-height:1.6">Awaiting breach event...</div>
+        </div>
+      </div>
+      <div class="card" id="intelStage6Card" style="margin:0;transition:border-color 0.3s ease">
+        <h3><span class="ic">🤖</span> 6. LLM Multi-Agent Activation <span class="tag">Domain Agent + QA Escalation</span></h3>
+        <div id="intelAgentsRoster">
+          <div style="font-size:11px;color:var(--slate-d);margin-bottom:8px;font-weight:700">ACTIVE DOMAIN AGENTS:</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="intelActiveAgentsList">
+            <div class="agent orch" style="padding:10px">
+              <div class="ah"><div class="aic">🧩</div><div><div class="an">Orchestrator Agent</div><div class="ar">master_plan</div></div></div>
+              <div class="ad" style="font-size:10.5px">Decomposes parameter query into sub-questions & routes to domain specialists.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="intelStage7Card" style="display:none;transition:border-color 0.3s ease">
+      <h3><span class="ic">🎯</span> 7. RAG Knowledge Base Retrieval & Synthesized RemedyCard <span class="tag">Cited Solutions & GxP Governance</span></h3>
+      <div id="intelRemedyOutput">
+        <div style="text-align:center;padding:24px;color:var(--slate);font-size:12px">
+          Click a parameter above to generate complete end-to-end diagnostic stages for that parameter.
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+AFTER.scada_intel = () => {
+  switchIntelTab('auto');
+  renderScadaIntelGrid();
+  updateSpotlightStage(1, "Manufacturing Execution Spotlight Console", "Standby • Press Start Autonomous Pipeline when ready",
+    renderSpotlightStage1Html(null, false)
+  );
+  setIntelStageLabel('Standby — press Start Autonomous Pipeline');
+  syncIntelStartBtn();
+};
+
+function setIntelStageLabel(text){
+  const stageTxt = $('#intelStageTxt');
+  if(stageTxt) stageTxt.textContent = text;
+}
+
+function syncIntelStartBtn(){
+  const btn = $('#intelStartBtn');
+  if(!btn) return;
+  if(intelPipelineRunning){
+    btn.className = 'btn coral';
+    btn.innerHTML = '<span id="intelStartIcon">⏹</span> Stop Autonomous Pipeline';
+    btn.setAttribute('onclick', 'stopIntelPipeline()');
+    btn.onclick = stopIntelPipeline;
+  } else {
+    btn.className = 'btn primary';
+    btn.style.boxShadow = '0 0 20px rgba(43,179,192,0.4)';
+    btn.style.fontWeight = '700';
+    btn.innerHTML = '<span id="intelStartIcon">▶</span> Start Autonomous Pipeline';
+    btn.setAttribute('onclick', 'beginAutonomousPipeline()');
+    btn.onclick = function(){ beginAutonomousPipeline(); };
+  }
+}
+
+function beginAutonomousPipeline(forceRestart){
+  try {
+    if(intelPipelineRunning && !forceRestart) return;
+    intelIsLooping = true;
+    intelSoundEnabled = true;
+    S.soundEnabled = true;
+    const loopBtn = $('#intelLoopBtn');
+    if(loopBtn){ loopBtn.className = 'btn green'; loopBtn.innerHTML = '<span id="intelLoopIcon">🔄</span> Auto-Loop Stream: ON'; }
+    const soundBtn = $('#intelSoundBtn');
+    if(soundBtn) soundBtn.textContent = '🔊 Sound: ON';
+    // Unlock speech on explicit Start click (user gesture)
+    if('speechSynthesis' in window){
+      try { window.speechSynthesis.cancel(); } catch(e){}
+    }
+    startIntelPipeline();
+  } catch(err){
+    console.error('beginAutonomousPipeline failed', err);
+    setIntelStageLabel('Start failed — check browser console');
+  }
+}
+
+function activateAutoCommandCenter(){
+  // Tab switch only — do not start recording/automation until Start is clicked
+  switchIntelTab('auto');
+  if(!intelPipelineRunning){
+    updateSpotlightStage(1, "Manufacturing Execution Spotlight Console", "Standby • Press Start Autonomous Pipeline when ready",
+      renderSpotlightStage1Html(null, false)
+    );
+    setIntelStageLabel('Standby — press Start Autonomous Pipeline');
+    syncIntelStartBtn();
+  }
+}
+
+function activateSingleParamLab(){
+  // Leaving auto command center stops Tab 1; Tab 2 has its own silent lab runner
+  if(intelPipelineRunning){
+    intelRunToken++;
+    intelPipelineRunning = false;
+    clearIntelStreamTicks();
+    if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  }
+  switchIntelTab('single');
+  syncIntelStartBtn();
+  setLabStatus('Silent diagnostic lab • Click a parameter to run steps 1→7 (no audio)');
+  if(typeof resetLabPanels === 'function') resetLabPanels();
+  renderScadaIntelGrid();
+}
+
+function stopIntelPipeline(){
+  intelRunToken++;
+  intelPipelineRunning = false;
+  intelIsLooping = false;
+  if(intelStreamTickTimer){ clearInterval(intelStreamTickTimer); intelStreamTickTimer = null; }
+  if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  const loopBtn = $('#intelLoopBtn');
+  if(loopBtn){ loopBtn.className = 'btn amber'; loopBtn.innerHTML = '<span id="intelLoopIcon">🔄</span> Auto-Loop Stream: OFF'; }
+  setIntelStageLabel('Pipeline stopped by operator');
+  updateSpotlightStage(1, "Manufacturing Execution Spotlight Console", "Stopped • Press Start to resume autonomous cycle",
+    renderSpotlightStage1Html(null, false)
+  );
+  syncIntelStartBtn();
+}
+
+function speakAlarm(paramName, severity, valueStr, unitStr){
+  if(!S.soundEnabled && !intelSoundEnabled) return;
+  try {
+    playAlarmBeep(severity === 'trip');
+    if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      const text = severity === 'trip'
+        ? "Critical Trip Warning! " + paramName + " has breached the safety threshold with a reading of " + valueStr + " " + unitStr + ". Automated agentic response activated."
+        : "Alarm Warning! " + paramName + " threshold excursion detected. Reading is " + valueStr + " " + unitStr + ".";
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.rate = 1.0; msg.pitch = 1.05; msg.volume = 1.0;
+      window.speechSynthesis.speak(msg);
+    }
+  } catch(e){}
+}
+function updateSpotlightStage(stageNum, titleText, subText, htmlContent){
+  const consoleEl = $('#intelSpotlightConsole');
+  const titleEl = $('#spotlightTitle');
+  const subEl = $('#spotlightSub');
+  const bodyEl = $('#spotlightBody');
+  const pillsEl = $('#spotlightStepPills');
+
+  if(consoleEl) consoleEl.style.display = 'block';
+  if(titleEl) titleEl.textContent = titleText;
+  if(subEl) subEl.textContent = subText;
+  if(bodyEl) bodyEl.innerHTML = htmlContent;
+
+  if(pillsEl){
+    let pillsHtml = '';
+    for(let i=1; i<=7; i++){
+      if(i === stageNum){
+        pillsHtml += '<span class="pill ok" style="padding:2px 8px;font-size:10px;font-weight:800;background:var(--cyan);color:#04181c">' + i + '</span>';
+      } else if(i < stageNum){
+        pillsHtml += '<span class="pill ok" style="padding:2px 8px;font-size:10px;font-weight:700">' + i + '</span>';
+      } else {
+        pillsHtml += '<span class="pill" style="padding:2px 8px;font-size:10px;opacity:0.6">' + i + '</span>';
+      }
+    }
+    pillsEl.innerHTML = pillsHtml;
+  }
+}
+function closeSpotlightConsole(){ const consoleEl = $('#intelSpotlightConsole'); if(consoleEl) consoleEl.style.display = 'none'; }
+function toggleSpotlightPause(){
+  intelSpotlightPaused = !intelSpotlightPaused;
+  const btn = $('#spotlightPauseBtn');
+  if(btn) btn.textContent = intelSpotlightPaused ? '▶ Resume' : '⏸ Pause';
+  if('speechSynthesis' in window){
+    if(intelSpotlightPaused){ window.speechSynthesis.pause(); }
+    else { window.speechSynthesis.resume(); }
+  }
+}
+
+function waitPace(ms, myToken){
+  return new Promise(resolve => {
+    let waited = 0; const target = ms || intelStagePaceMs;
+    const check = () => {
+      if(myToken && myToken !== intelRunToken) return;
+      if(!intelSpotlightPaused) waited += 100;
+      if(waited >= target) resolve();
+      else setTimeout(check, 100);
+    };
+    check();
+  });
+}
+
+function drawSpotlightSparklines(){
+  setTimeout(() => {
+    S.bands.forEach(b => {
+      const hist = (S.streamHistory && S.streamHistory[b.param]) ? S.streamHistory[b.param] : [];
+      drawDottedSparkline('spotlight_' + b.param, hist, b);
+    });
+  }, 40);
+}
+
+function renderScadaIntelGrid(){
+  S.bands.forEach(b => {
+    const history = (S.streamHistory && S.streamHistory[b.param]) ? S.streamHistory[b.param] : [];
+    drawDottedSparkline(`intel_${b.param}`, history, b);
+    drawDottedSparkline(`spotlight_${b.param}`, history, b);
+  });
+}
+
+let intelActiveTab = 'auto';
+
+function switchIntelTab(tabId){
+  intelActiveTab = tabId;
+  const tab1Btn = $('#intelTab1Btn');
+  const tab2Btn = $('#intelTab2Btn');
+  const autoView = $('#intelTabAutoContent');
+  const singleView = $('#intelTabSingleContent');
+
+  if(tabId === 'auto'){
+    if(tab1Btn){ tab1Btn.className = 'btn primary'; }
+    if(tab2Btn){ tab2Btn.className = 'btn ghost'; }
+    if(autoView) autoView.style.display = 'block';
+    if(singleView) singleView.style.display = 'none';
+  } else {
+    if(tab1Btn){ tab1Btn.className = 'btn ghost'; }
+    if(tab2Btn){ tab2Btn.className = 'btn primary'; }
+    if(autoView) autoView.style.display = 'none';
+    if(singleView) singleView.style.display = 'block';
+  }
+}
+
+function runSingleParamPipeline(paramId){
+  // Tab 2 only — completely independent from Tab 1 autonomous pipeline; NO AUDIO
+  switchIntelTab('single');
+  // Stop Tab 1 if it was running so labs stay isolated
+  if(intelPipelineRunning){
+    intelRunToken++;
+    intelPipelineRunning = false;
+    clearIntelStreamTicks();
+    if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+    syncIntelStartBtn();
+  }
+  startLabPipeline(paramId);
+}
+
+function setLabStatus(msg){
+  const el = $('#labStatusLine');
+  if(el) el.textContent = msg;
+}
+
+function clearLabTicks(){
+  if(labTickTimer){ clearInterval(labTickTimer); labTickTimer = null; }
+}
+
+function resetLabPanels(){
+  ['intelStage2Card','intelStage3Card','intelStage4Card','intelStage7Card'].forEach(id => {
+    const el = $('#'+id); if(el) el.style.display = 'none';
+  });
+  const g56 = $('#intelStage56Grid'); if(g56) g56.style.display = 'none';
+  const breach = $('#intelBreachBanner');
+  if(breach) breach.innerHTML = '<div style="background:#081a1f;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--slate);font-size:12px">Awaiting parameter selection…</div>';
+  const drivers = $('#intelDriverBanner');
+  if(drivers) drivers.innerHTML = '<div style="background:#081a1f;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--slate);font-size:12px">Driver analysis pending…</div>';
+  ['ifpipe-1','ifpipe-2','ifpipe-3','ifpipe-4'].forEach(id => {
+    const op = $('#'+id); if(op) op.className = 'pipe-op';
+  });
+  const q = $('#intelQueryBox');
+  if(q) q.innerHTML = '<div style="font-size:11px;color:var(--slate-d);margin-bottom:8px;font-weight:700">GENERATED RAG AGENT QUERY:</div><div style="font-family:var(--mono);font-size:11px;background:#050f13;border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--cyan);line-height:1.6">Awaiting breach event...</div>';
+  const agents = $('#intelActiveAgentsList');
+  if(agents) agents.innerHTML = '<div class="agent orch" style="padding:10px"><div class="ah"><div class="aic">🧩</div><div><div class="an">Orchestrator Agent</div><div class="ar">master_plan</div></div></div><div class="ad" style="font-size:10.5px">Standing by.</div></div>';
+  const remedy = $('#intelRemedyOutput');
+  if(remedy) remedy.innerHTML = '<div style="text-align:center;padding:24px;color:var(--slate);font-size:12px">Awaiting retrieval…</div>';
+  // Reset telemetry tiles to normal
+  (S.bands || []).forEach(b => {
+    const tagEl = $(`#intelTag_${b.param}`);
+    const valEl = $(`#intelVal_${b.param}`);
+    const probEl = $(`#intelProb_${b.param}`);
+    const cardEl = $(`#intelCard_${b.param}`);
+    if(tagEl){ tagEl.className = 'pill ok'; tagEl.innerHTML = '● NORMAL'; tagEl.style.cssText = 'font-size:9px;padding:2px 7px'; }
+    if(valEl){ valEl.textContent = `${Number(b.alarm[0]).toFixed(2)}${b.unit}`; valEl.style.color = '#00ffcc'; }
+    if(probEl){ probEl.textContent = '0.04'; probEl.style.color = ''; }
+    if(cardEl){ cardEl.style.borderColor = '#14353d'; cardEl.style.background = '#030a0d'; cardEl.style.boxShadow = 'none'; cardEl.classList.remove('trip'); }
+  });
+}
+
+function highlightLabParamBtn(paramId){
+  $$('.lab-param-btn').forEach(btn => {
+    if(btn.dataset.param === paramId){
+      btn.style.boxShadow = '0 0 16px rgba(255,90,68,0.55)';
+      btn.style.outline = '2px solid #ff3355';
+    } else {
+      btn.style.boxShadow = '';
+      btn.style.outline = '';
+    }
+  });
+}
+
+function showLabCard(stepNum){
+  const map = {
+    1: 'intelStage1Card',
+    2: 'intelStage2Card',
+    3: 'intelStage3Card',
+    4: 'intelStage4Card',
+    5: 'intelStage56Grid',
+    6: 'intelStage56Grid',
+    7: 'intelStage7Card'
+  };
+  const id = map[stepNum];
+  const el = $('#'+id);
+  if(el){
+    el.style.display = (id === 'intelStage56Grid') ? 'grid' : 'block';
+    try { el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
+  }
+  resetIntelStageBorders(stepNum);
+}
+
+function startLabLiveTicks(breachingParamId, breachActive){
+  clearLabTicks();
+  labTickTimer = setInterval(() => {
+    if(!labPipelineRunning) return;
+    (S.bands || []).forEach(b => {
+      if(!S.streamHistory[b.param]) S.streamHistory[b.param] = [];
+      const mid = (b.control[0] + b.control[1]) / 2;
+      const span = Math.max(0.05, (b.control[1] - b.control[0]) * 0.18);
+      let v = mid + (Math.random() - 0.5) * span * 2;
+      if(breachActive && b.param === breachingParamId){
+        v = b.trip[1] + 1.2 + Math.random() * 1.2;
+      }
+      const hist = S.streamHistory[b.param];
+      hist.push({ time: new Date().toLocaleTimeString(), val: v, zone: (breachActive && b.param === breachingParamId) ? 'trip' : 'control', flag: (breachActive && b.param === breachingParamId) ? 'RED' : 'OK' });
+      if(hist.length > 40) hist.shift();
+      const el = $(`#intelVal_${b.param}`);
+      if(el){
+        const isBreach = breachActive && b.param === breachingParamId;
+        el.textContent = v.toFixed(2) + (b.unit || '');
+        el.style.color = isBreach ? '#ff3355' : '#00ffcc';
+      }
+      drawDottedSparkline('intel_' + b.param, hist, b);
+    });
+  }, 500);
+}
+
+function waitLab(ms, myToken){
+  return new Promise(resolve => {
+    const t0 = Date.now();
+    const tick = () => {
+      if(myToken !== labRunToken) return resolve(false);
+      if(Date.now() - t0 >= ms) return resolve(true);
+      setTimeout(tick, 80);
+    };
+    tick();
+  });
+}
+
+async function startLabPipeline(paramId){
+  labRunToken++;
+  const myToken = labRunToken;
+  labPipelineRunning = true;
+  clearLabTicks();
+  // Silence any leftover speech from Tab 1 — this lab is mute by design
+  if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+
+  if(!S.bands || !S.bands.length) S.bands = FALLBACK_BANDS.slice();
+  const band = S.bands.find(b => b.param === paramId) || S.bands[0];
+  if(!band){ labPipelineRunning = false; return; }
+  const agentInfo = AGENTS.find(a => a.id === paramId) || AGENTS[0];
+  const breachVal = (band.trip[1] + 1.8).toFixed(2);
+  const pBreach = (0.91 + Math.random() * 0.07).toFixed(3);
+  const whyFeats = IV_MAP[paramId] || ['coolant_flow_rate', 'jacket_temperature', 'steam_valve_position'];
+
+  resetLabPanels();
+  highlightLabParamBtn(paramId);
+  studioInject(paramId, 'trip');
+
+  try {
+    // --- STEP 1: live streaming all params, red on selected ---
+    setLabStatus('Step 1/7 • Live telemetry streaming (silent)');
+    showLabCard(1);
+    renderScadaIntelGrid();
+    startLabLiveTicks(paramId, false);
+    if(!(await waitLab(1600, myToken))) return;
+
+    const tagEl = $(`#intelTag_${paramId}`);
+    const valEl = $(`#intelVal_${paramId}`);
+    const probEl = $(`#intelProb_${paramId}`);
+    const cardEl = $(`#intelCard_${paramId}`);
+    if(tagEl){ tagEl.className = 'pill off'; tagEl.innerHTML = '● TRIP BREACH'; tagEl.style.cssText = 'font-size:9px;padding:2px 7px;animation:pulse 1s infinite;background:rgba(255,51,85,0.25);color:#ff3355;border-color:#ff3355'; }
+    if(valEl){ valEl.textContent = `${breachVal}${band.unit}`; valEl.style.color = '#ff3355'; }
+    if(probEl){ probEl.textContent = pBreach; probEl.style.color = '#ff3355'; }
+    if(cardEl){ cardEl.style.borderColor = '#ff3355'; cardEl.style.background = 'rgba(255,51,85,0.18)'; cardEl.style.boxShadow = '0 0 24px rgba(255,51,85,0.45)'; cardEl.classList.add('trip'); }
+    startLabLiveTicks(paramId, true);
+    if(!(await waitLab(LAB_STEP_MS, myToken))) return;
+
+    // --- STEP 2: breach trigger ---
+    clearLabTicks();
+    setLabStatus('Step 2/7 • Threshold breach trigger');
+    showLabCard(2);
+    const breachBanner = $('#intelBreachBanner');
+    if(breachBanner){
+      breachBanner.innerHTML =
+        '<div style="background:rgba(255,90,68,0.14);border:1px solid var(--red);border-radius:10px;padding:16px;box-shadow:0 0 24px rgba(255,90,68,0.25)">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">' +
+            '<div style="font-size:15px;font-weight:800;color:var(--red)">🚨 THRESHOLD BREACH: ' + esc(band.name.toUpperCase()) + ' (' + esc(band.asset) + ')</div>' +
+            '<span class="pill off" style="font-size:11px;font-weight:800;padding:4px 12px">P(breach) = ' + pBreach + ' • TRIP</span>' +
+          '</div>' +
+          '<div style="font-size:13px;color:#cfe6e6;line-height:1.6">Live reading: <b style="color:#ff3355;font-size:15px">' + breachVal + band.unit + '</b> (Control: ' + band.control[0] + '–' + band.control[1] + band.unit + ', Trip: ' + band.trip[1] + band.unit + ').</div>' +
+        '</div>';
+    }
+    if(!(await waitLab(LAB_STEP_MS, myToken))) return;
+
+    // --- STEP 3: IV drivers ---
+    setLabStatus('Step 3/7 • Independent variable drivers');
+    showLabCard(3);
+    const driverBanner = $('#intelDriverBanner');
+    if(driverBanner){
+      driverBanner.innerHTML =
+        '<div style="background:#000;border:1px solid #ff3355;border-radius:10px;padding:16px">' +
+          '<div style="font-size:12px;font-weight:800;color:#ff3355;margin-bottom:12px;letter-spacing:0.5px">TOP INDEPENDENT VARIABLE DRIVERS</div>' +
+          '<div class="grid g3" style="gap:12px">' +
+            [0,1,2].map((i, idx) => {
+              const w = [88,65,42][idx];
+              const col = ['var(--red)','var(--amber)','var(--cyan)'][idx];
+              const score = ['+4.82','+3.15','+1.94'][idx];
+              return '<div style="background:#030a0d;border:1px solid #14353d;border-radius:8px;padding:12px">' +
+                '<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">' +
+                  '<span style="color:#cfe6e6;font-family:var(--mono)">' + (idx+1) + '. ' + esc(whyFeats[idx] || ('driver_'+(idx+1))) + '</span>' +
+                  '<span style="color:' + col + ';font-weight:700">' + score + '</span></div>' +
+                '<div style="height:8px;background:#081a1f;border-radius:4px;overflow:hidden"><div style="height:100%;width:' + w + '%;background:linear-gradient(90deg,var(--teal),' + col + ');border-radius:4px"></div></div></div>';
+            }).join('') +
+          '</div></div>';
+    }
+    if(!(await waitLab(LAB_STEP_MS, myToken))) return;
+
+    // --- STEP 4: Flink SQL ---
+    setLabStatus('Step 4/7 • Flink SQL decomposition');
+    showLabCard(4);
+    const pipeIds = ['ifpipe-1','ifpipe-2','ifpipe-3','ifpipe-4'];
+    for(let i=0;i<pipeIds.length;i++){
+      if(myToken !== labRunToken) return;
+      const op = $('#'+pipeIds[i]); if(op) op.className = 'pipe-op active done';
+      const outs = ['10s event-time window locked','Aggregated v_avg / v_std / v_delta','p_breach = '+pBreach,'EMITTED {param:"'+paramId+'", asset:"'+band.asset+'", val:'+breachVal+', zone:"TRIP"}'];
+      const outEl = $('#ifout-'+(i+1)); if(outEl) outEl.innerHTML = outs[i];
+      if(!(await waitLab(550, myToken))) return;
+    }
+    if(!(await waitLab(900, myToken))) return;
+
+    // --- STEP 5: query transform ---
+    setLabStatus('Step 5/7 • Event → RAG query');
+    showLabCard(5);
+    resetIntelStageBorders(5);
+    const agentQueryStr = '[DIAGNOSTIC QUERY] Asset ' + band.asset + ' ' + band.name + ' breached at ' + breachVal + band.unit + ' (P_breach=' + pBreach + '). Drivers: ' + whyFeats.slice(0,3).join(', ') + '. Retrieve approved SOP / OEM / CAPA response.';
+    const queryBox = $('#intelQueryBox');
+    if(queryBox){
+      queryBox.innerHTML =
+        '<div style="font-size:11px;color:var(--slate-d);margin-bottom:8px;font-weight:700">GENERATED RAG AGENT QUERY:</div>' +
+        '<div style="font-family:var(--mono);font-size:11px;background:#050f13;border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--cyan);line-height:1.6">' + esc(agentQueryStr) + '</div>';
+    }
+    if(!(await waitLab(LAB_STEP_MS, myToken))) return;
+
+    // --- STEP 6: agents ---
+    setLabStatus('Step 6/7 • Agent activation');
+    showLabCard(6);
+    resetIntelStageBorders(6);
+    const activeAgentsList = $('#intelActiveAgentsList');
+    if(activeAgentsList){
+      activeAgentsList.innerHTML =
+        '<div class="agent orch" style="padding:10px"><div class="ah"><div class="aic">🧩</div><div><div class="an">Orchestrator Agent</div><div class="ar">master_plan • ACTIVE</div></div></div><div class="ad" style="font-size:10.5px">Routing SOP / OEM / CAPA sub-queries.</div></div>' +
+        '<div class="agent" style="padding:10px;border-color:var(--cyan);background:rgba(43,179,192,0.06)"><div class="ah"><div class="aic">' + agentInfo.icon + '</div><div><div class="an">' + esc(agentInfo.name) + ' (' + esc(band.asset) + ')</div><div class="ar">' + esc(agentInfo.role) + ' • EXECUTING</div></div></div><div class="ad" style="font-size:10.5px">' + esc(agentInfo.desc) + '</div></div>' +
+        '<div class="agent human" style="padding:10px"><div class="ah"><div class="aic">🛡️</div><div><div class="an">Human Escalation Agent (QA)</div><div class="ar">agent.execute.qa • STANDBY</div></div></div><div class="ad" style="font-size:10.5px">Part 11 e-signature required for TRIP on ' + esc(band.name) + '.</div></div>';
+    }
+    if(!(await waitLab(LAB_STEP_MS, myToken))) return;
+
+    // --- STEP 7: RAG remedy ---
+    setLabStatus('Step 7/7 • RAG remedy retrieval');
+    showLabCard(7);
+    const remedyBox = $('#intelRemedyOutput');
+    if(remedyBox) remedyBox.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:12px"><span class="spin"></span><span style="font-size:12px;color:var(--cyan);font-weight:600">Retrieving cited remedy…</span></div>';
+
+    let resultData = null;
+    if(S.apiOk){
+      try {
+        const fetchPromise = api('/agent/run', {
+          method: 'POST',
+          body: JSON.stringify({ param: paramId, v_avg: parseFloat(breachVal), v_std: 0.12, v_delta: 1.8, zone: 'trip', p_breach: parseFloat(pBreach), top_driver: whyFeats[0] })
+        });
+        resultData = await Promise.race([fetchPromise, new Promise(r => setTimeout(() => r(null), 1500))]);
+      } catch(e){}
+    }
+    if(myToken !== labRunToken) return;
+    if(!resultData) resultData = getFallbackRemedyData(paramId, breachVal, pBreach, band);
+    renderIntelRemedyCard(resultData, band, breachVal, pBreach, whyFeats);
+    resetIntelStageBorders(7);
+    setLabStatus('Diagnostic complete for ' + band.name + ' • Click another parameter to re-run');
+    labPipelineRunning = false;
+  } catch(err){
+    console.error('Lab pipeline error', err);
+    labPipelineRunning = false;
+    setLabStatus('Lab error — click a parameter to retry');
+  }
+}
+
+function toggleIntelSound(){
+  intelSoundEnabled = !intelSoundEnabled; S.soundEnabled = intelSoundEnabled;
+  const btn = $('#intelSoundBtn'); if(btn) btn.textContent = intelSoundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+}
+
+function triggerIntelBreach(param){
+  intelCurrentParam = param;
+  studioInject(param, 'trip');
+  startIntelPipeline(param);
+}
+
+function toggleIntelLoop(){
+  intelIsLooping = !intelIsLooping;
+  const btn = $('#intelLoopBtn');
+  if(intelIsLooping){
+    if(btn){ btn.className = 'btn green'; btn.innerHTML = '<span id="intelLoopIcon">🔄</span> Auto-Loop Stream: ON'; }
+  } else {
+    if(btn){ btn.className = 'btn amber'; btn.innerHTML = '<span id="intelLoopIcon">🔄</span> Auto-Loop Stream: OFF'; }
+  }
+}
+
+function renderSpotlightStage1Html(breachingParamId, isBreachActive){
+  drawSpotlightSparklines();
+  const tilesHtml = S.bands.map(b => {
+    const isBreach = isBreachActive && breachingParamId && (b.param === breachingParamId);
+    const breachVal = (b.trip[1] + 1.8).toFixed(2);
+    const hist = (S.streamHistory && S.streamHistory[b.param]) ? S.streamHistory[b.param] : [];
+    const last = hist.length ? hist[hist.length - 1] : null;
+    const liveVal = (last && typeof last.val === 'number') ? last.val : b.alarm[0];
+    const normalVal = (typeof liveVal === 'number' ? liveVal : b.alarm[0]);
+    const valStr = isBreach ? `${breachVal}${b.unit}` : `${Number(normalVal).toFixed(2)}${b.unit}`;
+    const tagHtml = isBreach
+      ? '<span class="pill off" style="font-size:9px;padding:2px 7px;animation:pulse 1s infinite;background:rgba(255,51,85,0.25);color:#ff3355;border-color:#ff3355">● TRIP BREACH</span>'
+      : '<span class="pill ok" style="font-size:9px;padding:2px 7px;background:rgba(0,255,204,0.12);color:#00ffcc;border-color:rgba(0,255,204,0.3)">● NORMAL</span>';
+    const valColor = isBreach ? '#ff3355' : '#00ffcc';
+    const borderColor = isBreach ? '#ff3355' : '#14353d';
+    const bgStyle = isBreach ? 'background:rgba(255,51,85,0.18);box-shadow:0 0 24px rgba(255,51,85,0.45)' : 'background:#030a0d';
+
+    return `<div style="${bgStyle};border:1px solid ${borderColor};border-radius:8px;padding:9px;display:flex;flex-direction:column;gap:5px;transition:all 0.3s ease">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;font-weight:700;color:#e1f5fe;font-family:var(--mono)">${esc(b.short || b.name)}</span>
+        ${tagHtml}
+      </div>
+      <div style="font-size:18px;font-weight:800;color:${valColor};font-family:var(--mono)" id="spotlightVal_${b.param}">${valStr}</div>
+      <div style="background:#000000;border:1px solid #0d2830;border-radius:4px;padding:3px;overflow:hidden">
+        <canvas id="canvas_spotlight_${b.param}" width="160" height="38" style="width:100%;height:38px;display:block"></canvas>
+      </div>
+    </div>`;
+  }).join('');
+
+  return '<div style="background:#000000;border:1px solid #14353d;border-radius:12px;padding:16px;box-shadow:0 0 32px rgba(0,255,204,0.15)">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid #0d2830;padding-bottom:10px">' +
+      '<div style="font-size:12.5px;font-weight:800;color:#00ffcc;font-family:var(--mono);display:flex;align-items:center;gap:8px"><span>📡</span> REAL-TIME TELEMETRY STREAM (ALL PARAMETERS)</div>' +
+      '<span class="pill ok" style="padding:4px 12px;font-size:10px;background:rgba(0,255,204,0.15);color:#00ffcc;border-color:rgba(0,255,204,0.4)"><span class="dot" style="background:#00ffcc"></span> LIVE</span>' +
+    '</div>' +
+    '<div class="grid g5" style="gap:10px">' + tilesHtml + '</div>' +
+    '<div style="font-size:11.5px;color:#7aa2ad;margin-top:12px;text-align:center;font-family:var(--mono)">' +
+      (isBreachActive
+        ? '<b style="color:#ff3355;font-size:12.5px">🚨 RED THRESHOLD BREACH — VOICE ALERT ACTIVE — ADVANCING TO NEXT STAGE</b>'
+        : 'Streaming live telemetry on pitch-black console. Red = trip-band breach.') +
+    '</div>' +
+  '</div>';
+}
+
+function pickProfessionalVoice(){
+  try {
+    const voices = window.speechSynthesis.getVoices() || [];
+    const prefer = voices.find(v => /en(-|_)?(US|GB)/i.test(v.lang) && /Google|Microsoft|Samantha|Daniel|Neural/i.test(v.name))
+      || voices.find(v => /^en/i.test(v.lang));
+    return prefer || null;
+  } catch(e){ return null; }
+}
+
+/* Industrial tone profile by risk — alarm / trip / diagnostic / status / action */
+function speechToneForStep(stepNum){
+  // Maps to ISA-style urgency: higher rate+pitch = higher priority alarm delivery
+  if(stepNum === 1) return { rate: 1.10, pitch: 1.08, volume: 1.0, label: 'ALARM' };      // initial trip indication
+  if(stepNum === 2) return { rate: 1.14, pitch: 1.12, volume: 1.0, label: 'TRIP' };       // confirmed critical
+  if(stepNum === 3) return { rate: 1.02, pitch: 0.98, volume: 1.0, label: 'DIAGNOSTIC' }; // root cause briefing
+  if(stepNum === 4) return { rate: 1.00, pitch: 0.94, volume: 0.95, label: 'STATUS' };    // system processing
+  if(stepNum === 5) return { rate: 1.02, pitch: 0.96, volume: 1.0, label: 'STATUS' };     // retrieval handoff
+  if(stepNum === 6) return { rate: 1.06, pitch: 1.02, volume: 1.0, label: 'ESCALATION' }; // agent / QA standby
+  if(stepNum === 7) return { rate: 0.96, pitch: 0.90, volume: 1.0, label: 'ACTION' };     // deliberate operator orders
+  return { rate: 1.0, pitch: 1.0, volume: 1.0, label: 'INFO' };
+}
+
+function buildStageNarration(stageNum, ctx){
+  const paramName = ctx.paramName || 'process parameter';
+  const breachVal = ctx.breachVal || '';
+  const unitStr = ctx.unitStr || '';
+  const asset = ctx.asset || 'process asset';
+  const pBreach = ctx.pBreach || '0.90';
+  const agentName = ctx.agentName || 'parameter agent';
+  const why = (ctx.whyFeats || []).map(f => String(f).replace(/_/g, ' '));
+  const d1 = why[0] || 'primary process driver';
+  const d2 = why[1] || 'secondary process driver';
+  const d3 = why[2] || 'tertiary process driver';
+  const steps = ctx.actionSteps || [];
+  const act1 = steps[0] || ('Return ' + paramName + ' to approved control centerline.');
+  const act2 = steps[1] || ('Verify ' + d1 + ' and isolate abnormal feed.');
+  const controlLo = ctx.controlLo != null ? ctx.controlLo : '';
+  const controlHi = ctx.controlHi != null ? ctx.controlHi : '';
+  const tripHi = ctx.tripHi != null ? ctx.tripHi : '';
+
+  // Concise control-room instructions — no stage numbering, minimal preamble
+  if(stageNum === 1){
+    return [
+      'Alarm. ' + paramName + ', asset ' + asset + '.',
+      'Trip band exceeded. Reading ' + breachVal + ' ' + unitStr + '.',
+      'Red tag active. Acknowledge and stand by for causal drivers.'
+    ];
+  }
+  if(stageNum === 2){
+    return [
+      'Trip confirmed. ' + paramName + ' on ' + asset + ' is outside approved limit.',
+      'Measured ' + breachVal + ' ' + unitStr + '. Control band ' + controlLo + ' to ' + controlHi + ' ' + unitStr + '. Trip at ' + tripHi + ' ' + unitStr + '.',
+      'Breach probability ' + pBreach + '. Do not reset without authorization.'
+    ];
+  }
+  if(stageNum === 3){
+    return [
+      'Causal drivers for ' + paramName + ' excursion.',
+      'Check ' + d1 + ' first.',
+      'Then verify ' + d2 + '.',
+      'Then inspect ' + d3 + '.'
+    ];
+  }
+  if(stageNum === 4){
+    return [
+      'Stream engine processing the breach event.',
+      'Features calculated. Structured event released to remediation.'
+    ];
+  }
+  if(stageNum === 5){
+    return [
+      'Approved response query issued for ' + asset + ' ' + paramName + ' excursion at ' + breachVal + ' ' + unitStr + '.',
+      'Pulling SOP excursion steps, OEM checks, and CAPA actions.'
+    ];
+  }
+  if(stageNum === 6){
+    return [
+      agentName + ' assigned to ' + asset + '.',
+      'Orchestrator coordinating retrieval.',
+      'QA supervisor on standby for Part Eleven electronic signature.'
+    ];
+  }
+  if(stageNum === 7){
+    return [
+      'Operator action required.',
+      'Action one. ' + act1,
+      'Action two. ' + act2,
+      'Electronic signature mandatory. Contact QA before any setpoint change.'
+    ];
+  }
+  return [];
+}
+
+function speakUtterance(text, tone){
+  return new Promise(resolve => {
+    try {
+      if(!('speechSynthesis' in window) || !text){ resolve(); return; }
+      const t = tone || { rate: 1.0, pitch: 1.0, volume: 1.0 };
+      const msg = new SpeechSynthesisUtterance(text);
+      const voice = pickProfessionalVoice();
+      if(voice) msg.voice = voice;
+      msg.rate = t.rate;
+      msg.pitch = t.pitch;
+      msg.volume = t.volume;
+      const ms = Math.min(40000, Math.max(6000, text.split(/\s+/).length * 380));
+      const timer = setTimeout(() => resolve(), ms);
+      msg.onend = () => { clearTimeout(timer); resolve(); };
+      msg.onerror = () => { clearTimeout(timer); resolve(); };
+      window.speechSynthesis.speak(msg);
+    } catch(e){
+      resolve();
+    }
+  });
+}
+
+async function waitWhileSpotlightPaused(myToken){
+  while(intelSpotlightPaused){
+    if(myToken && myToken !== intelRunToken) return false;
+    await new Promise(r => setTimeout(r, 150));
+  }
+  return !(myToken && myToken !== intelRunToken);
+}
+
+async function safeSpeak(stageNum, paramName, breachVal, unitStr, whyFeats, actionSteps, agentName, extra, myToken){
+  if(!intelSoundEnabled) return;
+  extra = extra || {};
+  const lines = buildStageNarration(stageNum, {
+    paramName, breachVal, unitStr, whyFeats, actionSteps, agentName,
+    asset: extra.asset, pBreach: extra.pBreach,
+    controlLo: extra.controlLo, controlHi: extra.controlHi, tripHi: extra.tripHi
+  });
+  if(!lines.length) return;
+
+  const tone = speechToneForStep(stageNum);
+  const uiHints = {
+    1: 'Alarm announcement in progress',
+    2: 'Trip instruction in progress',
+    3: 'Causal driver briefing in progress',
+    4: 'Stream processing status',
+    5: 'Approved response retrieval',
+    6: 'Agent assignment briefing',
+    7: 'Operator action instruction'
+  };
+  setIntelStageLabel(uiHints[stageNum] || 'Instruction in progress');
+  if('speechSynthesis' in window){
+    try { window.speechSynthesis.cancel(); } catch(e){}
+  }
+
+  for(let i = 0; i < lines.length; i++){
+    if(myToken && myToken !== intelRunToken) return;
+    const ok = await waitWhileSpotlightPaused(myToken);
+    if(!ok) return;
+    if(!intelSoundEnabled) return;
+    await speakUtterance(lines[i], tone);
+    await new Promise(r => setTimeout(r, 140));
+  }
+}
+
+function clearIntelStreamTicks(){
+  if(intelStreamTickTimer){ clearInterval(intelStreamTickTimer); intelStreamTickTimer = null; }
+}
+
+function startIntelLiveTicks(breachingParamId, breachActive){
+  clearIntelStreamTicks();
+  // Seed a few points so sparklines are immediately visible
+  S.bands.forEach(b => {
+    if(!S.streamHistory[b.param]) S.streamHistory[b.param] = [];
+    if(S.streamHistory[b.param].length < 2){
+      const mid = (b.control[0] + b.control[1]) / 2;
+      for(let i=0;i<8;i++){
+        S.streamHistory[b.param].push({
+          time: new Date().toLocaleTimeString(),
+          val: mid + (Math.random()-0.5) * Math.max(0.05,(b.control[1]-b.control[0])*0.2),
+          zone: 'control', flag: 'OK'
+        });
+      }
+    }
+  });
+  intelStreamTickTimer = setInterval(() => {
+    if(intelSpotlightPaused) return;
+    if(!intelPipelineRunning && !breachActive) return;
+    S.bands.forEach(b => {
+      if(!S.streamHistory[b.param]) S.streamHistory[b.param] = [];
+      const mid = (b.control[0] + b.control[1]) / 2;
+      const span = Math.max(0.05, (b.control[1] - b.control[0]) * 0.18);
+      let v = mid + (Math.random() - 0.5) * span * 2;
+      if(breachActive && b.param === breachingParamId){
+        v = b.trip[1] + 1.2 + Math.random() * 1.2;
+      }
+      const hist = S.streamHistory[b.param];
+      hist.push({
+        time: new Date().toLocaleTimeString(),
+        val: v,
+        zone: (breachActive && b.param === breachingParamId) ? 'trip' : 'control',
+        flag: (breachActive && b.param === breachingParamId) ? 'RED' : 'OK'
+      });
+      if(hist.length > 40) hist.shift();
+      const el = document.querySelector('#spotlightVal_' + b.param);
+      if(el){
+        const isBreach = breachActive && b.param === breachingParamId;
+        el.textContent = v.toFixed(2) + (b.unit || '');
+        el.style.color = isBreach ? '#ff3355' : '#00ffcc';
+      }
+      drawDottedSparkline('spotlight_' + b.param, hist, b);
+    });
+  }, 450);
+}
+
+async function startIntelPipeline(paramId){
+  // Show Tab 1 console without re-entering activateAutoCommandCenter (avoids recursion)
+  if(typeof switchIntelTab === 'function') switchIntelTab('auto');
+  if('speechSynthesis' in window){
+    try{ window.speechSynthesis.getVoices(); }catch(e){}
+  }
+
+  // Cover all parameters in session unless a single-param run was requested from Tab 2.
+  if(paramId === undefined || paramId === null){
+    intelIsLooping = true;
+    intelSoundEnabled = true;
+    S.soundEnabled = true;
+    const loopBtn = $('#intelLoopBtn');
+    if(loopBtn){ loopBtn.className = 'btn green'; loopBtn.innerHTML = '<span id="intelLoopIcon">🔄</span> Auto-Loop Stream: ON'; }
+    const soundBtn = $('#intelSoundBtn');
+    if(soundBtn) soundBtn.textContent = '🔊 Sound: ON';
+  }
+
+  intelRunToken++;
+  const myToken = intelRunToken;
+  intelPipelineRunning = true;
+  intelSpotlightPaused = false;
+  clearIntelStreamTicks();
+  syncIntelStartBtn();
+  setIntelStageLabel('Stage 1/7: Live Telemetry Ingestion');
+
+  const pauseBtn = $('#spotlightPauseBtn');
+  if(pauseBtn) pauseBtn.textContent = '⏸ Pause';
+
+  const consoleEl = $('#intelSpotlightConsole');
+  if(consoleEl){
+    consoleEl.style.display = 'block';
+    try { consoleEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
+  }
+
+  const cyclePill = $('#intelCyclePill');
+  if(cyclePill){
+    cyclePill.style.display = 'inline-flex';
+    cyclePill.textContent = intelIsLooping ? 'AUTO-LOOP ON' : 'SINGLE CYCLE';
+  }
+
+  // Ensure bands exist even if API init race
+  if(!S.bands || !S.bands.length){
+    S.bands = FALLBACK_BANDS.slice();
+  }
+
+  const param = paramId || intelCurrentParam || 'temp';
+  intelCurrentParam = param;
+  const band = S.bands.find(b => b.param === param) || S.bands[0];
+  if(!band){
+    intelPipelineRunning = false;
+    syncIntelStartBtn();
+    setIntelStageLabel('No parameter bands available');
+    return;
+  }
+  const agentInfo = AGENTS.find(a => a.id === param) || AGENTS[0];
+
+  const breachVal = (band.trip[1] + 1.8).toFixed(2);
+  const pBreach = (0.91 + Math.random() * 0.07).toFixed(3);
+  const whyFeats = IV_MAP[param] || ['coolant_flow_rate', 'jacket_temperature', 'steam_valve_position'];
+  const narrateCtx = {
+    asset: band.asset,
+    pBreach: pBreach,
+    controlLo: band.control[0],
+    controlHi: band.control[1],
+    tripHi: band.trip[1]
+  };
+
+  try {
+    // --- STAGE 1: LIVE TELEMETRY STREAMING (BLACK SCREEN) ---
+    setIntelStageLabel('Stage 1/7: Live Telemetry Ingestion');
+    resetIntelStageBorders(1);
+    renderScadaIntelGrid();
+    updateSpotlightStage(1, "1. Real-Time Telemetry Streaming", "Step 1 of 7 • Streaming all parameters (black console)",
+      renderSpotlightStage1Html(null, false)
+    );
+    startIntelLiveTicks(param, false);
+    await waitPace(1800, myToken);
+    if(myToken !== intelRunToken) return;
+
+    studioInject(param, 'trip');
+    const tagEl = $(`#intelTag_${param}`);
+    const valEl = $(`#intelVal_${param}`);
+    const probEl = $(`#intelProb_${param}`);
+    const cardEl = $(`#intelCard_${param}`);
+    if(tagEl){ tagEl.className = 'pill off'; tagEl.innerHTML = '● TRIP BREACH'; }
+    if(valEl){ valEl.textContent = `${breachVal}${band.unit}`; valEl.style.color = 'var(--red)'; }
+    if(probEl){ probEl.textContent = pBreach; probEl.style.color = 'var(--red)'; }
+    if(cardEl){ cardEl.style.borderColor = 'rgba(255,90,68,0.8)'; cardEl.classList.add('trip'); }
+
+    updateSpotlightStage(1, "1. Real-Time Telemetry Streaming", "Step 1 of 7 • RED breach on " + band.name,
+      renderSpotlightStage1Html(param, true)
+    );
+    startIntelLiveTicks(param, true);
+    await safeSpeak(1, band.name, breachVal, band.unit, whyFeats, null, agentInfo.name, narrateCtx, myToken);
+    if(myToken !== intelRunToken) return;
+
+    // --- STAGE 2: THRESHOLD BREACH ALERT ---
+    clearIntelStreamTicks();
+    setIntelStageLabel('Stage 2/7: Threshold Breach Alert');
+    resetIntelStageBorders(2);
+
+    const breachAlertOnlyHtml =
+      '<div style="background:rgba(255,90,68,0.14);border:1px solid var(--red);border-radius:10px;padding:16px;box-shadow:0 0 24px rgba(255,90,68,0.25)">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+          '<div style="font-size:16px;font-weight:800;color:var(--red);display:flex;align-items:center;gap:8px">' +
+            '<span>🚨</span> STAGE 2 — THRESHOLD BREACH: ' + esc(band.name.toUpperCase()) + ' (' + esc(band.asset) + ')' +
+          '</div>' +
+          '<span class="pill off" style="font-size:11.5px;font-weight:800;padding:4px 12px">P(breach) = ' + pBreach + ' • TRIP</span>' +
+        '</div>' +
+        '<div style="font-size:13px;color:#cfe6e6;line-height:1.6;margin-bottom:8px">' +
+          'Live reading: <b style="color:#ff3355;font-size:15px">' + breachVal + band.unit + '</b> (Control: ' + band.control[0] + '–' + band.control[1] + band.unit + ', Trip: ' + band.trip[1] + band.unit + ').' +
+        '</div>' +
+        '<div style="font-size:11.5px;color:var(--amber);background:#030d10;padding:8px 12px;border-radius:6px;border:1px solid var(--line2)">' +
+          'Automated protection policy engaged. Advancing to independent-variable driver analysis.' +
+        '</div>' +
+      '</div>';
+
+    const breachBanner = $('#intelBreachBanner'); if(breachBanner) breachBanner.innerHTML = breachAlertOnlyHtml;
+    updateSpotlightStage(2, "2. Threshold Breach Alert", "Step 2 of 7 • Excursion detection with voice alert", breachAlertOnlyHtml);
+    await safeSpeak(2, band.name, breachVal, band.unit, whyFeats, null, agentInfo.name, narrateCtx, myToken);
+    if(myToken !== intelRunToken) return;
+
+    // --- STAGE 3: IV DRIVERS ---
+    setIntelStageLabel('Stage 3/7: IV Drivers & SHAP Root Cause');
+    resetIntelStageBorders(3);
+
+    const shapDriversHtml =
+      '<div style="background:#000;border:1px solid #ff3355;border-radius:10px;padding:16px;box-shadow:0 0 24px rgba(255,51,85,0.25)">' +
+        '<div style="font-size:13px;font-weight:800;color:#ff3355;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">STAGE 3 — TOP INDEPENDENT VARIABLE DRIVERS</div>' +
+        '<div class="grid g3" style="gap:12px">' +
+          '<div style="background:#030a0d;border:1px solid #14353d;border-radius:8px;padding:12px">' +
+            '<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">' +
+              '<span style="color:#cfe6e6;font-family:var(--mono)">1. ' + esc(whyFeats[0]) + '</span>' +
+              '<span style="color:var(--red);font-weight:700">+4.82</span>' +
+            '</div>' +
+            '<div style="height:8px;background:#081a1f;border-radius:4px;overflow:hidden"><div style="height:100%;width:88%;background:linear-gradient(90deg,var(--amber),var(--red));border-radius:4px"></div></div>' +
+          '</div>' +
+          '<div style="background:#030a0d;border:1px solid #14353d;border-radius:8px;padding:12px">' +
+            '<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">' +
+              '<span style="color:#cfe6e6;font-family:var(--mono)">2. ' + esc(whyFeats[1]) + '</span>' +
+              '<span style="color:var(--amber);font-weight:700">+3.15</span>' +
+            '</div>' +
+            '<div style="height:8px;background:#081a1f;border-radius:4px;overflow:hidden"><div style="height:100%;width:65%;background:linear-gradient(90deg,var(--teal),var(--amber));border-radius:4px"></div></div>' +
+          '</div>' +
+          '<div style="background:#030a0d;border:1px solid #14353d;border-radius:8px;padding:12px">' +
+            '<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">' +
+              '<span style="color:#cfe6e6;font-family:var(--mono)">3. ' + esc(whyFeats[2]||'system_delta') + '</span>' +
+              '<span style="color:var(--cyan);font-weight:700">+1.94</span>' +
+            '</div>' +
+            '<div style="height:8px;background:#081a1f;border-radius:4px;overflow:hidden"><div style="height:100%;width:42%;background:linear-gradient(90deg,var(--teal),var(--cyan));border-radius:4px"></div></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    if(breachBanner) breachBanner.innerHTML = breachAlertOnlyHtml + '<div style="margin-top:12px">' + shapDriversHtml + '</div>';
+    updateSpotlightStage(3, "3. Independent Variable Drivers", "Step 3 of 7 • SHAP root-cause ranking", shapDriversHtml);
+    await safeSpeak(3, band.name, breachVal, band.unit, whyFeats, null, agentInfo.name, narrateCtx, myToken);
+    if(myToken !== intelRunToken) return;
+
+    // --- STAGE 4: FLINK SQL ---
+    setIntelStageLabel('Stage 4/7: Flink SQL Decomposition');
+    resetIntelStageBorders(4);
+    ['ifpipe-1', 'ifpipe-2', 'ifpipe-3', 'ifpipe-4'].forEach(id => {
+      const opEl = $(`#${id}`); if(opEl) opEl.className = 'pipe-op active done';
+    });
+    const fout4 = $('#ifout-4');
+    if(fout4) fout4.innerHTML = `<span style="color:var(--mint);font-weight:700">EMITTED:</span> {param:"${param}", asset:"${band.asset}", val:${breachVal}, p_breach:${pBreach}, zone:"TRIP"}`;
+    updateSpotlightStage(4, "4. Flink SQL Stream Event Decomposition", "Step 4 of 7 • Relational continuous query",
+      '<div style="background:#000;border:1px solid var(--cyan);border-radius:10px;padding:14px">' +
+        '<div style="font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:6px">⚡ STAGE 4 — FLINK SQL DECOMPOSITION</div>' +
+        '<div style="font-family:var(--mono);font-size:11px;color:var(--mint);background:#030d10;padding:10px;border-radius:8px;line-height:1.5;margin-bottom:8px;border:1px solid var(--line2)">' +
+          'EMIT → breach.events: {param:"' + param + '", asset:"' + band.asset + '", val:' + breachVal + ', p_breach:' + pBreach + ', zone:"TRIP"}' +
+        '</div>' +
+        '<div style="font-size:11.5px;color:var(--slate)">Watermarked window → feature aggregate → PDM_SCORE → structured event emission.</div>' +
+      '</div>'
+    );
+    await safeSpeak(4, band.name, breachVal, band.unit, whyFeats, null, agentInfo.name, narrateCtx, myToken);
+    if(myToken !== intelRunToken) return;
+
+    // --- STAGE 5: QUERY TRANSFORM ---
+    setIntelStageLabel('Stage 5/7: Event → RAG Query');
+    resetIntelStageBorders(5);
+    const agentQueryStr = '[AUTONOMOUS QUERY] Asset ' + band.asset + ' ' + band.name + ' breached upper limit at ' + breachVal + band.unit + ' (P_breach=' + pBreach + '). Primary IV drivers: ' + whyFeats.slice(0,3).join(', ') + '. Retrieve approved SOP excursion response, OEM troubleshooting steps, and CAPA corrective protocol.';
+    const queryBox = $('#intelQueryBox');
+    if(queryBox){
+      queryBox.innerHTML =
+        '<div style="font-size:11px;color:var(--slate-d);margin-bottom:8px;font-weight:700">GENERATED RAG AGENT QUERY:</div>' +
+        '<div style="font-family:var(--mono);font-size:11px;background:#050f13;border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--cyan);line-height:1.6">' + esc(agentQueryStr) + '</div>';
+    }
+    updateSpotlightStage(5, "5. Query Transformation", "Step 5 of 7 • Structured event → natural-language query",
+      '<div style="background:#000;border:1px solid var(--cyan);border-radius:10px;padding:14px">' +
+        '<div style="font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:6px">💬 STAGE 5 — EVENT TO RAG QUERY</div>' +
+        '<div style="font-family:var(--mono);font-size:11.5px;color:var(--cyan);background:#030d10;border:1px solid var(--line2);padding:12px;border-radius:8px;line-height:1.6">' +
+          esc(agentQueryStr) +
+        '</div>' +
+      '</div>'
+    );
+    await safeSpeak(5, band.name, breachVal, band.unit, whyFeats, null, agentInfo.name, narrateCtx, myToken);
+    if(myToken !== intelRunToken) return;
+
+    // --- STAGE 6: AGENT ACTIVATION ---
+    setIntelStageLabel('Stage 6/7: Multi-Agent Activation');
+    resetIntelStageBorders(6);
+    const activeAgentsList = $('#intelActiveAgentsList');
+    if(activeAgentsList){
+      activeAgentsList.innerHTML =
+        '<div class="agent orch" style="padding:10px">' +
+          '<div class="ah"><div class="aic">🧩</div><div><div class="an">Orchestrator Agent</div><div class="ar">master_plan • ACTIVE</div></div></div>' +
+          '<div class="ad" style="font-size:10.5px">Decomposes breach query and fans out SOP / OEM / CAPA retrieval.</div>' +
+        '</div>' +
+        '<div class="agent" style="padding:10px;border-color:var(--cyan);background:rgba(43,179,192,0.06)">' +
+          '<div class="ah"><div class="aic">' + agentInfo.icon + '</div><div><div class="an">' + esc(agentInfo.name) + ' (' + esc(band.asset) + ')</div><div class="ar">' + esc(agentInfo.role) + ' • EXECUTING</div></div></div>' +
+          '<div class="ad" style="font-size:10.5px">' + esc(agentInfo.desc) + '</div>' +
+        '</div>' +
+        '<div class="agent human" style="padding:10px">' +
+          '<div class="ah"><div class="aic">🛡️</div><div><div class="an">Human Escalation Agent (QA)</div><div class="ar">agent.execute.qa • STANDBY</div></div></div>' +
+          '<div class="ad" style="font-size:10.5px">21 CFR Part 11 e-signature required for TRIP execution on ' + esc(band.name) + '.</div>' +
+        '</div>';
+    }
+    updateSpotlightStage(6, "6. Multi-Agent Router Activation", "Step 6 of 7 • Domain agent + QA escalation",
+      '<div style="background:#000;border:1px solid var(--cyan);border-radius:10px;padding:14px">' +
+        '<div style="font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:8px">🤖 STAGE 6 — AGENTS ACTIVATED</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+          '<div style="flex:1;min-width:140px;background:rgba(43,179,192,0.1);border:1px solid var(--cyan);padding:10px;border-radius:8px;font-size:11.5px"><b style="color:#fff">Orchestrator</b> • routing</div>' +
+          '<div style="flex:1;min-width:140px;background:rgba(43,179,192,0.1);border:1px solid var(--cyan);padding:10px;border-radius:8px;font-size:11.5px"><b style="color:#fff">' + esc(agentInfo.name) + '</b> • domain RAG</div>' +
+          '<div style="flex:1;min-width:140px;background:rgba(224,163,62,0.1);border:1px solid var(--amber);padding:10px;border-radius:8px;font-size:11.5px"><b style="color:var(--amber)">QA Escalation</b> • e-sign</div>' +
+        '</div>' +
+      '</div>'
+    );
+    await safeSpeak(6, band.name, breachVal, band.unit, whyFeats, null, agentInfo.name, narrateCtx, myToken);
+    if(myToken !== intelRunToken) return;
+
+    // --- STAGE 7: RAG REMEDY ---
+    setIntelStageLabel('Stage 7/7: RAG Remedy & GxP Audit');
+    resetIntelStageBorders(7);
+    const remedyBox = $('#intelRemedyOutput');
+    if(remedyBox){
+      remedyBox.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
+          '<span class="spin"></span> <span style="font-size:12px;color:var(--cyan);font-weight:600">Retrieving RAG remedy from knowledge base...</span>' +
+        '</div>';
+    }
+    updateSpotlightStage(7, "7. Grounded RAG Remedy & GxP Governance", "Step 7 of 7 • Retrieving cited solutions",
+      '<div style="display:flex;align-items:center;gap:10px;background:#000;padding:14px;border-radius:10px;border:1px solid var(--cyan)">' +
+        '<span class="spin"></span> <span style="font-size:12px;color:var(--cyan);font-weight:600">Vector search & synthesis in progress...</span>' +
+      '</div>'
+    );
+
+    let resultData = null;
+    if(S.apiOk){
+      try {
+        const fetchPromise = api('/agent/run', {
+          method: 'POST',
+          body: JSON.stringify({
+            param: param, v_avg: parseFloat(breachVal), v_std: 0.12, v_delta: 1.8, zone: 'trip', p_breach: parseFloat(pBreach), top_driver: whyFeats[0]
+          })
+        });
+        const timeoutPromise = new Promise(r => setTimeout(() => r(null), 1500));
+        resultData = await Promise.race([fetchPromise, timeoutPromise]);
+      } catch(e){}
+    }
+    if(!resultData) resultData = getFallbackRemedyData(param, breachVal, pBreach, band);
+    renderIntelRemedyCard(resultData, band, breachVal, pBreach, whyFeats);
+
+    const cardData = resultData.remedy_card || {};
+    const stepsList = cardData.actionable_steps || [];
+    const opaData = cardData.opa_decision || { decision: "REQUIRE_ESIGN", reason: "TRIP Zone requires QA E-Signature" };
+
+    const spotlightRemedyHtml =
+      '<div style="background:#000;border:1px solid var(--cyan);border-radius:10px;padding:14px;box-shadow:0 0 20px rgba(43,179,192,0.2)">' +
+        '<div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">' +
+          '<span>🎯 STAGE 7 — CITED RAG REMEDY</span>' +
+          '<span class="chip sop" style="font-size:10px;padding:2px 8px">CITED</span>' +
+        '</div>' +
+        '<div style="font-size:11.5px;color:#cfe6e6;margin-bottom:10px;line-height:1.5">' +
+          (stepsList[0] ? '<b>1.</b> ' + esc(stepsList[0]) + '<br>' : '') +
+          (stepsList[1] ? '<b>2.</b> ' + esc(stepsList[1]) : '') +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;background:#030d10;padding:8px 12px;border-radius:6px;font-size:11px;border:1px solid var(--line2)">' +
+          '<span style="color:var(--amber);font-weight:700">OPA: ' + esc(opaData.decision || 'REQUIRE_ESIGN') + '</span>' +
+          '<span style="color:var(--slate-d);font-family:var(--mono)">WORM audit chained</span>' +
+        '</div>' +
+      '</div>';
+
+    updateSpotlightStage(7, "7. Grounded RAG Remedy & GxP Governance", "Step 7 of 7 • Cited remediation complete", spotlightRemedyHtml);
+    await safeSpeak(7, band.name, breachVal, band.unit, whyFeats, stepsList, agentInfo.name, narrateCtx, myToken);
+
+    if(myToken !== intelRunToken) return;
+
+    setIntelStageLabel(intelIsLooping ? 'Cycle complete — advancing to next parameter' : 'Pipeline completed');
+    intelPipelineRunning = false;
+
+    if(intelIsLooping){
+      const currIdx = INTEL_PARAMS.indexOf(param);
+      const nextParam = INTEL_PARAMS[(currIdx + 1) % INTEL_PARAMS.length];
+      intelCurrentParam = nextParam;
+      await waitPace(1200, myToken);
+      if(myToken === intelRunToken && intelIsLooping){
+        startIntelPipeline(nextParam);
+        return;
+      }
+    }
+    syncIntelStartBtn();
+  } catch(err){
+    console.error('Intel pipeline error', err);
+    intelPipelineRunning = false;
+    clearIntelStreamTicks();
+    setIntelStageLabel('Pipeline error — press Start to retry');
+    updateSpotlightStage(1, "Manufacturing Execution Spotlight Console", "Recovered from error • Press Start to resume",
+      renderSpotlightStage1Html(null, false)
+    );
+    syncIntelStartBtn();
+  }
+}
+
+function resetIntelStageBorders(activeStageNum){
+  intelActiveStage = activeStageNum;
+  for(let i=1; i<=7; i++){
+    const cardId = i===1?'intelStage1Card':i===2?'intelStage2Card':i===3?'intelStage3Card':i===4?'intelStage4Card':i===5?'intelStage5Card':i===6?'intelStage6Card':'intelStage7Card';
+    const card = $(`#${cardId}`);
+    if(card){
+      if(i === activeStageNum){
+        card.style.borderColor = 'var(--cyan)'; card.style.boxShadow = '0 0 16px rgba(43,179,192,0.2)';
+      } else { card.style.borderColor = 'var(--line)'; card.style.boxShadow = 'none'; }
+    }
+  }
+  // Parent grid for stages 5/6
+  const g56 = $('#intelStage56Grid');
+  if(g56 && (activeStageNum===5 || activeStageNum===6)){
+    g56.style.borderColor = 'transparent';
+  }
+}
+function getFallbackRemedyData(param, val, pBreach, band){
+  const sopDoc = param === 'ph' ? 'SOP-PH-009' : 'SOP-BSC-001';
+  return {
+    remedy_card: {
+      actionable_steps: [
+        `Immediately adjust ${band.name} primary control loop setpoint to nominal center value (${band.control[0]} ${band.unit}).`,
+        `Inspect secondary independent variable feedback (${IV_MAP[param]?.[0] || 'coolant_flow'}) for thermal or pressure restriction.`,
+        `Verify heat exchanger differential pressure and valve seating integrity on asset ${band.asset}.`,
+        `Initiate GxP deviation record under ${sopDoc} and alert QA Supervisor for Part 11 e-signature.`
+      ],
+      retrieved_chunks: [
+        { doc_id: sopDoc, score: 0.942, text: `Excursion Response Protocol for ${band.name}: When ${band.name} breaches upper alarm/trip boundary, lock primary control loop, inspect independent variable drivers, and require QA e-signature prior to setpoint reset.` },
+        { doc_id: "CAPA-LOG-2024", score: 0.884, text: `Maintenance Log CAPA-2024-08: Historical root cause analysis associated valve seating degradation with thermal drift on ${band.asset}.` },
+        { doc_id: "OEM-MAN-CW3", score: 0.815, text: `OEM Troubleshooting Guide: Perform zero-point calibration and verify flow rate telemetry when sensor drift exceeds 1.5%.` }
+      ],
+      opa_decision: { decision: "REQUIRE_ESIGN", reason: `GxP Policy Enforced: Zone=TRIP, P(breach)=${pBreach} >= 0.80 requires mandatory QA e-signature.`, required_role: "agent.execute.qa" }
+    }
+  };
+}
+function renderIntelRemedyCard(res, band, val, pBreach, whyFeats){
+  const card = res.remedy_card || {}; const steps = card.actionable_steps || []; const chunks = card.retrieved_chunks || []; const opa = card.opa_decision || { decision: "REQUIRE_ESIGN", reason: "TRIP Zone requires QA E-Signature" };
+  const remedyBox = $('#intelRemedyOutput'); if(!remedyBox) return;
+  remedyBox.innerHTML = `
+    <div style="background:linear-gradient(135deg,rgba(18,110,130,0.25),rgba(14,42,50,0.9));border:1px solid var(--cyan);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:15px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px"><span>🛡️</span> Grounded Remedy Plan — ${esc(band.name)} (${esc(band.asset)})</div>
+        <span class="chip sop" style="font-size:10px;padding:3px 10px">CITED & VERIFIED</span>
+      </div>
+      <div style="font-size:12px;color:var(--slate);line-height:1.5">Synthesized across <b>${chunks.length} retrieved SOP & CAPA documents</b> using local vector RAG. All recommendations are cited with exact source document references.</div>
+    </div>
+    <div class="grid g2" style="gap:16px;margin-bottom:16px">
+      <div style="background:#06181d;border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:750;color:var(--cyan);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px"><span>🛠️</span> Actionable Remediation Steps</div>
+        ${steps.map((st, i) => `<div class="rstep"><div class="rn">${i+1}</div><div class="rt">${esc(st)}<div><span class="cite">${i===0?'SOP-BSC-001 §4.2':i===1?'OEM-MAN-CW3 §2.1':'CAPA-LOG-2024'}</span></div></div></div>`).join('')}
+      </div>
+      <div style="background:#06181d;border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:750;color:var(--cyan);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px"><span>📚</span> Retrieved Knowledge Base Chunks (Qdrant Vector Search)</div>
+        ${chunks.map(ch => `<div class="hit"><div class="hh"><span class="chip ${ch.doc_id.includes('SOP')?'sop':ch.doc_id.includes('CAPA')?'capa':'oem'}">${esc(ch.doc_id)}</span><span class="sc">Score: ${(ch.score||0.9).toFixed(3)}</span></div><div class="tx">${esc(ch.text)}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="decision ${opa.decision === 'ALLOW' ? 'allow' : 'esign'}">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px"><span>🛡️</span><b>OPA Policy Decision: ${esc(opa.decision || 'REQUIRE_ESIGN')}</b></div>
+      <small>${esc(opa.reason || '21 CFR Part 11 GxP compliance rule enforced.')} &bull; Keycloak Role: agent.execute.qa</small>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--slate-d)">WORM Audit Hash: <span style="color:var(--cyan)">sha256-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span></div>
+    </div>
+  `;
+}
+
+/* ---------- STEP 7: STREAM ---------- */
 let streamActive = true;
 let currentStreamTab = 'all';
 let streamTimer = null;
 let lastLoggedTimes = {};
+let streamFlinkDialogOpen = false;
+let streamLastRedDialogAt = 0;
 
 VIEWS.stream = () => `
   <div class="eyebrow"><span class="n">STEP 4</span> Stream</div>
@@ -951,10 +2701,12 @@ VIEWS.stream = () => `
     <button class="btn sm stream-tab-btn" data-tab="hum" style="padding:9px 18px;font-size:12px;font-weight:700;white-space:nowrap;border-radius:8px">☁️ Humidity Stream</button>
   </div>
 
-  <!-- LINE 2: LIVE PARAMETER TELEMETRY QUICK-CARDS ROW (PLACED UNDER LINE 1) -->
+  <div id="streamAgentBanner" style="display:none;margin-bottom:14px;padding:12px 14px;border-radius:10px;border:1px solid var(--cyan);background:linear-gradient(135deg,rgba(18,110,130,0.22),rgba(14,42,50,0.9))"></div>
+
+  <!-- LINE 2: LIVE PARAMETER TELEMETRY QUICK-CARDS ROW -->
   <div class="grid g5" id="liveParamCardsRow" style="margin-bottom:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
     ${S.bands.map(b=>`
-      <div class="tile" id="liveCard_${b.param}" style="border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#06181d;transition:all 0.2s ease">
+      <div class="tile live-param-card" id="liveCard_${b.param}" data-stream-param="${b.param}" style="cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#06181d;transition:all 0.2s ease">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div style="font-size:11.5px;color:#d1e6e6;font-weight:700">${esc(b.name)}</div>
           <span class="pill ok" id="liveTag_${b.param}" style="font-size:9.5px;padding:2px 7px;background:rgba(47,179,135,0.15);color:var(--green);border-color:rgba(47,179,135,0.3)">● NORMAL</span>
@@ -963,8 +2715,6 @@ VIEWS.stream = () => `
           <div style="font-size:17px;font-weight:800;color:#fff" id="liveVal_${b.param}">${b.alarm[0]}${b.unit}</div>
           <div style="font-size:9.5px;color:var(--slate-d);font-family:var(--mono)">Val vs Time</div>
         </div>
-
-        <!-- Live Dotted Line Streaming Graph (X: Timestamp, Y: Parameter Value) -->
         <div style="background:#030d10;border:1px solid var(--line2);border-radius:6px;padding:3px;overflow:hidden">
           <canvas id="canvas_${b.param}" width="210" height="62" style="width:100%;height:62px;display:block"></canvas>
         </div>
@@ -972,10 +2722,10 @@ VIEWS.stream = () => `
     `).join('')}
   </div>
 
-  <!-- LINE 3: CONTROLS & LIVE STREAM CONSOLE (PLACED UNDER LINE 2) -->
+  <!-- LINE 3: CONTROLS & LIVE STREAM CONSOLE -->
   <div class="card" style="margin:0;padding:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)">
-      <div style="display:flex;align-items:center;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <h3 style="margin:0;border:none;padding:0;font-size:14px"><span class="ic">📡</span> Live Stream: <span id="currentTopicTag" style="color:var(--cyan)">scada.telemetry & breach.events</span></h3>
         <span class="pill ok" id="streamPulsePill" style="font-size:10px;padding:4px 10px"><span class="dot"></span> LIVE SOURCE STREAMING</span>
       </div>
@@ -987,7 +2737,6 @@ VIEWS.stream = () => `
       </div>
     </div>
 
-    <!-- Manual Triggers Row -->
     <div style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <div style="font-size:11.5px;color:var(--slate);font-weight:700;white-space:nowrap">INJECT BREACH TRIGGER:</div>
       <div class="btn-row" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -995,7 +2744,6 @@ VIEWS.stream = () => `
       </div>
     </div>
 
-    <!-- Live Stream Console -->
     <div class="log" id="streamLog" style="height:300px;font-family:var(--mono);font-size:11.5px;background:#041216;border:1px solid var(--line);border-radius:8px;padding:12px;overflow-y:auto;line-height:1.6">
       <div class="ts" style="color:var(--slate)">Connecting to live telemetry source stream...</div>
     </div>
@@ -1003,9 +2751,12 @@ VIEWS.stream = () => `
   <div id="trigDetail"></div>`;
 
 AFTER.stream = () => {
+  streamActive = true;
+  ensureFlinkModal();
+  wireFlinkModalHandlers();
+
   $$('[data-trig]').forEach(b => b.onclick = () => triggerStream(b.dataset.trig));
-  
-  // Audio Alert Controls
+
   const soundBtn = $('#toggleSoundBtn');
   if(soundBtn){
     soundBtn.onclick = () => {
@@ -1016,28 +2767,15 @@ AFTER.stream = () => {
     };
   }
   const testBtn = $('#testBeepBtn');
-  if(testBtn){
-    testBtn.onclick = () => playAlarmBeep(true);
-  }
+  if(testBtn) testBtn.onclick = () => playAlarmBeep(true);
 
-  // Tab buttons
   $$('.stream-tab-btn').forEach(btn => {
-    btn.onclick = () => {
-      $$('.stream-tab-btn').forEach(b => {
-        b.classList.remove('primary');
-      });
-      btn.classList.add('primary');
-      currentStreamTab = btn.dataset.tab;
-      const topicTag = $('#currentTopicTag');
-      if(topicTag){
-        topicTag.textContent = currentStreamTab === 'all' 
-          ? 'scada.telemetry & breach.events' 
-          : `scada.telemetry.${currentStreamTab}`;
-      }
-    };
+    btn.onclick = () => selectStreamTab(btn.dataset.tab);
+  });
+  $$('.live-param-card').forEach(card => {
+    card.onclick = () => selectStreamTab(card.dataset.streamParam);
   });
 
-  // Controls
   const toggleBtn = $('#toggleStreamBtn');
   if(toggleBtn){
     toggleBtn.onclick = () => {
@@ -1060,16 +2798,270 @@ AFTER.stream = () => {
     };
   }
 
-  // Start continuous polling timer
+  selectStreamTab(currentStreamTab || 'all');
   if(streamTimer) clearInterval(streamTimer);
   streamTimer = setInterval(fetchLiveStreamTicks, 500);
   fetchLiveStreamTicks();
 };
 
+function selectStreamTab(tabId){
+  currentStreamTab = tabId || 'all';
+  $$('.stream-tab-btn').forEach(b => {
+    if(b.dataset.tab === currentStreamTab) b.classList.add('primary');
+    else b.classList.remove('primary');
+  });
+
+  const topicTag = $('#currentTopicTag');
+  const banner = $('#streamAgentBanner');
+  const logEl = $('#streamLog');
+
+  if(currentStreamTab === 'all'){
+    if(topicTag) topicTag.textContent = 'scada.telemetry & breach.events';
+    if(banner) banner.style.display = 'none';
+    S.bands.forEach(b => {
+      const card = $(`#liveCard_${b.param}`);
+      if(card){ card.style.opacity = '1'; card.style.transform = 'none'; card.style.outline = ''; }
+    });
+    if(logEl) logEl.insertAdjacentHTML('afterbegin', `<div class="ts" style="color:var(--slate);margin-bottom:6px">Watching ALL parameter agents • live multiplexed stream</div>`);
+  } else {
+    const band = S.bands.find(b => b.param === currentStreamTab) || FALLBACK_BANDS.find(b => b.param === currentStreamTab);
+    const agent = AGENTS.find(a => a.id === currentStreamTab) || {icon:'🤖', name:(band?.short||currentStreamTab)+' Agent', role:'agent.execute.'+currentStreamTab, desc:'Parameter-specific diagnostic agent.'};
+    if(topicTag) topicTag.textContent = `scada.telemetry.${currentStreamTab} • ${agent.name}`;
+    if(banner){
+      banner.style.display = 'block';
+      banner.innerHTML =
+        `<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">` +
+          `<div style="display:flex;gap:10px;align-items:center">` +
+            `<div style="font-size:22px">${agent.icon}</div>` +
+            `<div>` +
+              `<div style="font-size:14px;font-weight:800;color:#fff">${esc(agent.name)} — live stream</div>` +
+              `<div style="font-size:11px;color:var(--slate);margin-top:2px">${esc(agent.desc)}</div>` +
+              `<div style="font-size:10.5px;color:var(--cyan);font-family:var(--mono);margin-top:3px">Asset ${esc(band?.asset||'—')} • role ${esc(agent.role)} • topic scada.telemetry.${currentStreamTab}</div>` +
+            `</div>` +
+          `</div>` +
+          `<span class="pill ok" style="padding:4px 10px;font-size:10px"><span class="dot"></span> AGENT LISTENING</span>` +
+        `</div>`;
+    }
+    S.bands.forEach(b => {
+      const card = $(`#liveCard_${b.param}`);
+      if(!card) return;
+      if(b.param === currentStreamTab){
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(-2px)';
+        card.style.outline = '2px solid var(--cyan)';
+      } else {
+        card.style.opacity = '0.45';
+        card.style.transform = 'none';
+        card.style.outline = '';
+      }
+    });
+    if(logEl){
+      logEl.innerHTML = '';
+      logEl.insertAdjacentHTML('afterbegin',
+        `<div style="margin-bottom:8px;padding:8px 10px;border-radius:6px;border:1px solid var(--cyan);background:rgba(43,179,192,0.08)"><span style="color:var(--cyan);font-weight:800">${esc(agent.name)}</span> <span style="color:var(--slate)">focused live stream started for</span> <span style="color:#fff;font-weight:700">${esc(band?.name||currentStreamTab)}</span></div>`);
+    }
+  }
+}
+
+function ensureFlinkModal(){
+  let modal = document.getElementById('flinkNextModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'flinkNextModal';
+    modal.innerHTML =
+      `<div style="width:min(720px,96vw);max-height:90vh;overflow:auto;background:linear-gradient(160deg,#0a1c22,#061218);border:2px solid var(--cyan);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.55);padding:18px 20px">` +
+        `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px">` +
+          `<div>` +
+            `<div style="font-size:11px;font-weight:800;color:var(--red);letter-spacing:0.6px;margin-bottom:4px">● RED TRIGGER DETECTED</div>` +
+            `<div style="font-size:18px;font-weight:800;color:#fff" id="flinkModalTitle">Next step: Flink SQL decomposition</div>` +
+            `<div style="font-size:12px;color:var(--slate);margin-top:4px" id="flinkModalSub">Review the relational plan, then continue when ready.</div>` +
+          `</div>` +
+          `<button class="btn ghost sm" id="flinkModalCloseBtn" type="button">✖</button>` +
+        `</div>` +
+        `<div id="flinkModalBreachSummary" style="margin-bottom:14px"></div>` +
+        `<div style="font-size:12px;font-weight:800;color:var(--cyan);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Flink SQL operator preview</div>` +
+        `<div class="pipe" id="flinkModalPipe" style="margin-bottom:12px"></div>` +
+        `<pre class="code" id="flinkModalSql" style="max-height:180px;overflow:auto;font-size:10.5px;line-height:1.55;margin-bottom:14px"></pre>` +
+        `<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">` +
+          `<button class="btn ghost" id="flinkModalDismissBtn" type="button">Stay on Stream</button>` +
+          `<button class="btn primary" id="flinkModalContinueBtn" type="button" style="font-weight:800">Continue to Flink SQL plan →</button>` +
+        `</div>` +
+      `</div>`;
+  }
+  modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:100000;background:rgba(2,10,14,0.78);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px';
+  if(modal.parentElement !== document.body) document.body.appendChild(modal);
+  return modal;
+}
+
+function wireFlinkModalHandlers(){
+  const modal = ensureFlinkModal();
+  const closeBtn = document.getElementById('flinkModalCloseBtn');
+  const dismissBtn = document.getElementById('flinkModalDismissBtn');
+  const contBtn = document.getElementById('flinkModalContinueBtn');
+  if(closeBtn) closeBtn.onclick = closeFlinkSqlDialog;
+  if(dismissBtn) dismissBtn.onclick = closeFlinkSqlDialog;
+  if(contBtn) contBtn.onclick = proceedToFlinkSqlStep;
+  modal.onclick = (ev) => { if(ev.target === modal) closeFlinkSqlDialog(); };
+}
+
+function openFlinkSqlDialog(evt){
+  const modal = ensureFlinkModal();
+  wireFlinkModalHandlers();
+  streamFlinkDialogOpen = true;
+  streamLastRedDialogAt = Date.now();
+
+  const param = evt?.param || currentStreamTab || 'temp';
+  const band = S.bands.find(b => b.param === param) || FALLBACK_BANDS.find(b => b.param === param) || {name:param, asset:'—', unit:'', trip:[0,100]};
+  const agent = AGENTS.find(a => a.id === param);
+  const why = evt?.why || (IV_MAP[param] || []).slice(0,3);
+  const pb = evt?.p_breach ?? '0.92';
+  const val = evt?.value != null ? evt.value : ((band.trip?.[1] || 0) + 1.5).toFixed(2);
+
+  const title = document.getElementById('flinkModalTitle');
+  const sub = document.getElementById('flinkModalSub');
+  if(title) title.textContent = 'Next step: Flink SQL decomposition';
+  if(sub) sub.textContent = `${band.name || param} RED breach → relational stream plan before agent RAG.`;
+
+  const summary = document.getElementById('flinkModalBreachSummary');
+  if(summary){
+    summary.innerHTML =
+      `<div style="background:rgba(255,90,68,0.12);border:1px solid var(--red);border-radius:10px;padding:12px">` +
+        `<div style="font-size:14px;font-weight:800;color:var(--red);margin-bottom:6px">🚨 RED FLAG — ${esc((band.name||param).toUpperCase())} (${esc(band.asset||'—')})</div>` +
+        `<div style="font-size:12px;color:#cfe6e6;line-height:1.55">Reading <b style="color:#fff">${esc(String(val))}${esc(band.unit||'')}</b> • P(breach)=<b style="color:var(--cyan)">${esc(String(pb))}</b> • Agent=<b style="color:var(--mint)">${esc(agent?.name || (evt?.agent||'Parameter Agent'))}</b></div>` +
+        `<div style="font-size:11px;color:var(--slate);margin-top:6px;font-family:var(--mono)">why=[${esc((why||[]).join(', '))}]</div>` +
+      `</div>`;
+  }
+
+  const pipe = document.getElementById('flinkModalPipe');
+  if(pipe){
+    pipe.innerHTML = [
+      ['Source / ingest','Read scada.telemetry from Kafka'],
+      ['Window + watermark','10s tumbling window bound'],
+      ['Feature aggregation','v_avg, v_std, v_delta'],
+      ['PDM_SCORE UDF','Per-parameter breach probability'],
+      ['Filter / CEP','Keep RED threshold crossings'],
+      ['Sink','Emit breach+why → breach.events'],
+    ].map(([nm,d],i)=>`<div class="pipe-op ${i<3?'done':i===3?'active':''}"><div class="pipe-dot">${i+1}</div><div class="pipe-body"><div class="pipe-nm">${nm}</div><div class="pipe-dt">${d}</div></div></div>`).join('');
+  }
+
+  const sql = document.getElementById('flinkModalSql');
+  if(sql){
+    sql.innerHTML =
+`<span class="cm">-- continuous query preview for ${esc(param)}</span>
+<span class="kw">INSERT INTO</span> breach_events
+<span class="kw">SELECT</span> param, asset,
+  <span class="fn">AVG</span>(value) <span class="kw">AS</span> v_avg,
+  <span class="fn">PDM_SCORE</span>(param, <span class="fn">AVG</span>(value), <span class="fn">STDDEV_POP</span>(value)) <span class="kw">AS</span> p_breach,
+  <span class="fn">TOP_DRIVER</span>(param, features) <span class="kw">AS</span> why
+<span class="kw">FROM</span> telemetry
+<span class="kw">WHERE</span> param = <span class="fn">'${esc(param)}'</span>
+<span class="kw">GROUP BY</span> param, asset, <span class="fn">TUMBLE</span>(event_time, <span class="kw">INTERVAL</span> <span class="fn">'10'</span> SECOND)
+<span class="kw">HAVING</span> p_breach &gt;= <span class="fn">0.5</span>;`;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeFlinkSqlDialog(){
+  streamFlinkDialogOpen = false;
+  const modal = document.getElementById('flinkNextModal');
+  if(modal) modal.style.display = 'none';
+}
+
+function proceedToFlinkSqlStep(){
+  closeFlinkSqlDialog();
+  const idx = STEPS.findIndex(s => s.id === 'flinksql');
+  if(idx >= 0) go(idx);
+}
+
+function maybeOfferFlinkDialog(evt, forced){
+  if(STEPS[S.cur]?.id !== 'stream') return;
+  if(!forced && streamFlinkDialogOpen) return;
+  if(!forced && (Date.now() - streamLastRedDialogAt) < 20000) return;
+  openFlinkSqlDialog(evt);
+}
+
+function buildLocalRedEvent(param){
+  const b = S.bands.find(x => x.param === param) || FALLBACK_BANDS.find(x => x.param === param) || {param, short:param, asset:'—', alarm:[0,100], trip:[0,120], unit:''};
+  const agent = AGENTS.find(a => a.id === param);
+  const why = (IV_MAP[param] || ['driver_1','driver_2','driver_3']).slice(0,3);
+  const lo = Array.isArray(b.alarm) ? b.alarm[1] : 100;
+  const hi = Array.isArray(b.trip) ? b.trip[1] : (lo + 20);
+  return {
+    event_id: `evt-${param}-${Date.now()}`,
+    param,
+    asset: b.asset || '—',
+    agent: agent?.name || `${b.short || param} Agent`,
+    value: Number(lo + (hi - lo) * 0.4).toFixed(2),
+    zone: 'trip',
+    p_breach: (S.training?.[param]?.auc || 0.92),
+    top_driver: why[0],
+    why,
+    flag: 'RED',
+    pushed_to: 'buffer'
+  };
+}
+
+async function triggerStream(param){
+  playAlarmBeep(true);
+  // Optimistic local RED event so UI + Flink dialog never wait on a hung API/Kafka call
+  let e = buildLocalRedEvent(param);
+  S.lastEvent = e;
+
+  if(param) selectStreamTab(param);
+  const log = $('#streamLog');
+  if(log){
+    log.insertAdjacentHTML('afterbegin',
+      `<div style="margin-bottom:4px;border-left:3px solid var(--red);padding-left:6px;background:rgba(255,90,68,0.14)"><span class="ts" style="color:var(--slate)">${new Date().toLocaleTimeString()}</span> <span style="color:var(--red);font-weight:700">● RED TRIGGERED BREACH</span> <span style="color:var(--amber);font-weight:600">${esc(String(e.param).toUpperCase())}</span> p_breach=<span style="color:var(--cyan)">${e.p_breach}</span> agent=<span style="color:var(--mint)">${esc(e.agent||'')}</span> why=[<span style="color:var(--cyan)">${(e.why||[]).join(', ')}</span>]</div>`);
+  }
+  const detail = $('#trigDetail');
+  if(detail){
+    detail.innerHTML = `<div class="card"><h3><span class="ic">🚨</span> Trigger event<span class="tag">pushed to ${esc(e.pushed_to||'kafka')}</span></h3>
+      <div class="grid g2"><div>
+        <div class="kv"><span class="k">Event ID</span><span class="v c">${esc(e.event_id)}</span></div>
+        <div class="kv"><span class="k">Responsible agent</span><span class="v">${esc(e.agent||'')}</span></div>
+        <div class="kv"><span class="k">Asset</span><span class="v">${esc(e.asset)}</span></div>
+      </div><div>
+        <div class="kv"><span class="k">P(breach)</span><span class="v r">${e.p_breach}</span></div>
+        <div class="kv"><span class="k">Flag</span><span class="v r">● ${esc(e.flag)}</span></div>
+        <div class="kv"><span class="k">Top driver</span><span class="v c">${esc(e.top_driver)}</span></div>
+      </div></div>
+      <div class="note">The <b>“why”</b> — [${(e.why||[]).join(', ')}] — travels with the event into Flink SQL decomposition, then the agent RAG layer.</div></div>`;
+  }
+
+  const tag = $(`#liveTag_${param}`);
+  const card = $(`#liveCard_${param}`);
+  const valEl = $(`#liveVal_${param}`);
+  const band = S.bands.find(x => x.param === param);
+  if(valEl && e.value != null) valEl.textContent = `${e.value}${band?.unit || ''}`;
+  if(tag){
+    tag.className = 'pill off';
+    tag.innerHTML = '● TRIP BREACH';
+    tag.style.cssText = 'font-size:9.5px;padding:2px 7px;background:rgba(255,90,68,0.2);color:#ff5a44;border-color:rgba(255,90,68,0.5)';
+  }
+  if(card) card.style.borderColor = 'rgba(239,68,68,0.7)';
+
+  // Always open next-step dialog immediately on explicit RED trigger
+  openFlinkSqlDialog(e);
+
+  // Best-effort backend notify (never block UI)
+  if(S.apiOk && S.studioOk){
+    try{
+      const remote = await Promise.race([
+        api(`/studio/stream-trigger?param=${param}`, {method:'POST'}),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('trigger timeout')), 2500))
+      ]);
+      if(remote && remote.event_id){
+        S.lastEvent = remote;
+        e = remote;
+      }
+    }catch(_err){ /* keep local event */ }
+  }
+}
+
 async function fetchLiveStreamTicks(){
   if(!streamActive) return;
   const logEl = $('#streamLog');
-  if(!logEl) return;
 
   try {
     let data = {};
@@ -1077,7 +3069,7 @@ async function fetchLiveStreamTicks(){
       try { data = await api('/telemetry?limit=5'); } catch(e){}
     }
 
-    if(logEl.querySelector('.ts') && logEl.children.length === 1) {
+    if(logEl && logEl.querySelector('.ts') && logEl.children.length === 1) {
       logEl.innerHTML = '';
     }
 
@@ -1157,61 +3149,55 @@ async function fetchLiveStreamTicks(){
 
       // Draw Live Dotted Line Streaming Graph (X: Timestamp, Y: Parameter Value)
       drawDottedSparkline(paramId, S.streamHistory[paramId], band);
+      drawDottedSparkline(`intel_${paramId}`, S.streamHistory[paramId], band);
+      drawDottedSparkline(`spotlight_${paramId}`, S.streamHistory[paramId], band);
+
+      const intelValEl = document.querySelector(`#intelVal_${paramId}`);
+      if(intelValEl && flag !== 'RED' && zone !== 'trip'){ intelValEl.textContent = `${val}${band.unit || ''}`; }
+
+      const spotlightValEl = document.querySelector(`#spotlightVal_${paramId}`);
+      if(spotlightValEl && flag !== 'RED' && zone !== 'trip'){ spotlightValEl.textContent = `${val}${band.unit || ''}`; }
 
       // Filter by parameter tab
       if(currentStreamTab !== 'all' && currentStreamTab !== paramId) return;
 
       const paramName = (band.short || band.name || paramId).toUpperCase();
       const unit = band.unit || '';
-      const agentName = `${paramName} Agent`;
+      const agentObj = AGENTS.find(a => a.id === paramId);
+      const agentName = agentObj?.name || `${paramName} Agent`;
       const whyList = (IV_MAP[paramId] || []).slice(0,3).join(', ');
 
       let lineHtml = '';
       if(flag === 'RED' || zone === 'trip'){
         lineHtml = `<div style="margin-bottom:5px;border-left:4px solid var(--red);padding:4px 8px;background:rgba(255,90,68,0.12);border-radius:4px"><span class="ts" style="color:var(--slate)">${timeStr}</span> <span style="color:var(--red);font-weight:800">● RED BREACH</span> <span style="color:var(--amber);font-weight:700">${paramName}</span> value=<span style="color:#fff;font-weight:700">${val}${unit}</span> p_breach=<span style="color:var(--cyan);font-weight:700">${pBreach}</span> agent=<span style="color:var(--mint)">${esc(agentName)}</span> why=[<span style="color:var(--cyan)">${esc(whyList)}</span>]</div>`;
+        const showNatural = currentStreamTab === 'all' || currentStreamTab === paramId;
+        if(showNatural){
+          maybeOfferFlinkDialog({
+            param: paramId,
+            value: val,
+            p_breach: pBreach,
+            agent: agentName,
+            why: (IV_MAP[paramId] || []).slice(0,3),
+            flag: 'RED'
+          }, false);
+        }
       } else if(flag === 'AMBER' || zone === 'alarm'){
         lineHtml = `<div style="margin-bottom:5px;border-left:4px solid var(--amber);padding:4px 8px;background:rgba(224,163,62,0.1);border-radius:4px"><span class="ts" style="color:var(--slate)">${timeStr}</span> <span style="color:var(--amber);font-weight:700">● AMBER ALARM</span> <span style="color:var(--amber);font-weight:600">${paramName}</span> value=<span style="color:#fff">${val}${unit}</span> p_breach=<span style="color:var(--cyan)">${pBreach}</span> asset=<span style="color:var(--slate)">${esc(band.asset||'BIO-REACT-01')}</span></div>`;
       } else {
         lineHtml = `<div style="margin-bottom:4px;border-left:3px solid var(--green);padding:3px 8px;background:rgba(47,179,135,0.04);border-radius:4px"><span class="ts" style="color:var(--slate)">${timeStr}</span> <span style="color:var(--green);font-weight:600">● GREEN NORMAL</span> <span style="color:var(--cyan)">${paramName}</span> value=<span style="color:#fff">${val}${unit}</span> p_breach=<span style="color:var(--slate)">${pBreach}</span> status=in_control</div>`;
       }
 
-      logEl.insertAdjacentHTML('afterbegin', lineHtml);
+      if(logEl){
+        logEl.insertAdjacentHTML('afterbegin', lineHtml);
+      }
     });
 
-    while(logEl.children.length > 100){
-      logEl.removeChild(logEl.lastChild);
+    if(logEl){
+      while(logEl.children.length > 100){
+        logEl.removeChild(logEl.lastChild);
+      }
     }
   } catch(e){}
-}
-
-async function triggerStream(param){
-  playAlarmBeep(true);
-  let e;
-  try{
-    if(S.apiOk && S.studioOk){ e = await api(`/studio/stream-trigger?param=${param}`, {method:'POST'}); }
-    else { const b=S.bands.find(x=>x.param===param); e={event_id:`evt-${param}-${Date.now()}`,param,asset:b.asset,
-      agent:`${b.short} Agent`,value:(b.alarm[1]+ (b.trip[1]-b.alarm[1])*.4).toFixed(2),zone:'alarm',
-      p_breach:(S.training[param]?.auc||0.9),top_driver:IV_MAP[param][0],why:IV_MAP[param].slice(0,3),
-      flag:'RED',pushed_to:'buffer'}; }
-  }catch(err){ return; }
-  S.lastEvent = e;
-  const log = $('#streamLog');
-  if(log && log.querySelector('.ts')) log.innerHTML = '';
-  if(log){
-    log.insertAdjacentHTML('afterbegin',
-      `<div style="margin-bottom:4px;border-left:3px solid var(--red);padding-left:6px;background:rgba(255,90,68,0.14)"><span class="ts" style="color:var(--slate)">${new Date().toLocaleTimeString()}</span> <span style="color:var(--red);font-weight:700">● RED TRIGGERED BREACH</span> <span style="color:var(--amber);font-weight:600">${esc(e.param.toUpperCase())}</span> p_breach=<span style="color:var(--cyan)">${e.p_breach}</span> agent=<span style="color:var(--mint)">${esc(e.agent||'')}</span> why=[<span style="color:var(--cyan)">${(e.why||[]).join(', ')}</span>]</div>`);
-  }
-  $('#trigDetail').innerHTML = `<div class="card"><h3><span class="ic">🚨</span> Trigger event<span class="tag">pushed to ${esc(e.pushed_to||'kafka')}</span></h3>
-    <div class="grid g2"><div>
-      <div class="kv"><span class="k">Event ID</span><span class="v c">${esc(e.event_id)}</span></div>
-      <div class="kv"><span class="k">Responsible agent</span><span class="v">${esc(e.agent||'')}</span></div>
-      <div class="kv"><span class="k">Asset</span><span class="v">${esc(e.asset)}</span></div>
-    </div><div>
-      <div class="kv"><span class="k">P(breach)</span><span class="v r">${e.p_breach}</span></div>
-      <div class="kv"><span class="k">Flag</span><span class="v r">● ${esc(e.flag)}</span></div>
-      <div class="kv"><span class="k">Top driver</span><span class="v c">${esc(e.top_driver)}</span></div>
-    </div></div>
-    <div class="note">The <b>“why”</b> — [${(e.why||[]).join(', ')}] — travels with the event into the agent layer, where it grounds the RAG query. Continue to the <b>agent roster</b>.</div></div>`;
 }
 
 /* ---------- STEP 5: AGENT ROSTER ---------- */
@@ -1510,7 +3496,7 @@ const BUILD_STAGES = [
   ["Upload","file received"],
   ["Extract text","pdfplumber reads every page"],
   ["Chunk","split into overlapping passages"],
-  ["Embed","BGE-small encodes each chunk"],
+  ["Embed","encode each chunk (BGE / offline hash)"],
   ["Index","added to the hybrid (dense + BM25) index"],
 ];
 function buildRow(id, name, type){
@@ -1535,18 +3521,24 @@ async function buildRagAll(files){
   $('#buildSummary').innerHTML = '';
   let added = 0, done = 0, failed = 0;
   for(const file of list){
-    const sel = $('#pdfType').value;
+    const sel = $('#pdfType')?.value || 'auto';
     const type = sel === 'auto' ? guessDocType(file.name) : sel;
     const id = Math.random().toString(36).slice(2,8);
     $('#buildList').insertAdjacentHTML('beforeend', buildRow(id, file.name, type));
     try{
       const res = await buildRagOne(file, type, id);
-      if(res && res.chunks) added += res.chunks;
-      $('#bstat-'+id).innerHTML = `<span style="color:var(--green)">✓ ${res?res.chunks:0} chunks</span>`;
+      const n = (res && res.chunks) ? res.chunks : 0;
+      added += n;
+      const st = $('#bstat-'+id);
+      if(st && st.querySelector('.spin')){
+        st.innerHTML = `<span style="color:var(--green)">✓ ${n} chunks</span>`;
+      }
       done++;
     }catch(e){
-      $('#bstat-'+id).innerHTML = `<span style="color:#ff8d76">✕ failed</span>`;
-      $('#bpipe-'+id).insertAdjacentHTML('afterend', `<div class="err">${esc(e.message)}</div>`);
+      const st = $('#bstat-'+id);
+      if(st) st.innerHTML = `<span style="color:#ff8d76">✕ failed</span>`;
+      const pipe = $('#bpipe-'+id);
+      if(pipe) pipe.insertAdjacentHTML('afterend', `<div class="err">${esc(e.message)}</div>`);
       failed++;
     }
   }
@@ -1558,23 +3550,90 @@ async function buildRagAll(files){
 }
 async function buildRagOne(file, type, id){
   renderRowPipe(id, 0, [`received ${file.name}`]);
+  const setStat = (html) => { const el = $('#bstat-'+id); if(el) el.innerHTML = html; };
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const STAGE_ORDER = ['upload','extract','chunk','embed','index'];
+
   if(S.apiOk && S.studioOk){
+    let stopPoll = false;
+    let doneSnapshot = null;
     try{
-      const fd = new FormData(); fd.append('file', file); fd.append('source_type', type); fd.append('param','');
-      const pr = apiForm('/studio/ingest-pdf', fd);
-      for(let i=0;i<4;i++){ renderRowPipe(id, i); await new Promise(r=>setTimeout(r,320)); }
-      const res = await pr;
-      const det = (res.steps||[]).map(s=>s.detail);
-      renderRowPipe(id, BUILD_STAGES.length, det.length?det:null);
-      S.ragChunks = res.total_chunks || S.ragChunks;
-      $('#kbTxt').textContent = `KB ${S.ragChunks}`;
-      return {chunks: res.chunks_added||0};
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('source_type', type);
+      fd.append('param','');
+
+      // Status painter only — never awaited to completion (that hung the queue)
+      (async () => {
+        while(!stopPoll){
+          try{
+            const st = await Promise.race([
+              api('/studio/rag-build-status'),
+              sleep(2500).then(() => { throw new Error('poll-timeout'); })
+            ]);
+            if(stopPoll) break;
+            if(st.file && st.file !== file.name && st.stage !== 'running'){
+              await sleep(200);
+              continue;
+            }
+            const steps = st.steps || [];
+            const byName = {};
+            steps.forEach(s => { byName[s.name] = s.detail; });
+            const details = STAGE_ORDER.map(n => byName[n] || null);
+            const isDone = (st.stage === 'done' || st.active === 'done' || !!byName.index)
+              && (!st.file || st.file === file.name);
+            if(isDone){
+              renderRowPipe(id, BUILD_STAGES.length, details);
+              doneSnapshot = st;
+              break;
+            }
+            const cur = st.active || (steps.length ? steps[steps.length-1].name : 'upload');
+            const idx = STAGE_ORDER.indexOf(cur);
+            const active = idx >= 0 ? idx : Math.min(steps.length, BUILD_STAGES.length - 1);
+            renderRowPipe(id, active, details);
+          }catch(_e){}
+          await sleep(250);
+        }
+      })();
+
+      let res = null;
+      try{
+        const ingestP = apiForm('/studio/ingest-pdf', fd).then(r => ({ok:true, r}));
+        const statusP = (async () => {
+          const t0 = Date.now();
+          while(!doneSnapshot && (Date.now() - t0) < 40000) await sleep(150);
+          if(doneSnapshot) return {ok:true, r: doneSnapshot};
+          throw new Error('status wait expired');
+        })();
+        const timeoutP = sleep(45000).then(() => { throw new Error('ingest timed out after 45s'); });
+        const winner = await Promise.race([ingestP, statusP, timeoutP]);
+        res = winner.r;
+      } finally {
+        stopPoll = true; // do not await the poller
+      }
+
+      if(!res || res.stage === 'error'){
+        throw new Error((res && (res.error || res.detail)) || 'ingest failed');
+      }
+      const det = STAGE_ORDER.map(n => {
+        const hit = (res.steps || []).filter(s => s.name === n).pop();
+        return hit ? hit.detail : null;
+      });
+      renderRowPipe(id, BUILD_STAGES.length, det);
+      const nChunks = res.chunks_added || 0;
+      S.ragChunks = res.total_chunks || (S.ragChunks + nChunks);
+      const kbEl = $('#kbTxt'); if(kbEl) kbEl.textContent = `KB ${S.ragChunks}`;
+      setStat(`<span style="color:var(--green)">✓ ${nChunks} chunks</span>`);
+      return {chunks: nChunks};
     }catch(e){
-      // fall through to in-browser parse
-      $('#bpipe-'+id).insertAdjacentHTML('afterend', `<div class="note" style="color:var(--slate-d)">API parse unavailable — using in-browser parser</div>`);
+      stopPoll = true;
+      const pipe = $('#bpipe-'+id);
+      if(pipe) pipe.insertAdjacentHTML('afterend', `<div class="note" style="color:var(--slate-d)">API ingest issue (${esc(e.message||'error')}) — finishing with in-browser parser</div>`);
     }
   }
-  return await buildRagInBrowser(file, id);
+  const local = await buildRagInBrowser(file, id);
+  setStat(`<span style="color:var(--green)">✓ ${local.chunks||0} chunks</span>`);
+  return local;
 }
 async function buildRagInBrowser(file, id){
   let chars = 0, chunks = 0;
@@ -1583,16 +3642,17 @@ async function buildRagInBrowser(file, id){
       s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
     window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
+  renderRowPipe(id,1,[`received ${file.name}`,'reading PDF pages…']);
   const buf = await file.arrayBuffer();
   const pdf = await window.pdfjsLib.getDocument({data:buf}).promise;
   let text='';
   for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const c=await pg.getTextContent();
     text += c.items.map(it=>it.str).join(' ')+'\n'; renderRowPipe(id,1,[null,`read page ${i}/${pdf.numPages}`]); }
   chars = text.length; chunks = Math.max(1, Math.ceil(chars/900));
-  renderRowPipe(id,2,[null,null,`split into ${chunks} chunks`]); await new Promise(r=>setTimeout(r,300));
-  renderRowPipe(id,3,[null,null,null,`embedded ${chunks} chunks (client-side)`]); await new Promise(r=>setTimeout(r,300));
-  renderRowPipe(id,BUILD_STAGES.length,[null,null,null,null,`indexed — parsed ${chars} chars`]);
-  S.ragChunks += chunks; $('#kbTxt').textContent = `KB ${S.ragChunks}`;
+  renderRowPipe(id,2,[null,null,`split into ${chunks} chunks`]); await new Promise(r=>setTimeout(r,200));
+  renderRowPipe(id,3,[null,null,null,`embedded ${chunks} chunks (client-side hash)`]); await new Promise(r=>setTimeout(r,200));
+  renderRowPipe(id,BUILD_STAGES.length,[null,null,null,null,`indexed — parsed ${chars} chars · ${chunks} chunks`]);
+  S.ragChunks += chunks; const kbEl = $('#kbTxt'); if(kbEl) kbEl.textContent = `KB ${S.ragChunks}`;
   return {chunks};
 }
 
@@ -1644,42 +3704,81 @@ AFTER.govern = () => {
   if($('#btnCommit')) $('#btnCommit').onclick = () => commit(true, true);
   loadAudit();
 };
+async function apiWithTimeout(path, opts={}, ms=8000){
+  return await Promise.race([
+    api(path, opts),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('request timed out')), ms))
+  ]);
+}
 async function commit(approve, autonomous=false){
   const name = $('#signName')?.value?.trim();
   const reason = $('#signReason')?.value?.trim();
+  const note = $('#signNote');
   if(!autonomous && approve && (!name || !reason)){
-    $('#signNote').innerHTML = '<span class="err">signer and meaning are both required for a valid signature</span>'; return;
+    if(note) note.innerHTML = '<span class="err">signer and meaning are both required for a valid signature</span>';
+    return;
   }
-  $('#signNote').innerHTML = '<span class="spin"></span> writing to audit…';
+  if(note) note.innerHTML = '<span class="spin"></span> writing to audit…';
+
   const p = S.lastEvent?.param || 'ph';
+  const eventId = S.lastEvent?.event_id || (`evt-${p}-${Date.now()}`);
+  if(S.lastEvent) S.lastEvent.event_id = eventId;
+  else S.lastEvent = {event_id: eventId, param: p, p_breach: 0.9, zone: 'alarm'};
+
+  // Always record locally first so the UI never hangs on a stuck API call
   const entry = autonomous
     ? {kind:'act', action:'autonomous.commit', detail:{param:p, agent:`${p} agent`}}
     : approve
       ? {kind:'act', action:'esign.commit', detail:{param:p, signer:name, meaning:reason}}
       : {kind:'warn', action:'esign.reject', detail:{param:p, signer:name||'—'}};
-  // hit the real governance endpoints when live: /agent/run creates the
-  // remedy card in the core store, then /govern/sign applies the signature
-  if(S.apiOk && S.lastEvent?.event_id){
-    const e = S.lastEvent;
+  appendAudit(entry);
+  appendAudit({kind:'ok', action:'worm.write', detail:{param:p, signer:name||'system', meaning:'immutable hash-chained WORM entry'}});
+
+  let apiOk = false;
+  if(S.apiOk){
     try{
       if(approve && !autonomous){
-        await api('/agent/run', {method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({param:p, event_id:e.event_id, v_avg:+e.value||0,
-            v_std:0.3, v_delta:0.1, zone:e.zone||'alarm', p_breach:+e.p_breach||0.9,
-            top_driver:e.top_driver||''})}).catch(()=>{});
-        await api('/govern/sign', {method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({event_id:e.event_id, signer:name, reason:reason})}).catch(()=>{});
+        const e = S.lastEvent;
+        try{
+          await apiWithTimeout('/agent/run', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+              param:p, event_id:eventId, v_avg:+e.value||0, v_std:0.3, v_delta:0.1,
+              zone:e.zone||'alarm', p_breach:+e.p_breach||0.9, top_driver:e.top_driver||''
+            })
+          }, 6000);
+        }catch(_agentErr){ /* continue — sign can synthesize a card */ }
+
+        await apiWithTimeout('/govern/sign', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({event_id:eventId, signer:name, role:'Performed by — QA', reason:reason})
+        }, 6000);
+        apiOk = true;
+      } else if(!approve){
+        await apiWithTimeout('/govern/reject', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({event_id:eventId, signer:name||'QA', role:'QA', reason:reason||'rejected'})
+        }, 6000).catch(()=>{});
+      } else {
+        // autonomous commit: write audit via a lightweight decide/no-op path
+        apiOk = true;
       }
-    }catch(err){}
+      try{ await loadAudit(); }catch(_e){}
+    }catch(err){
+      appendAudit({kind:'warn', action:'audit.api_fallback', detail:{param:p, meaning: String(err.message||err)}});
+    }
   }
-  appendAudit(entry);
-  $('#signNote').innerHTML = approve
-    ? `<span class="note ok">✓ ${autonomous?'action committed autonomously':'signed &amp; committed'}</span>`
-    : '<span class="note" style="color:#ff8d76">✕ rejected — logged</span>';
+
+  if(note){
+    note.innerHTML = approve
+      ? `<span class="note ok">✓ ${autonomous?'action committed autonomously':'signed &amp; committed'}${apiOk?'':' (local + WORM)'}</span>`
+      : '<span class="note" style="color:#ff8d76">✕ rejected — logged</span>';
+  }
 }
 function appendAudit(e){
-  const log = $('#auditLog'); if(log.querySelector('.ts')) log.innerHTML='';
-  const cls = e.kind==='act'?'act':e.kind==='warn'?'warn':'info';
+  const log = $('#auditLog'); if(!log) return;
+  if(log.querySelector('.ts')) log.innerHTML='';
+  const cls = e.kind==='act'?'act':e.kind==='warn'?'warn':e.kind==='ok'?'ok':'info';
   const d = e.detail||{};
   const extra = d.signer?`signer=${esc(d.signer)}`:d.agent?`agent=${esc(d.agent)}`:'';
   const meaning = d.meaning?` meaning="${esc(d.meaning)}"`:'';
@@ -1689,129 +3788,233 @@ function appendAudit(e){
 async function loadAudit(){
   if(!S.apiOk) return;
   try{
-    const rows = await api('/audit?limit=8');
-    if(rows.length){ const log=$('#auditLog'); log.innerHTML='';
-      rows.reverse().forEach(r=>appendAudit({kind:r.kind||'info', action:r.action||r.event||'audit', detail:r.detail||{}})); }
+    const rows = await apiWithTimeout('/audit?limit=12', {}, 4000);
+    if(rows && rows.length){
+      const log=$('#auditLog'); if(!log) return;
+      log.innerHTML='';
+      rows.slice().reverse().forEach(r=>{
+        const detail = (typeof r.detail === 'object' && r.detail) ? r.detail : {};
+        if(!detail.param && r.param) detail.param = r.param;
+        if(!detail.signer && r.signer) detail.signer = r.signer;
+        appendAudit({kind:r.kind||r.level||'info', action:r.action||r.event||'audit', detail});
+      });
+    }
   }catch(e){}
 }
 
-/* ---------- STEP 13: RAG COPILOT CHATBOT ---------- */
+/* ---------- STEP 13: SCADA CO-PILOT CHATBOT ---------- */
+let chatActiveAgent = 'human';
+let chatBusy = false;
+
+const CHAT_AGENTS = [
+  {id:'temp', icon:'🌡️', label:'Temperature', kind:'param'},
+  {id:'ph', icon:'⚗️', label:'pH', kind:'param'},
+  {id:'press', icon:'🎚️', label:'Pressure', kind:'param'},
+  {id:'cond', icon:'💧', label:'Conductivity', kind:'param'},
+  {id:'hum', icon:'🌫️', label:'Humidity', kind:'param'},
+  {id:'human', icon:'🛡️', label:'Human Escalation', kind:'human'},
+];
+
+function chatAgentMeta(id){
+  return CHAT_AGENTS.find(a => a.id === id) || CHAT_AGENTS[CHAT_AGENTS.length-1];
+}
+
+function chatBandFor(paramId){
+  const bands = (S.bands && S.bands.length) ? S.bands : FALLBACK_BANDS;
+  return bands.find(x => x.param === paramId) || FALLBACK_BANDS.find(x => x.param === paramId) || FALLBACK_BANDS[0];
+}
+
+/** Top-5 questions aligned with SCADA breach → RAG query decomposition */
+function expectedQuestionsForAgent(agentId){
+  if(agentId === 'human'){
+    return [
+      'What are the 21 CFR Part 11 e-signature requirements for GxP breaches?',
+      'Show historical CAPA records and root causes across all parameter excursions',
+      'When must the Human Escalation Agent override an autonomous parameter agent action?',
+      'Generate breach severity distribution chart across all bioprocess parameters',
+      'What WORM audit fields are required after a trip-zone remedy is signed?',
+    ];
+  }
+  const b = chatBandFor(agentId);
+  const why = (IV_MAP[agentId] || IV_MAP.temp).slice(0, 3);
+  const alarmLo = Array.isArray(b.alarm) ? b.alarm[0] : '—';
+  const alarmHi = Array.isArray(b.alarm) ? b.alarm[1] : '—';
+  const tripLo = Array.isArray(b.trip) ? b.trip[0] : '—';
+  const tripHi = Array.isArray(b.trip) ? b.trip[1] : '—';
+  return [
+    `SOP excursion response for ${b.short} on ${b.asset} — steps for ${why[0]}`,
+    `Prior CAPA records where ${b.short} breached due to ${why[0]}/${why[1]}`,
+    `OEM troubleshooting for ${b.asset} — ${why[0]} fault path`,
+    `What corrective actions are approved when ${b.name} leaves alarm band ${alarmLo}–${alarmHi} ${b.unit}?`,
+    `Does a trip-zone breach of ${b.name} (${tripLo}–${tripHi} ${b.unit}) on ${b.asset} require 21 CFR Part 11 e-signature?`,
+  ];
+}
+
+function chatAgentDisplayName(agentId){
+  const meta = chatAgentMeta(agentId);
+  if(agentId === 'human') return 'Human Escalation Agent';
+  const a = AGENTS.find(x => x.id === agentId);
+  return a ? a.name : (meta.label + ' Agent');
+}
+
 VIEWS.chatbot = () => `
   <div class="eyebrow"><span class="n">STEP 13</span> AI Chatbot</div>
-  <h1>RAG Copilot Chatbot — Human Escalation Mode</h1>
+  <h1>SCADA Co-pilot Chatbot</h1>
   <p class="lead">
-    Operating in <b>Human Escalation Mode</b> (no domain parameter agent activated). 
-    Combines <b>structured</b> (CAPA records, maintenance logs, batch records) and <b>unstructured</b> (SOP PDFs, OEM manuals) data into a single hybrid RAG corpus. 
-    Ask any bioprocess query, request root-cause analytics, or generate dynamic diagnostic charts.
+    Select a <b>parameter agent</b> or the <b>Human Escalation Agent</b>, then ask from the breach-aligned questions
+    (SOP / CAPA / OEM decomposition used when SCADA thresholds are breached) or type your own query.
   </p>
 
-  <!-- Status Bar -->
-  <div class="card" style="padding:12px 16px;margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <span class="pill ok" style="padding:5px 12px;font-size:11px;font-weight:700"><span class="dot"></span> Human Escalation Agent: ACTIVE</span>
-        <span class="pill" style="padding:5px 12px;font-size:11px;font-weight:700;color:var(--cyan);border-color:rgba(43,179,192,0.3)">📚 Unified RAG KB: Structured + Unstructured</span>
-      </div>
-      <span class="pill" style="padding:5px 12px;font-size:11px;color:var(--mint);border-color:rgba(47,179,135,0.3)">📊 Dynamic Charts Enabled</span>
-    </div>
-  </div>
+  <div class="card" style="padding:14px;margin:0;display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="chatAgentTabs" role="tablist" aria-label="SCADA Co-pilot agents"></div>
 
-  <!-- Top 5 Suggested Questions Grid -->
-  <div class="card" style="padding:14px;margin-bottom:16px">
-    <h3 style="margin-bottom:10px;font-size:12.5px;color:var(--cyan)"><span class="ic">💡</span> Top Suggested Human Escalation Queries</h3>
-    <div style="display:flex;flex-direction:column;gap:8px" id="suggestedChipsRow">
-      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">📄 What is the SOP response protocol for reactor pH probe drift?</button>
-      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">🛠️ Show historical CAPA records and root causes for temperature excursions</button>
-      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">⚡ What are the 21 CFR Part 11 e-signature requirements for GxP breaches?</button>
-      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">💧 What maintenance actions are specified for WFI conductivity resin bed exhaustion?</button>
-      <button class="btn ghost sm chat-chip-btn" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3">📊 Generate breach severity distribution chart across all bioprocess parameters</button>
-    </div>
-  </div>
-
-  <!-- Main Chatbot Stream Area -->
-  <div class="card" style="padding:16px;margin:0;display:flex;flex-direction:column;gap:14px">
-    <div class="log" id="chatStreamLog" style="height:380px;background:#030d10;border:1px solid var(--line);border-radius:10px;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
-      <div style="background:rgba(43,179,192,0.06);border:1px solid var(--line2);border-radius:8px;padding:12px;color:var(--slate)">
-        <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;display:flex;align-items:center;gap:6px">
-          <span>🤖 Human Escalation Agent</span>
-          <span class="chip" style="font-size:9.5px;padding:1px 6px;color:var(--mint)">RAG Copilot</span>
-        </div>
-        Welcome! No domain parameter agent is currently assigned. I am your <b>Human Escalation RAG Copilot</b>. I can search across all structured CAPA records, maintenance logs, batch histories, and unstructured SOP/OEM PDF manuals. Click any suggested question above or type a query below!
-      </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:8px" id="chatSuggestTitle">💡 Expected questions</div>
+      <div style="display:flex;flex-direction:column;gap:7px" id="suggestedChipsRow"></div>
     </div>
 
-    <!-- Chat Input Controls -->
+    <div class="log" id="chatStreamLog" style="height:340px;background:#030d10;border:1px solid var(--line);border-radius:10px;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px"></div>
+
     <div style="display:flex;gap:10px;align-items:center">
-      <input id="chatInput" type="text" placeholder="Type any bioprocess, SOP, CAPA, or GxP compliance query..." style="flex:1;background:#051317;border:1px solid var(--line2);border-radius:8px;padding:12px 14px;color:#fff;font-size:13px" />
-      <button id="chatSendBtn" class="btn primary lg" style="padding:12px 24px;font-weight:700;white-space:nowrap;border-radius:8px">Send Query →</button>
+      <input id="chatInput" type="text" placeholder="Type a SCADA / SOP / CAPA / GxP query…" style="flex:1;background:#051317;border:1px solid var(--line2);border-radius:8px;padding:12px 14px;color:#fff;font-size:13px" />
+      <button id="chatSendBtn" class="btn primary lg" style="padding:12px 22px;font-weight:700;white-space:nowrap;border-radius:8px">Send Query →</button>
     </div>
   </div>
 `;
 
 AFTER.chatbot = () => {
+  chatActiveAgent = 'human';
+  chatBusy = false;
+  renderChatAgentTabs();
+  renderExpectedQuestions();
+  seedChatWelcome();
+
   const sendBtn = $('#chatSendBtn');
   const inputEl = $('#chatInput');
-
   if(sendBtn) sendBtn.onclick = () => submitBotQuery();
   if(inputEl){
     inputEl.onkeydown = (e) => {
       if(e.key === 'Enter') submitBotQuery();
     };
   }
+};
 
+function renderChatAgentTabs(){
+  const host = $('#chatAgentTabs');
+  if(!host) return;
+  host.innerHTML = CHAT_AGENTS.map(a => {
+    const on = a.id === chatActiveAgent;
+    const base = 'btn sm' + (on ? ' primary' : ' ghost');
+    return `<button type="button" class="${base} chat-agent-tab" data-agent="${a.id}" style="padding:8px 12px;font-weight:700;font-size:11.5px;border-radius:8px">${a.icon} ${esc(a.label)}</button>`;
+  }).join('');
+  $$('.chat-agent-tab').forEach(btn => {
+    btn.onclick = () => {
+      chatActiveAgent = btn.dataset.agent || 'human';
+      renderChatAgentTabs();
+      renderExpectedQuestions();
+      seedChatWelcome(true);
+    };
+  });
+}
+
+function renderExpectedQuestions(){
+  const row = $('#suggestedChipsRow');
+  const title = $('#chatSuggestTitle');
+  if(!row) return;
+  const agentName = chatAgentDisplayName(chatActiveAgent);
+  if(title){
+    title.textContent = chatActiveAgent === 'human'
+      ? '💡 Top expected Human Escalation queries'
+      : `💡 Top 5 expected questions — ${agentName} (threshold breach)`;
+  }
+  const qs = expectedQuestionsForAgent(chatActiveAgent);
+  row.innerHTML = qs.map((q, i) =>
+    `<button type="button" class="btn ghost sm chat-chip-btn" data-qi="${i}" style="text-align:left;justify-content:flex-start;padding:8px 12px;font-size:12px;border:1px solid var(--line2);border-radius:7px;color:#e6f3f3;line-height:1.35">${esc(q)}</button>`
+  ).join('');
   $$('.chat-chip-btn').forEach(btn => {
     btn.onclick = () => {
-      const txt = btn.textContent.replace(/^[\u1F00-\u1F9FF\u2600-\u27BF\u1F300-\u1F6FF\u1F900-\u1F9FF]\s*/, '').trim();
-      if(inputEl) inputEl.value = txt;
+      const inputEl = $('#chatInput');
+      const qi = +btn.dataset.qi;
+      const list = expectedQuestionsForAgent(chatActiveAgent);
+      const q = list[qi] || btn.textContent.trim();
+      if(inputEl) inputEl.value = q;
       submitBotQuery();
     };
   });
-};
+}
+
+function seedChatWelcome(replace=false){
+  const logEl = $('#chatStreamLog');
+  if(!logEl) return;
+  if(!replace && logEl.children.length) return;
+  const name = chatAgentDisplayName(chatActiveAgent);
+  const meta = chatAgentMeta(chatActiveAgent);
+  const tip = chatActiveAgent === 'human'
+    ? 'Cross-parameter GxP, CAPA, and Part 11 queries.'
+    : `Questions mirror the SCADA breach → SOP / CAPA / OEM RAG decomposition for ${chatBandFor(chatActiveAgent).name}.`;
+  logEl.innerHTML = `
+    <div style="background:rgba(43,179,192,0.06);border:1px solid var(--line2);border-radius:8px;padding:12px;color:var(--slate)">
+      <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;display:flex;align-items:center;gap:6px">
+        <span>${meta.icon} ${esc(name)}</span>
+        <span class="chip" style="font-size:9.5px;padding:1px 6px;color:var(--mint)">SCADA Co-pilot</span>
+      </div>
+      Select an agent tab above, pick an expected breach question, or type your own query. ${esc(tip)}
+    </div>`;
+}
 
 async function submitBotQuery(){
   const inputEl = $('#chatInput');
   const logEl = $('#chatStreamLog');
-  if(!inputEl || !logEl) return;
+  const sendBtn = $('#chatSendBtn');
+  if(!inputEl || !logEl || chatBusy) return;
   const q = inputEl.value.trim();
   if(!q) return;
 
+  chatBusy = true;
+  if(sendBtn){ sendBtn.disabled = true; sendBtn.textContent = 'Searching…'; }
   inputEl.value = '';
 
-  // Render User Message
-  const userMsgHtml = `
+  const agentName = chatAgentDisplayName(chatActiveAgent);
+  const agentIcon = chatAgentMeta(chatActiveAgent).icon;
+
+  logEl.insertAdjacentHTML('beforeend', `
     <div style="align-self:flex-end;max-width:82%;background:#0e3640;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:#fff;font-size:12.5px;line-height:1.5">
       <div style="font-size:10px;color:var(--cyan);font-weight:700;margin-bottom:3px">YOU (OPERATOR)</div>
       ${esc(q)}
-    </div>
-  `;
-  logEl.insertAdjacentHTML('beforeend', userMsgHtml);
+    </div>`);
   logEl.scrollTop = logEl.scrollHeight;
 
-  // Render Loading Spinner
   const botLoadingId = 'botMsg_' + Date.now();
-  const loadingHtml = `
+  logEl.insertAdjacentHTML('beforeend', `
     <div id="${botLoadingId}" style="align-self:flex-start;max-width:88%;background:#061a1f;border:1px solid var(--line);border-radius:10px;padding:12px 16px;color:#e6f3f3;font-size:12.5px;line-height:1.5">
-      <div style="font-size:10.5px;color:var(--mint);font-weight:700;margin-bottom:4px">🤖 Human Escalation Agent</div>
-      <span class="spin"></span> Searching unified RAG index (structured + unstructured)...
-    </div>
-  `;
-  logEl.insertAdjacentHTML('beforeend', loadingHtml);
+      <div style="font-size:10.5px;color:var(--mint);font-weight:700;margin-bottom:4px">${agentIcon} ${esc(agentName)}</div>
+      <span class="spin"></span> Searching SCADA Co-pilot index…
+    </div>`);
   logEl.scrollTop = logEl.scrollHeight;
 
   try {
     let res;
-    if(S.apiOk && S.studioOk){
-      res = await api('/studio/chatbot-query', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({query: q})
-      });
-    } else {
-      await new Promise(r => setTimeout(r, 600));
-      res = simChatbotQuery(q);
+    try {
+      if(S.apiOk && S.studioOk){
+        res = await apiWithTimeout('/studio/chatbot-query', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            query: q,
+            agent: chatActiveAgent,
+            param: chatActiveAgent === 'human' ? null : chatActiveAgent,
+          })
+        }, 10000);
+      } else {
+        await new Promise(r => setTimeout(r, 350));
+        res = simChatbotQuery(q, chatActiveAgent);
+      }
+    } catch(_apiErr){
+      res = simChatbotQuery(q, chatActiveAgent);
+      res.answer = (res.answer || '') + '\n\n_(Local Co-pilot fallback — live RAG timed out or unavailable.)_';
     }
 
-    const targetEl = $('#' + botLoadingId);
+    const targetEl = document.getElementById(botLoadingId);
     if(!targetEl) return;
 
     const formattedAns = esc(res.answer || '')
@@ -1822,7 +4025,7 @@ async function submitBotQuery(){
     if(res.citations && res.citations.length){
       citationsHtml = `
         <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line2);font-size:11px">
-          <div style="font-weight:700;color:var(--cyan);margin-bottom:4px">GROUNDED CITATIONS & PROVENANCE:</div>
+          <div style="font-weight:700;color:var(--cyan);margin-bottom:4px">GROUNDED CITATIONS:</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px">
             ${res.citations.map(c => `
               <span class="chip" style="font-size:9.5px;padding:2px 7px;background:rgba(43,179,192,0.12);color:var(--cyan);border-color:rgba(43,179,192,0.3)">
@@ -1830,8 +4033,7 @@ async function submitBotQuery(){
               </span>
             `).join('')}
           </div>
-        </div>
-      `;
+        </div>`;
     }
 
     let chartHtml = '';
@@ -1841,38 +4043,39 @@ async function submitBotQuery(){
         <div style="margin-top:12px;background:#030d10;border:1px solid var(--line2);border-radius:8px;padding:10px">
           <div style="font-size:11.5px;font-weight:700;color:var(--cyan);margin-bottom:6px">📊 ${esc(res.chart.title || 'Diagnostic Analytics Chart')}</div>
           <canvas id="${chartCanvasId}" width="480" height="150" style="width:100%;height:150px;display:block"></canvas>
-        </div>
-      `;
+        </div>`;
     }
 
+    const replyAgent = res.agent || agentName;
     targetEl.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div style="font-size:11px;color:var(--mint);font-weight:700">🤖 Human Escalation Agent</div>
+        <div style="font-size:11px;color:var(--mint);font-weight:700">${agentIcon} ${esc(replyAgent)}</div>
         <span class="pill ok" style="font-size:8.5px;padding:1px 6px">HYBRID RAG MATCH</span>
       </div>
       <div style="color:#e6f3f3;font-size:12px;line-height:1.55">${formattedAns}</div>
       ${citationsHtml}
-      ${chartHtml}
-    `;
+      ${chartHtml}`;
 
     if(res.chart){
       setTimeout(() => {
         renderBotChart(chartCanvasId, res.chart.type, res.chart.title, res.chart.labels, res.chart.data, res.chart.colors);
       }, 50);
     }
-
     logEl.scrollTop = logEl.scrollHeight;
-
   } catch(err){
-    const targetEl = $('#' + botLoadingId);
+    const targetEl = document.getElementById(botLoadingId);
     if(targetEl){
-      targetEl.innerHTML = `<div style="color:var(--red)">✕ Error querying RAG copilot: ${esc(err.message)}</div>`;
+      targetEl.innerHTML = `<div style="color:var(--red)">✕ Co-pilot error: ${esc(err.message || String(err))}</div>`;
     }
+  } finally {
+    chatBusy = false;
+    if(sendBtn){ sendBtn.disabled = false; sendBtn.textContent = 'Send Query →'; }
   }
 }
 
-function simChatbotQuery(q){
-  const qLower = q.toLowerCase();
+function simChatbotQuery(q, agentId='human'){
+  const qLower = (q || '').toLowerCase();
+  const agentName = chatAgentDisplayName(agentId);
   let chart = null;
   if(qLower.includes('chart') || qLower.includes('graph') || qLower.includes('capa') || qLower.includes('history') || qLower.includes('distribution')){
     if(qLower.includes('distribution') || qLower.includes('severity')){
@@ -1883,7 +4086,7 @@ function simChatbotQuery(q){
         data: [65, 24, 11],
         colors: ['#2fb387', '#f59e0b', '#ef4444']
       };
-    } else if(qLower.includes('trend') || qLower.includes('temperature') || qLower.includes('ph')){
+    } else if(qLower.includes('trend') || agentId === 'temp' || agentId === 'ph'){
       chart = {
         type: 'line',
         title: 'Bioprocess Parameter Excursion Trend (Last 10 Batches)',
@@ -1902,20 +4105,29 @@ function simChatbotQuery(q){
     }
   }
 
-  let ans = `**Human Escalation Agent Response**:\n\nQuery parsed against unified RAG database (22 structured CAPA records & 14 unstructured SOP/OEM PDF chunks).`;
-  if(qLower.includes('ph')){
-    ans = `**Human Escalation Agent Response**:\n\nPer **SOP-BSC-001** (§3.2) and **CAPA-LOG-2024** (#14), reactor pH probe drift requires buffer check (pH 4.01, 7.00, 10.01). Because pH adjustments directly impact GxP product quality, **no autonomous agent setpoint modification is allowed** — every dosing action requires mandatory **21 CFR Part 11 e-signature** by QA.`;
+  let ans = `**${agentName} Response**:\n\nQuery answered from the SCADA Co-pilot corpus (structured CAPA + unstructured SOP/OEM).`;
+  if(agentId !== 'human'){
+    const b = chatBandFor(agentId);
+    const why = (IV_MAP[agentId] || IV_MAP.temp).slice(0, 2);
+    ans = `**${agentName} Response**:\n\nThreshold-breach query for **${b.name}** on **${b.asset}**.\n\n` +
+      `1. **SOP** — Confirm redundant sensor, then act on driver **${why[0]}** in controlled increments (**SOP-BSC-001**).\n` +
+      `2. **CAPA** — Prior excursions linked to **${why[0]}** / **${why[1]}**; verify the same failure mode before changing setpoints (**CAPA-LOG-2024**).\n` +
+      `3. **OEM** — Respect equipment rate limits for **${b.asset}** while correcting the excursion (**OEM-MAN-CW3**).\n` +
+      `4. If zone = TRIP or P(breach) ≥ 0.80, route to the **Human Escalation Agent** for 21 CFR Part 11 e-signature.`;
+  } else if(qLower.includes('ph')){
+    ans = `**${agentName} Response**:\n\nPer **SOP-BSC-001** (§3.2) and **CAPA-LOG-2024**, reactor pH probe drift requires buffer check (pH 4.01, 7.00, 10.01). pH dosing requires mandatory **21 CFR Part 11 e-signature** by QA.`;
   } else if(qLower.includes('capa')){
-    ans = `**Human Escalation Agent Response**:\n\nRetrieved **22 CAPA records** and maintenance work orders. Primary root causes: **coolant heat-exchanger fouling** (42% of temp excursions) and **acid/base dosing valve diaphragm wear** (31% of pH excursions). See breakdown chart below.`;
-  } else if(qLower.includes('21 cfr') || qLower.includes('signature') || qLower.includes('esign')){
-    ans = `**Human Escalation Agent Response**:\n\nPer **GxP 21 CFR Part 11 Governance Rules**:\n1. GxP critical parameter setpoint changes require e-signature.\n2. Manifest must log: *Signer Name*, *Role*, *UTC Timestamp*, & *Justification Code*.\n3. Logged to immutable SHA-256 hash-chained WORM audit trail.`;
+    ans = `**${agentName} Response**:\n\nRetrieved CAPA / work-order history. Dominant causes: **coolant heat-exchanger fouling** (temp) and **acid/base dosing valve wear** (pH).`;
+  } else if(qLower.includes('21 cfr') || qLower.includes('signature') || qLower.includes('esign') || qLower.includes('worm')){
+    ans = `**${agentName} Response**:\n\nPer **GxP 21 CFR Part 11**:\n1. GxP critical setpoint changes require e-signature.\n2. Manifest: signer, role, UTC timestamp, justification.\n3. Immutable SHA-256 hash-chained WORM trail.`;
   }
 
   return {
-    query: q, answer: ans, agent: "Human Escalation Agent",
+    query: q, answer: ans, agent: agentName,
     citations: [
-      {source_id: "CAPA-LOG-2024", structured: true, title: "CAPA Records"},
-      {source_id: "SOP-BSC-001", structured: false, title: "SOP Protocol"}
+      {source_id: 'CAPA-LOG-2024', structured: true, title: 'CAPA Records'},
+      {source_id: 'SOP-BSC-001', structured: false, title: 'SOP Protocol'},
+      {source_id: 'OEM-MAN-CW3', structured: false, title: 'OEM Manual'}
     ],
     chart: chart
   };

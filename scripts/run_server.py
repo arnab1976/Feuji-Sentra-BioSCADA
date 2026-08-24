@@ -9,8 +9,8 @@ import uvicorn
 from main import app
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8080"))
+    port = int(os.getenv("PORT", "8085"))
     log_level = os.getenv("LOG_LEVEL", "info").lower()
-    host = os.getenv("HOST", "::")
-    print(f"Launching BioSCADA AI Server on http://localhost:{port}/studio (Dual-stack host='{host}') ...")
+    host = os.getenv("HOST", "0.0.0.0")
+    print(f"Launching BioSCADA AI Server on http://127.0.0.1:{port}/studio (host='{host}') ...")
     uvicorn.run(app, host=host, port=port, log_level=log_level)
